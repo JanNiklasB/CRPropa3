@@ -4,6 +4,7 @@
 #include "crpropa/Common.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Vector3.h"
+#include "crpropa/Geometry.h"
 
 #include <vector>
 #include <string>
@@ -24,7 +25,8 @@ public:
 	PhotonField() {
 		this->fieldName = "AbstractPhotonField";
 		this->isRedshiftDependent = false;
-    this->isPositionDependent = false;
+        this->isPositionDependent = false;
+        this->surface = nullptr;
 	}
 
 	/**
@@ -53,10 +55,14 @@ public:
 		return this->isRedshiftDependent;
 	}
     
-  bool hasPositionDependence() const {
-      return this->isPositionDependent;     
-  }
+    bool hasPositionDependence() const {
+        return this->isPositionDependent;
+    }
 
+    bool hasSurface() const {
+        return this->surface != nullptr;
+    }
+    
 	void setFieldName(std::string fieldName) {
 		this->fieldName = fieldName;
 	}
@@ -64,7 +70,8 @@ public:
 protected:
 	std::string fieldName;
 	bool isRedshiftDependent;
-  bool isPositionDependent;
+    bool isPositionDependent;
+    ref_ptr<Surface> surface;
 };
 
 /**
@@ -78,7 +85,7 @@ protected:
  */
 class TabularPhotonField: public PhotonField {
 public:
-	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true);
+	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true); // Surface* surface = nullptr
 
 	double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
 	double getRedshiftScaling(double z) const;
@@ -110,7 +117,7 @@ protected:
  */
 class TabularSpatialPhotonField: public PhotonField {
 public:
-    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true);
+    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true, Surface* surface = nullptr);
     
     double getPhotonDensity(double ePhoton = 0., double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
     double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const;
@@ -120,7 +127,11 @@ protected:
     std::vector<double> readPhotonEnergy(std::string filePath);
     std::vector<double> readPhotonDensity(std::string filePath);
     void checkInputData() const;
-    std::string splitFilename (const std::string str) const;
+    std::string splitFilename(const std::string str) const;
+    
+    /** Apply a surface that confine the position dependent photon field
+     * @param surface closed surface to confine the grid to be  uploaded */
+    void setSurface(Surface* surface);
     
     std::vector<double> photonEnergies; // assuming all the nodes in the grid have the same energy binning!
     std::vector<std::vector<double>> photonDensity;
@@ -321,7 +332,7 @@ public:
  */
 class ISRF_Freudenreich98: public TabularSpatialPhotonField {
 public:
-    ISRF_Freudenreich98() : TabularSpatialPhotonField("ISRF_Freudenreich98", false, true) {}
+    ISRF_Freudenreich98(Surface* surface) : TabularSpatialPhotonField("ISRF_Freudenreich98", false, true, surface) {}
 };
 
 /**
@@ -334,7 +345,7 @@ public:
  */
 class ISRF_Robitaille12: public TabularSpatialPhotonField {
 public:
-    ISRF_Robitaille12() : TabularSpatialPhotonField("ISRF_Robitaille12", false, true) {}
+    ISRF_Robitaille12(Surface* surface) : TabularSpatialPhotonField("ISRF_Robitaille12", false, true, surface) {}
 };
 
 /**

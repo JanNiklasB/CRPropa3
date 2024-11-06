@@ -2,6 +2,7 @@
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 #include "crpropa/Vector3.h"
+#include "crpropa/Geometry.h"
 
 #include "kiss/logger.h"
 
@@ -20,7 +21,7 @@ namespace crpropa {
 TabularPhotonField::TabularPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent) {
 	this->fieldName = fieldName;
 	this->isRedshiftDependent = isRedshiftDependent;
-  this->isPositionDependent = isPositionDependent;
+    this->isPositionDependent = isPositionDependent;
 
     if (this->isPositionDependent) {
         throw std::runtime_error("Photon Field " + fieldName + " is position dependent! It is not the correct class. \n");
@@ -180,10 +181,13 @@ void TabularPhotonField::checkInputData() const {
 	}
 }
 
-TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent) {
+TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent, Surface* surface) {
     this->fieldName = fieldName;
     this->isRedshiftDependent = isRedshiftDependent;
     this->isPositionDependent = isPositionDependent;
+    this->surface = surface;
+    
+    int nLoadedFiles = 0;
     
     if (this->isRedshiftDependent) {
         
@@ -211,7 +215,6 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
     
         std::__fs::filesystem::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
         
-        // for cycle over the files in the photon field path. Building a photonDictionary, filling this->photonDensity.
         for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dirD}) {
             
             double x, y, z;
@@ -229,7 +232,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
             
             while (getline(ss, str, '_')) {
                 if (iLine == 2) {
-                    x = stod(str) * kpc;
+                    x = -stod(str) * kpc;
                 }
                 if (iLine == 3) {
                     y = stod(str) * kpc;
@@ -241,20 +244,32 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
             }
             
             Vector3d vPos(x, y, z);
+            
+            if (hasSurface() and !surface->isInside(vPos))
+                continue;
+                
             photonDict[iFile] = vPos;
             
+            nLoadedFiles = nLoadedFiles + 1;
             iFile = iFile + 1;
             
             std::vector<double> vD = readPhotonDensity(dir_entry.path().string());
-            
             this->photonDensity.push_back(vD);
             
         }
         
-        this->photonDict = photonDict;
+        std::cout << "nLoadedFiles: " << nLoadedFiles << std::endl;
         
+        if (this->photonDensity.empty())
+            throw std::runtime_error("Tabular spatial photon field for " + fieldName + " empty! Check if the surface is properly set.");
+        
+        this->photonDict = photonDict;
         checkInputData();
     }
+}
+
+void TabularSpatialPhotonField::setSurface(Surface* surface) {
+    this->surface = surface;
 }
 
 std::string TabularSpatialPhotonField::splitFilename(const std::string str) const {

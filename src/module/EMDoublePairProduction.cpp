@@ -170,6 +170,9 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
         infile.close();
     }
 
+    if (tabRate.empty())
+        throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
+    
     intRatesPosDep->setTabulatedRate(tabRate);
     intRatesPosDep->setPhotonDict(photonDict);
     

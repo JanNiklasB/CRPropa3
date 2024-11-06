@@ -178,7 +178,7 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
         if (vecRate.size() != vecEnergy1.size()) {
             nRSups = nRSups + 1;
             std::cout << std::fixed << std::setprecision(7);
-            std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
+            // std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
         }
         
         tabRate.push_back(vecRate);
@@ -186,7 +186,11 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
         iFile = iFile + 1;
         infile.close();
     }
-    std::cout << "# sousp rate: " << nRSups << std::endl;
+    // std::cout << "# sousp rate: " << nRSups << std::endl;
+    
+    if (tabRate.empty())
+        throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
+    
     intRatesPosDep->setTabulatedRate(tabRate);
     intRatesPosDep->setPhotonDict(photonDict);
 }
