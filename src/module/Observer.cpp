@@ -308,7 +308,7 @@ void ObserverTimeEvolution::addTimeRange(double min, double max, double numb, bo
 		if (log == true) {
 			addTime(min * pow(max / min, i / (numb - 1.0)));
 		} else {
-			addTime(min + i * (max - min) / numb);
+			addTime(min + i * (max - min) / (numb - 1.0));
 		}
 	}
 }
