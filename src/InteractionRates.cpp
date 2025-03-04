@@ -120,14 +120,15 @@ std::vector<double> InteractionRatesPositionDependent::getClosestRate(const Vect
     
     std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
     
-    double dMin = 1000. * kpc;
+    double dMin = 100. * kpc;
     int iMin = -1;
     
     for (const auto& el : photonDict) {
         
         Vector3d posNode = el.second;
-        double d;
-        d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
+        double d = posNode.getDistanceTo(position);
+        
+        // double dForm = sqrt((- posNode.x - position.x) * (- posNode.x - position.x) + (posNode.y - position.y) * (posNode.y - position.y) + (posNode.z - position.z) * (posNode.z - position.z));
         
         if (d < dMin) {
             dMin = d;
@@ -141,14 +142,16 @@ std::vector<double> InteractionRatesPositionDependent::getClosests(const Vector3
     
     std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
     
-    double dMin = 1000. * kpc;
+    double dMin = 100. * kpc;
     int iMin = -1;
     
     for (const auto& el : photonDict) {
         
         Vector3d posNode = el.second;
-        double d;
-        d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
+        // double d;
+        // d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
+        
+        double d = posNode.getDistanceTo(position);
         
         if (d < dMin) {
             dMin = d;
@@ -162,14 +165,17 @@ std::vector<std::vector<double>> InteractionRatesPositionDependent::getClosestCD
     
     std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
     
-    double dMin = 1000. * kpc;
+    double dMin = 100. * kpc;
     int iMin = -1;
     
     for (const auto& el : photonDict) {
         
         Vector3d posNode = el.second;
-        double d;
-        d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
+        // double d;
+        // d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
+        
+        double d = posNode.getDistanceTo(position);
+        
         
         if (d < dMin) {
             dMin = d;

@@ -176,10 +176,10 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
         
         tabRate.push_back(vecRate);
         
-        if (vecRate.size() != vecEnergy.size()) {
-            std::cout << std::fixed << std::setprecision(7);
-            std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
-        }
+        //if (vecRate.size() != vecEnergy.size()) {
+        //    std::cout << std::fixed << std::setprecision(7);
+        //    std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
+        //}
         
         iFile = iFile + 1;
         infile.close();
