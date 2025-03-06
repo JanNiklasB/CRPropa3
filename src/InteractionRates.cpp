@@ -4,6 +4,8 @@
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 
+#include <nanoflann.hpp>
+
 #include <vector>
 #include <string>
 #include <unordered_map>
@@ -15,7 +17,7 @@ InteractionRatesHomogeneous::InteractionRatesHomogeneous(std::string ratesName, 
   this->isPositionDependent = isPositionDependent;
     
     // getTables
-    // check for table consistency...
+    // check for table consistency?
     
 }
 
@@ -41,8 +43,6 @@ std::vector<std::vector<double>> InteractionRatesHomogeneous::getTabulatedCDF() 
 
 double InteractionRatesHomogeneous::getProcessRate(const double E, const Vector3d &position) const {
     if (!this->isPositionDependent) {
-        //std::vector<double> tabEnergy = this->getTabulatedEnergy();
-        //std::vector<double> tabRate = this->getTabulatedRate();
         
         // check if in tabulated energy range
         if ((E < this->tabEnergy.front()) or (E > this->tabEnergy.back())) {
@@ -90,6 +90,30 @@ void InteractionRatesHomogeneous::setTabulatedCDF(std::vector<std::vector<double
 InteractionRatesPositionDependent::InteractionRatesPositionDependent(std::string ratesName, bool isPositionDependent) : InteractionRates() {
     this->ratesName = ratesName;
     this->isPositionDependent = isPositionDependent;
+
+}
+
+int InteractionRatesPositionDependent::findClosestGridPoint(const Vector3d &position) const {
+    
+    if (!tree) {
+        throw std::runtime_error("KD-Tree not initialized!");
+    }
+    
+    unsigned int closestIndex;
+    double closestDistSquared;
+    double queryPoint[3] = { position.x, position.y, position.z };
+    
+    this->tree->knnSearch(queryPoint, 1, &closestIndex, &closestDistSquared);
+    
+    /**
+    std::cout << "iMin: " << cloud.ids[closestIndex] << std::endl;
+    
+    std::cout << "position: " << position.x / kpc << " " << position.y / kpc << " " << position.z / kpc << std::endl;
+    
+    std::cout << "node: " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 0) / kpc << " " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 1) / kpc << " " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 2) / kpc << std::endl;
+     */
+    
+    return this->cloud.ids[closestIndex];
 }
 
 std::vector<double> InteractionRatesPositionDependent::getTabulatedEnergy() const {
@@ -117,71 +141,17 @@ std::unordered_map<int, Vector3d> InteractionRatesPositionDependent::getPhotonDi
 }
 
 std::vector<double> InteractionRatesPositionDependent::getClosestRate(const Vector3d &position) const {
-    
-    std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
-    
-    double dMin = 100. * kpc;
-    int iMin = -1;
-    
-    for (const auto& el : photonDict) {
-        
-        Vector3d posNode = el.second;
-        double d = posNode.getDistanceTo(position);
-        
-        // double dForm = sqrt((- posNode.x - position.x) * (- posNode.x - position.x) + (posNode.y - position.y) * (posNode.y - position.y) + (posNode.z - position.z) * (posNode.z - position.z));
-        
-        if (d < dMin) {
-            dMin = d;
-            iMin = el.first;
-        }
-    }
+    int iMin = findClosestGridPoint(position);
     return tabRate[iMin];
 }
 
 std::vector<double> InteractionRatesPositionDependent::getClosests(const Vector3d &position) const {
-    
-    std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
-    
-    double dMin = 100. * kpc;
-    int iMin = -1;
-    
-    for (const auto& el : photonDict) {
-        
-        Vector3d posNode = el.second;
-        // double d;
-        // d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
-        
-        double d = posNode.getDistanceTo(position);
-        
-        if (d < dMin) {
-            dMin = d;
-            iMin = el.first;
-        }
-    }
+    int iMin = findClosestGridPoint(position);
     return tabs[iMin];
 }
 
 std::vector<std::vector<double>> InteractionRatesPositionDependent::getClosestCDF(const Vector3d &position) const {
-    
-    std::unordered_map<int,Vector3d> photonDict = this->getPhotonDict();
-    
-    double dMin = 100. * kpc;
-    int iMin = -1;
-    
-    for (const auto& el : photonDict) {
-        
-        Vector3d posNode = el.second;
-        // double d;
-        // d = sqrt((- posNode.x / kpc - position.x / kpc) * (- posNode.x / kpc - position.x / kpc) + (posNode.y / kpc - position.y / kpc) * (posNode.y / kpc - position.y / kpc) + (posNode.z / kpc - position.z / kpc) * (posNode.z / kpc - position.z / kpc));
-        
-        double d = posNode.getDistanceTo(position);
-        
-        
-        if (d < dMin) {
-            dMin = d;
-            iMin = el.first;
-        }
-    }
+    int iMin = findClosestGridPoint(position);
     return tabCDF[iMin];
 }
 
@@ -192,10 +162,8 @@ double InteractionRatesPositionDependent::getProcessRate(const double E, const V
         
     } else {
         
-        // std::vector<double> tabEnergy = this->getTabulatedEnergy();
         std::vector<double> tabRate = this->getClosestRate(position);
         
-        // check if in tabulated energy range
         if ((E < this->tabEnergy.front()) or (E > this->tabEnergy.back())) {
         //    throw std::runtime_error("Candidate energy out of tables!");
             
@@ -242,6 +210,24 @@ void InteractionRatesPositionDependent::setTabulatedCDF(std::vector<std::vector<
 
 void InteractionRatesPositionDependent::setPhotonDict(std::unordered_map<int, Vector3d>& photonDict) {
     this->photonDict = photonDict;
+    
+    // delete old clouds
+    this->cloud.points.clear();
+    this->cloud.ids.clear();
+    
+    for (const auto& el : this->photonDict) {
+        this->cloud.ids.push_back(el.first);
+        this->cloud.points.push_back(el.second);
+    }
+    
+    // delete old tree
+    if (this->tree) {
+        delete this->tree;
+    }
+    
+    this->tree = new KDTree(3, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    this->tree->buildIndex();
+    
 }
 
 } //namespace crpropa

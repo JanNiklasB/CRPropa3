@@ -439,7 +439,11 @@ else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
 
-
+find_package(nanoflann REQUIRED)
+# add_executable(crpropa test.cpp)
+# Ensure the nanoflann include directory is added
+# include_directories(${nanoflann_INCLUDE_DIRS})
+target_link_libraries(crpropa nanoflann::nanoflann)
 
 # ----------------------------------------------------------------------------
 # Python

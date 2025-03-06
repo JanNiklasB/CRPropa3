@@ -191,6 +191,14 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
     if (tabRate.empty())
         throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
     
+    for (const auto& el : photonDict) {
+        
+        std::cout << "ID: " << el.first << ", Position: ("
+        << el.second.x << ", "
+        << el.second.y << ", "
+        << el.second.z << ")" << std::endl;
+    }
+    
     intRatesPosDep->setTabulatedRate(tabRate);
     intRatesPosDep->setPhotonDict(photonDict);
 }

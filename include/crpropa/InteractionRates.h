@@ -5,11 +5,40 @@
 #include "crpropa/Referenced.h"
 #include "crpropa/Vector3.h"
 
+#include <nanoflann.hpp>
+
 #include <vector>
 #include <string>
 #include <unordered_map>
 
 namespace crpropa {
+
+struct PointCloud {
+    std::vector<Vector3d> points;
+    std::vector<int> ids;
+
+    inline size_t kdtree_get_point_count() const { return points.size(); }
+
+    inline double kdtree_get_pt(const size_t idx, const size_t dim) const {
+        if (dim == 0) return points[idx].x;
+        if (dim == 1) return points[idx].y;
+        return points[idx].z;
+    }
+
+    // Optional bounding-box computation (required by nanoflann)
+    template <class BBOX>
+    bool kdtree_get_bbox(BBOX& /*bb*/) const {
+        return false;  // No bounding box optimization
+    }
+    
+};
+
+using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
+    nanoflann::L2_Simple_Adaptor<double, PointCloud>,
+    PointCloud,
+    3
+>;
+
 /**
  * \addtogroup InteractionRates
  * @{
@@ -85,8 +114,11 @@ protected:
 };
 
 class InteractionRatesPositionDependent: public InteractionRates {
+
 public:
     InteractionRatesPositionDependent(const std::string ratesName, const bool isPositionDependent = true);
+    
+    int findClosestGridPoint(const Vector3d &position) const;
     
     std::vector<double> getTabulatedEnergy() const;
     std::vector<std::vector<double>> getTabulatedRate() const;
@@ -119,6 +151,10 @@ protected:
     std::vector<std::vector<double>> tabs; //!< s_kin = s - m^2 in [J**2]
     std::vector<std::vector<std::vector<double>>> tabCDF; //!< cumulative interaction rate
     std::unordered_map<int, Vector3d> photonDict; //!< dictionary to link tables to spatial coordinates
+    
+    PointCloud cloud; //!< Point cloud for nanoflann KD-tree
+    KDTree* tree = nullptr; //!< Pointer to the KD Tree
+    
 };
 
 } // namespace crpropa
