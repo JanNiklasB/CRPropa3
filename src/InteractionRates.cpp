@@ -225,8 +225,13 @@ void InteractionRatesPositionDependent::setPhotonDict(std::unordered_map<int, Ve
         delete this->tree;
     }
     
-    this->tree = new KDTree(3, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(10));
+    int maxLeafTree = 20;
+    int nThreads = 4;
+    nanoflann::KDTreeSingleIndexAdaptorFlags flag;
+
+    this->tree = new KDTree(3, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(maxLeafTree, flag, nThreads));
     this->tree->buildIndex();
+
     
 }
 
