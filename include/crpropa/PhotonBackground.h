@@ -21,57 +21,60 @@ namespace crpropa {
  @brief Abstract base class for photon fields.
  */
 class PhotonField: public Referenced {
+  
 public:
-	PhotonField() {
-		this->fieldName = "AbstractPhotonField";
-		this->isRedshiftDependent = false;
-        this->isPositionDependent = false;
-        this->surface = nullptr;
-	}
-
-	/**
-	 returns comoving photon density [1/m^3].
-	 multiply with (1+z^3) for physical number density.
-	 @param ePhoton		photon energy [J]
-	 @param z			redshift (if redshift dependent, default = 0.)
-	 */
-	virtual double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
-	virtual double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
-	virtual double getMaximumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
-	virtual std::string getFieldName() const {
-		return this->fieldName;
-	}
-
-	/**
-	 returns overall comoving scaling factor
-	 (cf. CRPropa3-data/calc_scaling.py)
-	 @param z		redshift
-	 */
-	virtual double getRedshiftScaling(double z) const {
-		return 1.;
-	};
-
-	bool hasRedshiftDependence() const {
-		return this->isRedshiftDependent;
-	}
-    
-    bool hasPositionDependence() const {
-        return this->isPositionDependent;
-    }
-
-    bool hasSurface() const {
-        return this->surface != nullptr;
-    }
-    
-	void setFieldName(std::string fieldName) {
-		this->fieldName = fieldName;
-	}
-
+  
+  PhotonField() {
+    this->fieldName = "AbstractPhotonField";
+    this->isRedshiftDependent = false;
+    this->isPositionDependent = false;
+    this->surface = nullptr;
+  }
+  
+  /**
+   returns comoving photon density [1/m^3].
+   multiply with (1+z^3) for physical number density.
+   @param ePhoton		photon energy [J]
+   @param z			redshift (if redshift dependent, default = 0.)
+   */
+  virtual double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
+  virtual double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
+  virtual double getMaximumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const = 0;
+  virtual std::string getFieldName() const {
+    return this->fieldName;
+  }
+  
+  /**
+   returns overall comoving scaling factor
+   (cf. CRPropa3-data/calc_scaling.py)
+   @param z		redshift
+   */
+  virtual double getRedshiftScaling(double z) const {
+    return 1.;
+  };
+  
+  bool hasRedshiftDependence() const {
+    return this->isRedshiftDependent;
+  }
+  
+  bool hasPositionDependence() const {
+    return this->isPositionDependent;
+  }
+  
+  bool hasSurface() const {
+    return this->surface != nullptr;
+  }
+  
+  void setFieldName(std::string fieldName) {
+    this->fieldName = fieldName;
+  }
+  
 protected:
-	std::string fieldName;
-	bool isRedshiftDependent;
-    bool isPositionDependent;
-    ref_ptr<Surface> surface;
+  std::string fieldName;
+  bool isRedshiftDependent;
+  bool isPositionDependent;
+  ref_ptr<Surface> surface;
+  
 };
 
 /**

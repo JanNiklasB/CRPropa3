@@ -114,7 +114,7 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
     std::__fs::filesystem::path dir = filepath;
     std::unordered_map<int, Vector3d> photonDict;
     int iFile = 0;
-    int nRSups = 0;
+    //int nRSups = 0;
     
     for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
 
@@ -174,12 +174,12 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
             infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
         }
         
-        std::vector<double> vecEnergy1 = intRatesPosDep->getTabulatedEnergy(); //std::defaultfloat
-        if (vecRate.size() != vecEnergy1.size()) {
-            nRSups = nRSups + 1;
-            std::cout << std::fixed << std::setprecision(7);
+        // std::vector<double> vecEnergy1 = intRatesPosDep->getTabulatedEnergy(); //std::defaultfloat
+        //if (vecRate.size() != vecEnergy1.size()) {
+        //    nRSups = nRSups + 1;
+        //    std::cout << std::fixed << std::setprecision(7);
             // std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
-        }
+        //}
         
         tabRate.push_back(vecRate);
         
@@ -190,14 +190,6 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
     
     if (tabRate.empty())
         throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
-    
-    for (const auto& el : photonDict) {
-        
-        std::cout << "ID: " << el.first << ", Position: ("
-        << el.second.x << ", "
-        << el.second.y << ", "
-        << el.second.z << ")" << std::endl;
-    }
     
     intRatesPosDep->setTabulatedRate(tabRate);
     intRatesPosDep->setPhotonDict(photonDict);
@@ -211,7 +203,7 @@ void EMPairProduction::initCumulativeRate(std::string filename, InteractionRates
   std::vector<double> tabs;
   std::vector<std::vector<double>> tabCDF;
     
-	if (!infile.good())
+    if (!infile.good())
 		throw std::runtime_error("EMPairProduction: could not open file " + filename);
     
 	// skip header
@@ -254,7 +246,7 @@ void EMPairProduction::initCumulativeRatePositionDependentPhotonField(std::strin
     
     std::__fs::filesystem::path dir = filepath;
     int iFile = 0;
-    int nCDFSusp = 0;
+    //int nCDFSusp = 0;
 
     for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
         

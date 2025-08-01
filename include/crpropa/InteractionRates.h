@@ -25,10 +25,10 @@ struct PointCloud {
         return points[idx].z;
     }
 
-    // Optional bounding-box computation (required by nanoflann)
+    // optional bounding-box computation (required by nanoflann)
     template <class BBOX>
     bool kdtree_get_bbox(BBOX& /*bb*/) const {
-        return false;  // No bounding box optimization
+        return false;  // no bounding box optimization
     }
     
 };
@@ -79,7 +79,7 @@ protected:
 
 /**
  @class InteractionRateHomogeneous
- @brief Interaction rates decorator for tabulated homogeneous interaction rates.
+ @brief Interaction rates decorator for tabulated homogeneous photon fields.
  */
 class InteractionRatesHomogeneous: public InteractionRates {
 public:
@@ -113,6 +113,10 @@ protected:
     
 };
 
+/**
+ @class InteractionRatePositionDependent
+ @brief Interaction rates decorator for tabulated position dependent photon fields.
+ */
 class InteractionRatesPositionDependent: public InteractionRates {
 
 public:
@@ -152,8 +156,8 @@ protected:
     std::vector<std::vector<std::vector<double>>> tabCDF; //!< cumulative interaction rate
     std::unordered_map<int, Vector3d> photonDict; //!< dictionary to link tables to spatial coordinates
     
-    PointCloud cloud; //!< Point cloud for nanoflann KD-tree
-    KDTree* tree = nullptr; //!< Pointer to the KD Tree
+    PointCloud cloud; //!< point cloud for nanoflann KD-tree
+    KDTree* tree = nullptr; //!< pointer to the KD Tree
     
 };
 
