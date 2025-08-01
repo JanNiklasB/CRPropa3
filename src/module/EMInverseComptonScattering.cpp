@@ -22,36 +22,38 @@ namespace crpropa {
 static const double mec2 = mass_electron * c_squared;
 
 EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons, double thinning, double limit, Surface* surface) {
-    setSurface(surface);
-    setPhotonField(photonField);
-	setHavePhotons(havePhotons);
-	setLimit(limit);
-	setThinning(thinning);
+
+  setSurface(surface);
+  setPhotonField(photonField);
+  setHavePhotons(havePhotons);
+  setLimit(limit);
+  setThinning(thinning);
+  
 }
 
 void EMInverseComptonScattering::setPhotonField(ref_ptr<PhotonField> photonField) {
-	
-    this->photonField = photonField;
-	std::string fname = photonField->getFieldName();
-	setDescription("EMInverseComptonScattering: " + fname);
+  
+  this->photonField = photonField;
+  std::string fname = photonField->getFieldName();
+  setDescription("EMInverseComptonScattering: " + fname);
+  
+  if (!this->photonField->hasPositionDependence()) {
     
-    if (!this->photonField->hasPositionDependence()) {
-        
-        this->interactionRates = new InteractionRatesHomogeneous("interactionRatesHomogeneous", false);
-        InteractionRatesHomogeneous* intRatesHom = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
-        
-        initRate(getDataPath("EMInverseComptonScattering/rate_" + fname + ".txt"), intRatesHom);
-        initCumulativeRate(getDataPath("EMInverseComptonScattering/cdf_" + fname + ".txt"), intRatesHom);
-        
-    } else {
-        
-        this->interactionRates = new InteractionRatesPositionDependent("interactionRatesPositionDependent", true);
-        InteractionRatesPositionDependent* intRatesPosDep = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
-        
-        initRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/Rate/"), intRatesPosDep);
-        initCumulativeRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/CumulativeRate/"), intRatesPosDep);
-        
-    }
+    this->interactionRates = new InteractionRatesHomogeneous("interactionRatesHomogeneous", false);
+    InteractionRatesHomogeneous* intRatesHom = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
+    
+    initRate(getDataPath("EMInverseComptonScattering/rate_" + fname + ".txt"), intRatesHom);
+    initCumulativeRate(getDataPath("EMInverseComptonScattering/cdf_" + fname + ".txt"), intRatesHom);
+    
+  } else {
+    
+    this->interactionRates = new InteractionRatesPositionDependent("interactionRatesPositionDependent", true);
+    InteractionRatesPositionDependent* intRatesPosDep = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
+    
+    initRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/Rate/"), intRatesPosDep);
+    initCumulativeRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/CumulativeRate/"), intRatesPosDep);
+    
+  }
 }
 
 void EMInverseComptonScattering::setHavePhotons(bool havePhotons) {
@@ -75,36 +77,39 @@ bool EMInverseComptonScattering::hasSurface() const {
 }
 
 void EMInverseComptonScattering::initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom) {
-	std::ifstream infile(filename.c_str());
-
-    std::vector<double> tabEnergy;
-    std::vector<double> tabRate;
-    
-	if (!infile.good())
-		throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-
-	while (infile.good()) {
-		if (infile.peek() != '#') {
-			double a, b;
-			infile >> a >> b;
-			if (infile) {
-				tabEnergy.push_back(pow(10, a) * eV);
-				tabRate.push_back(b / Mpc);
-			}
-		}
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-	}
-	infile.close();
-    
-    intRatesHom->setTabulatedEnergy(tabEnergy);
-    intRatesHom->setTabulatedRate(tabRate);
+  std::ifstream infile(filename.c_str());
+  
+  std::vector<double> tabEnergy;
+  std::vector<double> tabRate;
+  
+  if (!infile.good())
+    throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
+  
+  while (infile.good()) {
+    if (infile.peek() != '#') {
+      double a, b;
+      infile >> a >> b;
+      if (infile) {
+        tabEnergy.push_back(pow(10, a) * eV);
+        tabRate.push_back(b / Mpc);
+      }
+    }
+    infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+  }
+  infile.close();
+  
+  intRatesHom->setTabulatedEnergy(tabEnergy);
+  intRatesHom->setTabulatedRate(tabRate);
+  
 }
 
 std::string EMInverseComptonScattering::splitFilename(const std::string str) {
-            std::size_t found = str.find_last_of("/\\");
-            std::string s = str.substr(found+1);
-            return s;
-    }
+  
+  std::size_t found = str.find_last_of("/\\");
+  std::string s = str.substr(found+1);
+  return s;
+  
+}
 
 void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep) {
     
@@ -114,221 +119,217 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
     std::unordered_map<int, Vector3d> photonDict;
     int iFile = 0;
     
-    for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
-
-        // the input filename here should be a string
-        //check if it is correct, i.e. a proper filename string
-        std::string filename = dir_entry.path().string();
-        std::ifstream infile(filename.c_str());
-        
-        std::vector<double> vecEnergy;
-        std::vector<double> vecRate;
-        
-        if (!infile.good())
-            throw
-            std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-        
-        double x, y, z;
-        std::string str;
-        std::stringstream ss;
-        
-        std::string filename_split = splitFilename(dir_entry.path().string());
-        ss << filename_split;
-        
-        int iLine = 0;
-        
-        std::locale::global(std::locale("C"));
-        
-        while (getline(ss, str, '_')) {
-            if (iLine == 3) {
-                x = -std::stod(str) * kpc;
-            }
-            if (iLine == 4) {
-                y = std::stod(str) * kpc;
-            }
-            if (iLine == 5) {
-                z = std::stod(str) * kpc;
-            }
-            iLine = iLine + 1;
-        }
-        
-        Vector3d vPos(x, y, z);
-        
-        if (hasSurface() and !surface->isInside(vPos))
-            continue;
-        
-        photonDict[iFile] = vPos;
-        
-        while (infile.good()) {
-            if (infile.peek() != '#') {
-                double a, b;
-                infile >> a >> b;
-                if (infile) {
-                    if (iFile == 0) {
-                        vecEnergy.push_back(pow(10, a) * eV);
-                        intRatesPosDep->setTabulatedEnergy(vecEnergy);
-                    }
-                    vecRate.push_back(b / Mpc);
-                }
-            }
-            infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-        }
-        
-        tabRate.push_back(vecRate);
-        
-        //if (vecRate.size() != vecEnergy.size()) {
-        //    std::cout << std::fixed << std::setprecision(7);
-        //    std::cout << "suspVec: " << vPos.x / kpc << " " << vPos.y / kpc << " " << vPos.z / kpc << std::endl;
-        //}
-        
-        iFile = iFile + 1;
-        infile.close();
+  for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
+    
+    // the input filename here should be a string
+    //check if it is correct, i.e. a proper filename string
+    std::string filename = dir_entry.path().string();
+    std::ifstream infile(filename.c_str());
+    
+    std::vector<double> vecEnergy;
+    std::vector<double> vecRate;
+    
+    if (!infile.good())
+      throw
+      std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
+    
+    double x, y, z;
+    std::string str;
+    std::stringstream ss;
+    
+    std::string filename_split = splitFilename(dir_entry.path().string());
+    ss << filename_split;
+    
+    int iLine = 0;
+    
+    std::locale::global(std::locale("C"));
+    
+    while (getline(ss, str, '_')) {
+      if (iLine == 3) {
+        x = -std::stod(str) * kpc;
+      }
+      if (iLine == 4) {
+        y = std::stod(str) * kpc;
+      }
+      if (iLine == 5) {
+        z = std::stod(str) * kpc;
+      }
+      iLine = iLine + 1;
     }
     
-    if (tabRate.empty())
-        throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
+    Vector3d vPos(x, y, z);
     
-    intRatesPosDep->setTabulatedRate(tabRate);
-    intRatesPosDep->setPhotonDict(photonDict);
+    if (hasSurface() and !surface->isInside(vPos))
+      continue;
+    
+    photonDict[iFile] = vPos;
+    
+    while (infile.good()) {
+      if (infile.peek() != '#') {
+        double a, b;
+        infile >> a >> b;
+        if (infile) {
+          if (iFile == 0) {
+            vecEnergy.push_back(pow(10, a) * eV);
+            intRatesPosDep->setTabulatedEnergy(vecEnergy);
+          }
+          vecRate.push_back(b / Mpc);
+        }
+      }
+      infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+    }
+    
+    tabRate.push_back(vecRate);
+    
+    iFile = iFile + 1;
+    infile.close();
+    
+  }
+    
+  if (tabRate.empty())
+    throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
+    
+  intRatesPosDep->setTabulatedRate(tabRate);
+  intRatesPosDep->setPhotonDict(photonDict);
     
 }
 
 void EMInverseComptonScattering::initCumulativeRate(std::string filename, InteractionRatesHomogeneous* intRatesHom) {
-	
-    std::ifstream infile(filename.c_str());
-
-    std::vector<double> tabE;
-    std::vector<double> tabs;
-    std::vector<std::vector<double>> tabCDF;
-    
-	if (!infile.good())
-		throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-	
-	// skip header
-	while (infile.peek() == '#')
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-
-	// read s values in first line
-	double a;
-	infile >> a; // skip first value
-	while (infile.good() and (infile.peek() != '\n')) {
-		infile >> a;
-		tabs.push_back(pow(10, a) * eV * eV);
-	}
-
-	// read all following lines: E, cdf values
-	while (infile.good()) {
-		infile >> a;
-		if (!infile)
-			break;  // end of file
-		tabE.push_back(pow(10, a) * eV);
-		std::vector<double> cdf;
-		for (int i = 0; i < tabs.size(); i++) {
-			infile >> a;
-			cdf.push_back(a / Mpc);
-		}
-		tabCDF.push_back(cdf);
-	}
-	infile.close();
-    
-    intRatesHom->setTabulatedE(tabE);
-    intRatesHom->setTabulateds(tabs);
-    intRatesHom->setTabulatedCDF(tabCDF);
+  
+  std::ifstream infile(filename.c_str());
+  
+  std::vector<double> tabE;
+  std::vector<double> tabs;
+  std::vector<std::vector<double>> tabCDF;
+  
+  if (!infile.good())
+    throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
+  
+  // skip header
+  while (infile.peek() == '#')
+    infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+  
+  // read s values in first line
+  double a;
+  infile >> a; // skip first value
+  while (infile.good() and (infile.peek() != '\n')) {
+    infile >> a;
+    tabs.push_back(pow(10, a) * eV * eV);
+  }
+  
+  // read all following lines: E, cdf values
+  while (infile.good()) {
+    infile >> a;
+    if (!infile)
+      break;  // end of file
+    tabE.push_back(pow(10, a) * eV);
+    std::vector<double> cdf;
+    for (int i = 0; i < tabs.size(); i++) {
+      infile >> a;
+      cdf.push_back(a / Mpc);
+    }
+    tabCDF.push_back(cdf);
+  }
+  infile.close();
+  
+  intRatesHom->setTabulatedE(tabE);
+  intRatesHom->setTabulateds(tabs);
+  intRatesHom->setTabulatedCDF(tabCDF);
+  
 }
 
 void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep) {
+  
+  std::vector<std::vector<double>> tabs;
+  std::vector<std::vector<std::vector<double>>> tabCDF;
+  
+  std::__fs::filesystem::path dir = filepath;
+  int iFile = 0;
+  
+  for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
     
-    std::vector<std::vector<double>> tabs;
-    std::vector<std::vector<std::vector<double>>> tabCDF;
+    std::vector<double> vecE;
+    std::vector<double> vecs;
+    std::vector<std::vector<double>> vecCDF;
     
-    std::__fs::filesystem::path dir = filepath;
-    int iFile = 0;
+    std::string filename = dir_entry.path().string();
+    std::ifstream infile(filename.c_str());
     
-    for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
-        
-        std::vector<double> vecE;
-        std::vector<double> vecs;
-        std::vector<std::vector<double>> vecCDF;
-        
-        // the input filename here should be a string
-        //check if it is correct, i.e. a proper filename string
-        std::string filename = dir_entry.path().string();
-        std::ifstream infile(filename.c_str());
-        
-        if (!infile.good())
-            throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-        
-        double x, y, z;
-        std::string str;
-        std::stringstream ss;
-        
-        std::string filename_split = splitFilename(dir_entry.path().string());
-        ss << filename_split;
-        
-        int iLine = 0;
-        
-        std::locale::global(std::locale("C"));
-        
-        while (getline(ss, str, '_')) {
-            if (iLine == 3) {
-                x = -std::stod(str) * kpc;
-            }
-            if (iLine == 4) {
-                y = std::stod(str) * kpc;
-            }
-            if (iLine == 5) {
-                z = std::stod(str) * kpc;
-            }
-            iLine = iLine + 1;
-        }
-        
-        Vector3d vPos(x, y, z);
-        
-        if (hasSurface() and !surface->isInside(vPos))
-            continue;
-        
-        // skip header
-        while (infile.peek() == '#')
-            infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-        
-        // read s values in first line
-        double a;
-        infile >> a; // skip first value
-        while (infile.good() and (infile.peek() != '\n')) {
-            infile >> a;
-            vecs.push_back(pow(10, a) * eV * eV);
-        }
-        
-        // read all following lines: E, cdf values
-        while (infile.good()) {
-            infile >> a;
-            if (!infile)
-                break;  // end of file
-            if (iFile == 0) {
-                vecE.push_back(pow(10, a) * eV);
-                intRatesPosDep->setTabulatedE(vecE);
-            }
-            std::vector<double> cdf;
-            for (int i = 0; i < tabs.size(); i++) {
-                infile >> a;
-                cdf.push_back(a / Mpc);
-            }
-            vecCDF.push_back(cdf);
-        }
-        
-        if (vecs.size() != vecE.size()) {
-            std::cout << "suspVec (CDF) index: " << iFile << std::endl;
-        }
-        
-        iFile = iFile + 1;
-        
-        tabs.push_back(vecs);
-        tabCDF.push_back(vecCDF);
-        infile.close();
+    if (!infile.good())
+      throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
+    
+    double x, y, z;
+    std::string str;
+    std::stringstream ss;
+    
+    std::string filename_split = splitFilename(dir_entry.path().string());
+    ss << filename_split;
+    
+    int iLine = 0;
+    
+    std::locale::global(std::locale("C"));
+    
+    while (getline(ss, str, '_')) {
+      if (iLine == 3) {
+        x = -std::stod(str) * kpc;
+      }
+      if (iLine == 4) {
+        y = std::stod(str) * kpc;
+      }
+      if (iLine == 5) {
+        z = std::stod(str) * kpc;
+      }
+      iLine = iLine + 1;
     }
     
-    intRatesPosDep->setTabulateds(tabs);
-    intRatesPosDep->setTabulatedCDF(tabCDF);
+    Vector3d vPos(x, y, z);
+    
+    if (hasSurface() and !surface->isInside(vPos))
+      continue;
+    
+    // skip header
+    while (infile.peek() == '#')
+      infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
+    
+    // read s values in first line
+    double a;
+    infile >> a; // skip first value
+    while (infile.good() and (infile.peek() != '\n')) {
+      infile >> a;
+      vecs.push_back(pow(10, a) * eV * eV);
+    }
+    
+    // read all following lines: E, cdf values
+    while (infile.good()) {
+      infile >> a;
+      if (!infile)
+        break;  // end of file
+      if (iFile == 0) {
+        vecE.push_back(pow(10, a) * eV);
+        intRatesPosDep->setTabulatedE(vecE);
+      }
+      std::vector<double> cdf;
+      for (int i = 0; i < tabs.size(); i++) {
+        infile >> a;
+        cdf.push_back(a / Mpc);
+      }
+      vecCDF.push_back(cdf);
+    }
+    
+    if (vecs.size() != vecE.size()) {
+      std::cout << "suspVec (CDF) index: " << iFile << std::endl;
+    }
+    
+    iFile = iFile + 1;
+    
+    tabs.push_back(vecs);
+    tabCDF.push_back(vecCDF);
+    infile.close();
+  }
+  
+  intRatesPosDep->setTabulateds(tabs);
+  intRatesPosDep->setTabulatedCDF(tabCDF);
+  
 }
 
 // Class to calculate the energy distribution of the ICS photon and to sample from it
@@ -400,82 +401,84 @@ class ICSSecondariesEnergyDistribution {
 };
 
 void EMInverseComptonScattering::performInteraction(Candidate *candidate) const {
-	// scale the particle energy instead of background photons
-	double z = candidate->getRedshift();
-	double E = candidate->current.getEnergy() * (1 + z);
-
-    Vector3d position = candidate->current.getPosition();
-    
-    std::vector<double> tabE;
-    std::vector<double> tabs;
-    std::vector<std::vector<double>> tabCDF;
-    
-    this->interactionRates->loadPerformInteractionTabs(position, tabE, tabs, tabCDF);
-    
-	if (E < tabE.front() or E > tabE.back())
-		return;
-
-	// sample the value of s
-	Random &random = Random::instance();
-	size_t i = closestIndex(E, tabE);
-	size_t j = random.randBin(tabCDF[i]);
-	double s_kin = pow(10, log10(tabs[j]) + (random.rand() - 0.5) * 0.1);
-	double s = s_kin + mec2 * mec2;
-
-	// sample electron energy after scattering
-	static ICSSecondariesEnergyDistribution distribution;
-	double Enew = distribution.sample(E, s);
-
-	// add up-scattered photon
-	double Esecondary = E - Enew;
-	double f = Enew / E;
-	if (havePhotons) {
-		if (random.rand() < pow(1 - f, thinning)) {
-			double w = 1. / pow(1 - f, thinning);
-			Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
-			candidate->addSecondary(22, Esecondary / (1 + z), pos, w, interactionTag);
-		}
-	}
-
-	// update the primary particle energy; do this after adding the secondary to correctly set the secondary's parent
-	candidate->current.setEnergy(Enew / (1 + z));
+  // scale the particle energy instead of background photons
+  double z = candidate->getRedshift();
+  double E = candidate->current.getEnergy() * (1 + z);
+  
+  Vector3d position = candidate->current.getPosition();
+  
+  std::vector<double> tabE;
+  std::vector<double> tabs;
+  std::vector<std::vector<double>> tabCDF;
+  
+  this->interactionRates->loadPerformInteractionTabs(position, tabE, tabs, tabCDF);
+  
+  if (E < tabE.front() or E > tabE.back())
+    return;
+  
+  // sample the value of s
+  Random &random = Random::instance();
+  size_t i = closestIndex(E, tabE);
+  size_t j = random.randBin(tabCDF[i]);
+  double s_kin = pow(10, log10(tabs[j]) + (random.rand() - 0.5) * 0.1);
+  double s = s_kin + mec2 * mec2;
+  
+  // sample electron energy after scattering
+  static ICSSecondariesEnergyDistribution distribution;
+  double Enew = distribution.sample(E, s);
+  
+  // add up-scattered photon
+  double Esecondary = E - Enew;
+  double f = Enew / E;
+  if (havePhotons) {
+    if (random.rand() < pow(1 - f, thinning)) {
+      double w = 1. / pow(1 - f, thinning);
+      Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
+      candidate->addSecondary(22, Esecondary / (1 + z), pos, w, interactionTag);
+    }
+  }
+  
+  // update the primary particle energy; do this after adding the secondary to correctly set the secondary's parent
+  candidate->current.setEnergy(Enew / (1 + z));
+  
 }
 
 void EMInverseComptonScattering::process(Candidate *candidate) const {
-	// check if electron / positron
-	int id = candidate->current.getId();
-	if (abs(id) != 11)
-		return;
-
-	// scale the particle energy instead of background photons
-	double z = candidate->getRedshift();
-	double E = candidate->current.getEnergy() * (1 + z);
-    Vector3d position = candidate->current.getPosition();
-
-	// interaction rate
-    double rate = this->interactionRates->getProcessRate(E, position);
-	
-    if (rate < 0)
-        return;
+  // check if electron / positron
+  int id = candidate->current.getId();
+  if (abs(id) != 11)
+    return;
+  
+  // scale the particle energy instead of background photons
+  double z = candidate->getRedshift();
+  double E = candidate->current.getEnergy() * (1 + z);
+  Vector3d position = candidate->current.getPosition();
+  
+  // interaction rate
+  double rate = this->interactionRates->getProcessRate(E, position);
+  
+  if (rate < 0)
+    return;
+  
+  rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
+  
+  // run this loop at least once to limit the step size
+  double step = candidate->getCurrentStep();
+  Random &random = Random::instance();
+  do {
+    double randDistance = -log(random.rand()) / rate;
     
-    rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
-
-	// run this loop at least once to limit the step size
-	double step = candidate->getCurrentStep();
-	Random &random = Random::instance();
-	do {
-		double randDistance = -log(random.rand()) / rate;
-
-		// check for interaction; if it doesn't ocurr, limit next step
-		if (step < randDistance) {
-			candidate->limitNextStep(limit / rate);
-			return;
-		}
-		performInteraction(candidate);
-
-		// repeat with remaining step
-		step -= randDistance;
-	} while (step > 0);
+    // check for interaction; if it doesn't ocurr, limit next step
+    if (step < randDistance) {
+      candidate->limitNextStep(limit / rate);
+      return;
+    }
+    performInteraction(candidate);
+    
+    // repeat with remaining step
+    step -= randDistance;
+  } while (step > 0);
+  
 }
 
 void EMInverseComptonScattering::setInteractionTag(std::string tag) {

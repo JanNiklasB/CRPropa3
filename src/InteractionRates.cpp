@@ -13,12 +13,10 @@
 namespace crpropa {
 
 InteractionRatesHomogeneous::InteractionRatesHomogeneous(std::string ratesName, bool isPositionDependent) : InteractionRates() {
+  
   this->ratesName = ratesName;
   this->isPositionDependent = isPositionDependent;
-    
-    // getTables
-    // check for table consistency?
-    
+  
 }
 
 std::vector<double> InteractionRatesHomogeneous::getTabulatedEnergy() const {
@@ -44,20 +42,14 @@ std::vector<std::vector<double>> InteractionRatesHomogeneous::getTabulatedCDF() 
 double InteractionRatesHomogeneous::getProcessRate(const double E, const Vector3d &position) const {
     if (!this->isPositionDependent) {
         
-        // check if in tabulated energy range
-        if ((E < this->tabEnergy.front()) or (E > this->tabEnergy.back())) {
-            // throw std::runtime_error("Candidate energy out of tables!");
-            
-            return -1;
-        }
-        
         // compute the interaction rate for the given candidate energy, E
         double rate = interpolate(E, this->tabEnergy, this->tabRate);
-        
         return rate;
         
     } else {
-        throw std::runtime_error("Error in boolean isPositionDependent!");
+    
+      throw std::runtime_error("Error in boolean isPositionDependent!");
+      
     }
 }
 
@@ -94,26 +86,18 @@ InteractionRatesPositionDependent::InteractionRatesPositionDependent(std::string
 }
 
 int InteractionRatesPositionDependent::findClosestGridPoint(const Vector3d &position) const {
-    
-    if (!tree) {
-        throw std::runtime_error("KD-Tree not initialized!");
-    }
-    
-    unsigned int closestIndex;
-    double closestDistSquared;
-    double queryPoint[3] = { position.x, position.y, position.z };
-    
-    this->tree->knnSearch(queryPoint, 1, &closestIndex, &closestDistSquared);
-    
-    /**
-    std::cout << "iMin: " << cloud.ids[closestIndex] << std::endl;
-    
-    std::cout << "position: " << position.x / kpc << " " << position.y / kpc << " " << position.z / kpc << std::endl;
-    
-    std::cout << "node: " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 0) / kpc << " " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 1) / kpc << " " << cloud.kdtree_get_pt(cloud.ids[closestIndex], 2) / kpc << std::endl;
-     */
-    
-    return this->cloud.ids[closestIndex];
+  
+  if (!tree) {
+    throw std::runtime_error("KD-Tree not initialized!");
+  }
+  
+  unsigned int closestIndex;
+  double closestDistSquared;
+  double queryPoint[3] = { position.x, position.y, position.z };
+  
+  this->tree->knnSearch(queryPoint, 1, &closestIndex, &closestDistSquared);
+  return this->cloud.ids[closestIndex];
+  
 }
 
 std::vector<double> InteractionRatesPositionDependent::getTabulatedEnergy() const {
@@ -161,19 +145,13 @@ double InteractionRatesPositionDependent::getProcessRate(const double E, const V
         throw std::runtime_error("Error in boolean isPositionDependent!");
         
     } else {
-        
-        std::vector<double> tabRate = this->getClosestRate(position);
-        
-        if ((E < this->tabEnergy.front()) or (E > this->tabEnergy.back())) {
-        //    throw std::runtime_error("Candidate energy out of tables!");
-            
-            return -1;
-        }
-        
-        // compute the interaction rate for the given candidate energy, E
-        double rate = interpolate(E, this->tabEnergy, tabRate);
-        
-        return rate;
+      
+      std::vector<double> tabRate = this->getClosestRate(position);
+      
+      // compute the interaction rate for the given candidate energy, E
+      double rate = interpolate(E, this->tabEnergy, tabRate);
+      return rate;
+      
     }
 }
 
@@ -232,7 +210,6 @@ void InteractionRatesPositionDependent::setPhotonDict(std::unordered_map<int, Ve
     this->tree = new KDTree(3, cloud, nanoflann::KDTreeSingleIndexAdaptorParams(maxLeafTree, flag, nThreads));
     this->tree->buildIndex();
 
-    
 }
 
 } //namespace crpropa
