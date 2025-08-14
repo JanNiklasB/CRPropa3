@@ -70,6 +70,12 @@ public:
 	 @param collector	object of type ParticleCollector that will store the information
 	 */
 	static void load(const std::string &filename, ParticleCollector *collector);
+	/** Loads a stream to a particle collector.
+	 This is useful for analysis involving, e.g., magnetic lenses.
+	 @param in	stream containing the data to be loaded in the same format TextOutput outputs the data
+	 @param collector	object of type ParticleCollector that will store the information
+	 */
+	static void load(std::istream* in, ParticleCollector *collector);
 	std::string getDescription() const;
 
 	void dumpIndexList(std::vector<int> indicies);
