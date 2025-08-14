@@ -118,16 +118,16 @@ if(ENABLE_COVERAGE)
     if(ENABLE_TESTING)
       SET(COVERAGE_LIBS "-coverage -lgcov")
       add_custom_target(coverage_clean
-        COMMAND ${LCOV_PATH} --directory . --zerocounters
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters
       )
       add_custom_target(coverage
         # generate coverage data
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file coverage.info VERBATIM
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info VERBATIM
         # clean external libs
-        COMMAND ${LCOV_PATH} --remove coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o coverage.info.cleaned VERBATIM
+        COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned VERBATIM
         # Generate html output
-        COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
-        COMMAND echo "Generated coverage report in coverageReport/index.html"
+        COMMAND ${GENHTML_PATH} -o ${CMAKE_CURRENT_BINARY_DIR}/coverageReport ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned VERBATIM
+        COMMAND echo "Generated coverage report in ${CMAKE_CURRENT_BINARY_DIR}/coverageReport/index.html"
       )
     endif(ENABLE_TESTING)
 
@@ -174,14 +174,14 @@ if(ENABLE_GALACTICMAGNETICLENS)
     list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/eigen3)
   endif(EIGEN_PATH)
   if(INSTALL_EIGEN)
-    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/eigen3/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/eigen3/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
   endif(INSTALL_EIGEN)
 
   # healpix redux (provided)
   add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/healpix_base)
   list(APPEND CRPROPA_EXTRA_LIBRARIES healpix_base)
   list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/healpix_base/include)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/healpix_base/include/ DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include FILES_MATCHING PATTERN "*.h")
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/healpix_base/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
 
   list(APPEND CRPROPA_SWIG_DEFINES -DWITH_GALACTIC_LENSES)
 
@@ -205,7 +205,6 @@ endif(ENABLE_OPENMP)
 # Additional configuration OMP_SCHEDULE
 set(OMP_SCHEDULE "static,100" CACHE STRING "FORMAT type,chunksize")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
-list(APPEND CRPROPA_EXTRA_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp")
 
 # Google Performance Tools (optional as possible performance tweak for OpenMP)
 find_package(GooglePerfTools)
@@ -321,14 +320,14 @@ if(DOWNLOAD_DATA)
     ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
     USERPWD "3juW9sntQX2IWBS"
     EXPECTED_MD5 "${DATA_CHECKSUM}")
-  message("-- Extracting data file")
 else()
   message("-- Downloading of data file disabled")
 endif(DOWNLOAD_DATA)
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/data ${CMAKE_CURRENT_BINARY_DIR}/data/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  message("-- Extracting data file")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory data-${CRPROPA_DATAFILE_VER}/data data/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 else()
   message(WARNING "CRPropa data file not found at ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
 CRPropa should compile, but will likely not work properly! Please install data file manually, or use the automatic download which is enabled by default.")
@@ -353,7 +352,7 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
@@ -430,7 +429,7 @@ if(BUILD_DOC)
     MESSAGE(STATUS "Found Doxygen to build documentation")
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in" ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
     configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/DoxygenLayout.xml" ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml COPYONLY)
-    add_custom_target(doxy ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
+    add_custom_target(doxy ${DOXYGEN_EXECUTABLE} Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
     add_custom_target(docstrings_from_doxy
@@ -573,7 +572,7 @@ if(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
   set(SPHINX_BUILD "${CMAKE_CURRENT_BINARY_DIR}/doc")
   add_custom_target(doc
                     ${SPHINX_EXECUTABLE} -b html
-                    -Dbreathe_projects.CRPropa3=${CMAKE_CURRENT_BINARY_DIR}/xml
+                    -Dbreathe_projects.CRPropa3=xml
                     ${SPHINX_SOURCE} ${SPHINX_BUILD}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Generating documentation with Sphinx")
