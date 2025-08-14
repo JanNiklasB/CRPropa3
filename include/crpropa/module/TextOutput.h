@@ -75,7 +75,7 @@ public:
 	 @param in	stream containing the data to be loaded in the same format TextOutput outputs the data
 	 @param collector	object of type ParticleCollector that will store the information
 	 */
-	static void load(std::istream* in, ParticleCollector *collector);
+	static void load(std::istream &in, ParticleCollector *collector);
 	std::string getDescription() const;
 
 	void dumpIndexList(std::vector<int> indicies);

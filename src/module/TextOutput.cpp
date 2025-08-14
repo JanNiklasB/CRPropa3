@@ -307,6 +307,7 @@ void TextOutput::load(const std::string &filename, ParticleCollector *collector)
 	}
 
 	load(*in, collector);
+	infile.close();
 }
 
 void TextOutput::load(std::istream &in, ParticleCollector *collector){
@@ -365,7 +366,6 @@ void TextOutput::load(std::istream &in, ParticleCollector *collector){
 
 		collector->process(c);
 	}
-	infile.close();
 }
 
 std::string TextOutput::getDescription() const {
