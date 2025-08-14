@@ -544,6 +544,9 @@ endif(ENABLE_PYTHON AND Python_FOUND)
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
+
+# makes the binary directory visible to c++, needed to have a last resort when searching for data
+add_definitions(-DCRPROPA_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
