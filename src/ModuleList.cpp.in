@@ -21,6 +21,11 @@ void g_cancel_signal_callback(int sig) {
 }
 
 ModuleList::ModuleList() : showProgress(false) {
+	#ifdef __CUDACC__
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, 0);
+	maxThreadsPerBlock = prop.maxThreadsDim[0];
+	#endif
 }
 
 ModuleList::~ModuleList() {
@@ -150,6 +155,7 @@ void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool 
 	}
 }
 
+#ifndef __CUDACC__
 void ModuleList::run(SourceInterface *source, size_t count, bool recursive, bool secondariesFirst) {
 
 #if _OPENMP
@@ -214,6 +220,7 @@ void ModuleList::run(SourceInterface *source, size_t count, bool recursive, bool
 		std::cerr << "############################################################################\n";
 	}
 }
+#endif
 
 ModuleList::iterator ModuleList::begin() {
 	return modules.begin();

@@ -5,7 +5,7 @@ set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
 
 add_definitions(-w)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 set(CRPROPA_EXTRA_SOURCES)
