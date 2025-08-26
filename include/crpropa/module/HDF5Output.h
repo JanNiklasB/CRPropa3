@@ -114,7 +114,7 @@ public:
 	 	@param filename	string containing name of output hdf5 file
 	 */
 	HDF5Output(const std::string &filename, OutputType outputtype);
-	~HDF5Output();
+	CUDA_CALLABLE_MEMBER ~HDF5Output();
 
 	void process(Candidate *candidate) const;
 	herr_t insertStringAttribute(const std::string &key, const std::string &value);

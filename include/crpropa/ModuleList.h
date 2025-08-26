@@ -27,7 +27,7 @@ public:
 	typedef std::vector<ref_ptr<Candidate> > candidate_vector_t;
 
 	ModuleList();
-	virtual ~ModuleList();
+	CUDA_CALLABLE_MEMBER virtual ~ModuleList();
 	void setShowProgress(bool show = true); ///< activate a progress bar
 
 	void add(Module* module);

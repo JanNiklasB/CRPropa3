@@ -112,7 +112,7 @@ public:
 		origin(origin), Nx(Nx), Ny(Ny), Nz(Nz), spacing(spacing), reflective(false), ipol(TRILINEAR), clipVolume(false) {
 	}
 	
-	virtual ~GridProperties() {
+	CUDA_CALLABLE_MEMBER virtual ~GridProperties() {
 	}
 	
 	/** If True, the repetition of the grid is refletive instead of periodic. */

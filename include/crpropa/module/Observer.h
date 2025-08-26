@@ -289,7 +289,7 @@ public:
 	ObserverTimeEvolution(const std::vector<double> &detList);
 	/** Destructor
 	 */
-	~ObserverTimeEvolution(){}
+	CUDA_CALLABLE_MEMBER ~ObserverTimeEvolution(){}
 
 	/** Function
 	 Generates the detList if it is empty when for example the 

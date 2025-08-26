@@ -59,7 +59,7 @@ class TurbulenceSpectrum : public Referenced {
 		}
 	}
 
-	~TurbulenceSpectrum() {}
+	CUDA_CALLABLE_MEMBER ~TurbulenceSpectrum() {}
 
 	double getBrms() const { return Brms; }
 	double getLmin() const { return lMin; }
@@ -104,7 +104,7 @@ class TurbulentField : public MagneticField {
 
   public:
 	TurbulentField(const TurbulenceSpectrum &spectrum) : spectrum(spectrum) {}
-	virtual ~TurbulentField() {}
+	CUDA_CALLABLE_MEMBER virtual ~TurbulentField() {}
 
 	double getBrms() const { return spectrum.getBrms(); }
 	virtual double getCorrelationLength() const {

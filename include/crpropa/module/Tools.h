@@ -30,7 +30,7 @@ private:
 	mutable size_t calls;
 
 public:
-	~PerformanceModule();
+	CUDA_CALLABLE_MEMBER ~PerformanceModule();
 	void add(Module* module);
 	void process(Candidate* candidate) const;
 	std::string getDescription() const;

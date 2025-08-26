@@ -19,7 +19,7 @@ class Module: public Referenced {
 	std::string description;
 public:
 	Module();
-	virtual ~Module() {
+	CUDA_CALLABLE_MEMBER virtual ~Module() {
 	}
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);

@@ -21,7 +21,7 @@ namespace crpropa {
  */
 class MagneticField: public Referenced {
 public:
-	virtual ~MagneticField() {
+	CUDA_CALLABLE_MEMBER virtual ~MagneticField() {
 	}
 	virtual Vector3d getField(const Vector3d &position) const {
 		return Vector3d(0,0,0);
@@ -161,7 +161,7 @@ public:
 	 * 						e.g., "gauss". 
 	*/
 	RenormalizeMagneticField(ref_ptr<MagneticField> field, std::string expression);
-	~RenormalizeMagneticField() { delete p;	}
+	CUDA_CALLABLE_MEMBER ~RenormalizeMagneticField() { delete p;	}
 	Vector3d getField(const Vector3d &position);
 };
 #endif

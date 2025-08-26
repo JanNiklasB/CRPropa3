@@ -56,7 +56,7 @@ public:
 	TextOutput(const std::string &filename, OutputType outputType);
 	/** Destructor
 	 */
-	~TextOutput();
+	CUDA_CALLABLE_MEMBER ~TextOutput();
 	/** Whether to store the random seeds used in the simulation.
 	 This enables reproducibility of each realisation of the simulation.
 	 */
