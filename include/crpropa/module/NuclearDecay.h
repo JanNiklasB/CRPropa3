@@ -65,7 +65,7 @@ public:
 	void setInteractionTag(std::string tag);
 	std::string getInteractionTag() const;
 
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate, int channel) const;
 	void gammaEmission(Candidate *candidate, int channel) const;
 	void betaDecay(Candidate *candidate, bool isBetaPlus) const;

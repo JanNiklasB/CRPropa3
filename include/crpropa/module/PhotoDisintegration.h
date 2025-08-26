@@ -71,7 +71,7 @@ public:
 	void initBranching(std::string filename);
 	void initPhotonEmission(std::string filename);
 
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate, int channel) const;
 
 	/**

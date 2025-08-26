@@ -63,7 +63,7 @@ public:
 	 */
 	DiffusionSDE(ref_ptr<crpropa::MagneticField> magneticField, ref_ptr<crpropa::AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1);
 
-	void process(crpropa::Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(crpropa::Candidate *candidate) const;
 
 	void tryStep(const Vector3d &Pos, Vector3d &POut, Vector3d &PosErr, double z, double propStep ) const;
 	void driftStep(const Vector3d &Pos, Vector3d &LinProp, double h, double t) const;

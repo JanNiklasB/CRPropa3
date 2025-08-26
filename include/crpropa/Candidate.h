@@ -11,6 +11,10 @@
 #include <sstream>
 #include <stdint.h>
 
+#ifdef __CUDACC__
+#include "thrust/device_vector.h"
+#endif
+
 namespace crpropa {
 /**
  * \addtogroup Core
@@ -31,7 +35,11 @@ public:
 	ParticleState current; /**< Current particle state */
 	ParticleState previous; /**< Particle state at the end of the previous step */
 
+	#ifndef __CUDACC__
 	std::vector<ref_ptr<Candidate> > secondaries; /**< Secondary particles from interactions */
+	#else
+	thrust::device_vector<Candidate*> secondaries;
+	#endif
 
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
 	PropertyMap properties; /**< Map of property names and their values. */

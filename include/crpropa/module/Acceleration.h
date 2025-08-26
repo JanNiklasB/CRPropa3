@@ -44,7 +44,7 @@ class AbstractAccelerationModule : public Module {
 	// add a step length modifier to the model
 	void add(StepLengthModifier *modifier);
 	// update the candidate
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 
 	/// Returns the velocity vector of the scatter centers in the rest frame of
 	/// the candidate. Needs to be implemented in inheriting classes.
@@ -190,7 +190,7 @@ class ParticleSplitting : public Module {
 	                  std::string counterid = "ParticleSplittingCounter");
 
 	// update the candidate
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 };
 
 

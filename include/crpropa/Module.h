@@ -23,8 +23,8 @@ public:
 	}
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);
-	virtual void process(Candidate *candidate) const = 0;
-	inline void process(ref_ptr<Candidate> candidate) const {
+	CUDA_CALLABLE_MEMBER virtual void process(Candidate *candidate) const = 0;
+	CUDA_CALLABLE_MEMBER inline void process(ref_ptr<Candidate> candidate) const {
 		process(candidate.get());
 	}
 };
@@ -73,7 +73,7 @@ public:
 */
 class Deactivation: public AbstractCondition {
 	public: 
-		void process(Candidate *cand) const { reject(cand); }
+		CUDA_CALLABLE_MEMBER void process(Candidate *cand) const { reject(cand); }
 };
 
 

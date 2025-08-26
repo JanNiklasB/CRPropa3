@@ -62,7 +62,7 @@ public:
 	 @param clone		if true, clone candidate
 	 */
 	void onDetection(Module *action, bool clone = false);
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 	void setFlag(std::string key, std::string value);
 	/** Determine whether candidate should be deactivated on detection

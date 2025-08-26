@@ -23,7 +23,7 @@ private:
 	ref_ptr<Module> module;
 public:
 	RestrictToRegion(Module* _module, Surface* _surface);
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 

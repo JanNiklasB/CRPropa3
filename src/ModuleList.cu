@@ -1,38 +1,36 @@
-#include "ModuleList.h"
+#include "crpropa/ModuleList.h"
 
 namespace crpropa{
 
-void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candidates, const ref_ptr<ModuleList> ModuleList,
+__global__ void cudarun(const thrust::device_vector<Candidate*>& candidates, const ModuleList* MLIST,
 	bool recursive, bool secondariesFirst) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	if (i>=candidates.size()) return;
 
-	Candidate* candidate = thrust::raw_pointer_cast(candidates[i]);
+	Candidate* candidate = candidates[i];
 
 	// propagate primary candidate until finished
 	while (candidate->isActive()) {
-		ModuleList->process(candidate);
+		MLIST->process(candidate);
 
 		// propagate all secondaries before next step of primary
 		if (recursive and secondariesFirst) {
-			thrust::device_vector<ref_ptr<Candidate>> secondaries = candidate->secondaries;
-			int threadsPerBlock = ModuleList->maxThreadsPerBlock;
-			int blocksPerGrid   = (secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-			cudarun<<<blocksPerGrid, threadsPerBlock>>>(secondaries, recursive, secondariesFirst);
+			int threadsPerBlock = MLIST->maxThreadsPerBlock;
+			int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
+			cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
 		}
 	}
 
 	// propagate secondaries after completing primary
 	if (recursive and not secondariesFirst) {
-		thrust::device_vector<ref_ptr<Candidate>> secondaries = candidate->secondaries;
-		int threadsPerBlock = ModuleList->maxThreadsPerBlock;
-		int blocksPerGrid   = (secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-		cudarun<<<blocksPerGrid, threadsPerBlock>>>(secondaries, recursive, secondariesFirst);
+		int threadsPerBlock = MLIST->maxThreadsPerBlock;
+		int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
+		cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
 	}
 
 }
 
-void ModuleList::cudarun(SourceInterface *source, size_t count, bool recursive, bool secondariesFirst) {
+void ModuleList::run(SourceInterface *source, size_t count, bool recursive, bool secondariesFirst) {
 
 	// extract all primaries:
 	candidate_vector_t candidates;
@@ -49,7 +47,7 @@ void ModuleList::cudarun(SourceInterface *source, size_t count, bool recursive, 
 	// start all primaries on gpu:
 	int threadsPerBlock = maxThreadsPerBlock;
 	int blocksPerGrid   = (candidates.size() + threadsPerBlock - 1) / threadsPerBlock;
-	cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, recursive, secondariesFirst);
+	cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, this, recursive, secondariesFirst);
 }
 
 }

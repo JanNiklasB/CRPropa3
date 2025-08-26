@@ -67,7 +67,7 @@ public:
     PropagationCK(ref_ptr<MagneticField> field = NULL, double tolerance = 1e-4,
 			double minStep = (0.1 * kpc), double maxStep = (1 * Gpc));
 
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 
 	// derivative of phase point, dY/dt = d/dt(x, u) = (v, du/dt)
 	// du/dt = q*c^2/E * (u x B)

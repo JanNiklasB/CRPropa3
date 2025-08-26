@@ -356,6 +356,7 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cu
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
@@ -420,6 +421,8 @@ add_library(crpropa SHARED
   ${CRPROPA_EXTRA_SOURCES}
 )
 target_link_libraries(crpropa ${CRPROPA_EXTRA_LIBRARIES})
+set_property(TARGET crpropa PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+
 
 #------------------------------------------------------------------
 # Doxygen ; xml data is used for sphinx site and python docstrings

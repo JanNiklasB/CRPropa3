@@ -22,7 +22,7 @@ public:
 	PhotonOutput1D(std::ostream &out);
 	PhotonOutput1D(const std::string &filename);
 	CUDA_CALLABLE_MEMBER ~PhotonOutput1D();
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 	void close();
 	void gzip();

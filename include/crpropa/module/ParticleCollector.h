@@ -26,14 +26,14 @@ protected:
 	bool recursive;
 
 public:
-        ParticleCollector();
-        ParticleCollector(const std::size_t nBuffer);
-        ParticleCollector(const std::size_t nBuffer, const bool clone);
-        ParticleCollector(const std::size_t nBuffer, const bool clone, const bool recursive);
-        CUDA_CALLABLE_MEMBER ~ParticleCollector();
+	ParticleCollector();
+	ParticleCollector(const std::size_t nBuffer);
+	ParticleCollector(const std::size_t nBuffer, const bool clone);
+	ParticleCollector(const std::size_t nBuffer, const bool clone, const bool recursive);
+	CUDA_CALLABLE_MEMBER ~ParticleCollector();
 
-        void process(Candidate *candidate) const;
-	void process(ref_ptr<Candidate> c) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(ref_ptr<Candidate> c) const;
 	void reprocess(Module *action) const;
 	void dump(const std::string &filename) const;
 	void load(const std::string &filename);

@@ -60,7 +60,7 @@ public:
 	
 	void initRate(std::string filename);
 	void initSpectrum(std::string filename);
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 
 	/**
 	 Calculates the energy loss length 1/beta = -E dx/dE in [m]

@@ -116,7 +116,7 @@ public:
 	HDF5Output(const std::string &filename, OutputType outputtype);
 	CUDA_CALLABLE_MEMBER ~HDF5Output();
 
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	herr_t insertStringAttribute(const std::string &key, const std::string &value);
 	herr_t insertDoubleAttribute(const std::string &key, const double &value);
 	std::string getDescription() const;

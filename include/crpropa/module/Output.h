@@ -173,7 +173,7 @@ public:
 	 */
 	size_t size() const;
 
-	void process(Candidate *) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *) const;
 
 	/**	
 	 * write the indices of not started candidates into the output file. 

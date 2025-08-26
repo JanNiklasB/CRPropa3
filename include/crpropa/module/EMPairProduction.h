@@ -78,7 +78,7 @@ public:
 	void initCumulativeRate(std::string filename);
 
 	void performInteraction(Candidate *candidate) const;
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 };
 /** @}*/
 

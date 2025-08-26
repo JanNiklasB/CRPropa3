@@ -61,7 +61,7 @@ struct sparse_time_dense_product_impl<SparseLhsType,DenseRhsType,DenseResType, t
     }
   }
   
-  static void processRow(const LhsEval& lhsEval, const DenseRhsType& rhs, DenseResType& res, const typename Res::Scalar& alpha, Index i, Index col)
+  CUDA_CALLABLE_MEMBER static void processRow(const LhsEval& lhsEval, const DenseRhsType& rhs, DenseResType& res, const typename Res::Scalar& alpha, Index i, Index col)
   {
     typename Res::Scalar tmp(0);
     for(LhsInnerIterator it(lhsEval,i); it ;++it)

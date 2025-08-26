@@ -51,7 +51,7 @@ public:
 	 */
 	CandidateSplitting(double spectralIndex, double Emin, int nBins);
 
-	void process(Candidate *c) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *c) const;
 
 	void setEnergyBins(double Emin, double Emax, double nBins, bool log);
 

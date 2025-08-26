@@ -63,7 +63,7 @@ public:
 	void enableRandomSeeds() {storeRandomSeeds = true;};
 	void close();
 	void gzip();
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	/** Loads a file to a particle collector.
 	 This is useful for analysis involving, e.g., magnetic lenses.
 	 @param filename	string containing the name of the file to be loaded

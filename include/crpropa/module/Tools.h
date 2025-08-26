@@ -32,7 +32,7 @@ private:
 public:
 	CUDA_CALLABLE_MEMBER ~PerformanceModule();
 	void add(Module* module);
-	void process(Candidate* candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;
 	std::string getDescription() const;
 };
 
@@ -50,7 +50,7 @@ public:
 	void removeId(int remove);
 	std::set<int> &getIds();
 
-	void process(Candidate* candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;
 	std::string getDescription() const;
 };
 
@@ -64,7 +64,7 @@ class EmissionMapFiller: public Module {
 public:
 	EmissionMapFiller(EmissionMap *emissionMap);
 	void setEmissionMap(EmissionMap *emissionMap);
-	void process(Candidate* candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;
 	std::string getDescription() const;
 };
 

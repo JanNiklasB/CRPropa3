@@ -159,7 +159,7 @@ public:
 	 * @param X 	charge number of the nucleus
 	 */
 	double nucleiModification(int A, int X) const;
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate, bool onProton) const;
 
 	/**

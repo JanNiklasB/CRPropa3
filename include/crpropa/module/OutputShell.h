@@ -17,7 +17,7 @@ namespace crpropa {
  */
 class ShellOutput: public Module {
 public:
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -27,7 +27,7 @@ public:
  */
 class ShellOutput1D: public Module {
 public:
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -38,7 +38,7 @@ public:
 class ShellPropertyOutput: public Module {
 public:
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
-	void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 /** @}*/

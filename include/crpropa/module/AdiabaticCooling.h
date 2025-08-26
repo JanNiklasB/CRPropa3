@@ -40,7 +40,7 @@ public:
 	 @param limit 			Maximum relative energy change allowed
 	 */
 	AdiabaticCooling(ref_ptr<AdvectionField> advectionField, double limit);
-	void process(Candidate *c) const;
+	CUDA_CALLABLE_MEMBER void process(Candidate *c) const;
 
 	void setLimit(double l);
 

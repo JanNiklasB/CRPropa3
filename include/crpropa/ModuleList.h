@@ -48,9 +48,6 @@ public:
 	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
 	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
 	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
-	#ifdef __CUDACC__
-	void cudarun(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
-	#endif
 
 	std::string getDescription() const;
 	void showModules() const;
@@ -84,14 +81,14 @@ private:
 public:
 
 	ModuleListRunner(ModuleList *mlist);
-	void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
+	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
 	std::string getDescription() const;
 };
 
 #ifdef __CUDACC__
 __global__ void cudarun(
-	const thrust::device_vector<ref_ptr<Candidate>>& candidates,
-	const ref_ptr<ModuleList> ModuleList,
+	const thrust::device_vector<Candidate*>& candidates,
+	const ModuleList* ModuleList,
 	bool recursive = true, 
 	bool secondariesFirst = false
 );
