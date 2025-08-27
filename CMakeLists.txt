@@ -217,11 +217,7 @@ endif(ENABLE_OPENMP)
 
 # Additional configuration OMP_SCHEDULE
 set(OMP_SCHEDULE "static,100" CACHE STRING "FORMAT type,chunksize")
-if(ENABLE_CUDA AND CUDAToolkit_FOUND)
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cu.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cu" @ONLY)
-else()
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
-endif(ENABLE_CUDA AND CUDAToolkit_FOUND)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
 
 # Google Performance Tools (optional as possible performance tweak for OpenMP)
 find_package(GooglePerfTools)
@@ -359,15 +355,17 @@ set(CRPROPA_EXTRA_INCLUDES "${CRPROPA_EXTRA_INCLUDES}" CACHE STRING "The include
 mark_as_advanced(CRPROPA_EXTRA_INCLUDES)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
-set(CRPROPA_SOURCES)
 if(ENABLE_CUDA)
-  list(APPEND CRPROPA_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cu)
-else()
-  list(APPEND CRPROPA_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp)
+  # Sets files that should be compiled with NVCC instead if cuda is enabled
+  set_source_files_properties(
+    ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
+    PROPERTIES LANGUAGE CUDA
+  )
 endif(ENABLE_CUDA)
 
-list(APPEND CRPROPA_SOURCES
+add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
@@ -436,10 +434,7 @@ list(APPEND CRPROPA_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Massdistribution.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Nakanishi.cpp
-)
 
-add_library(crpropa SHARED
-  ${CRPROPA_SOURCES}
   ${CRPROPA_EXTRA_SOURCES}
 )
 
