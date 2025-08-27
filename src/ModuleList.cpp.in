@@ -227,14 +227,14 @@ __global__ void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candida
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	if (i>=candidates.size()) return;
 
-	ref_ptr<Candidate> candidate = candidates[i];
+	ref_ptr<Candidate> candidate = candidates[i].operator crpropa::ref_ptr<crpropa::Candidate>();
 
 	// propagate primary candidate until finished
 	while (candidate->isActive()) {
 		MLIST->process(candidate);
 
 		// propagate all secondaries before next step of primary
-		if (recursive and secondariesFirst) {
+		if (recursive and secondariesFirst and candidate->secondaries.size()!=0) {
 			int threadsPerBlock = MLIST->maxThreadsPerBlock;
 			int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
 			cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
@@ -242,7 +242,7 @@ __global__ void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candida
 	}
 
 	// propagate secondaries after completing primary
-	if (recursive and not secondariesFirst) {
+	if (recursive and not secondariesFirst and candidate->secondaries.size()!=0) {
 		int threadsPerBlock = MLIST->maxThreadsPerBlock;
 		int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
 		cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
@@ -268,6 +268,7 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 	int threadsPerBlock = maxThreadsPerBlock;
 	int blocksPerGrid   = (candidates.size() + threadsPerBlock - 1) / threadsPerBlock;
 	cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, this, recursive, secondariesFirst);
+	cudaDeviceSynchronize();
 }
 #endif
 
