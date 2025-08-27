@@ -41,6 +41,10 @@ Candidate::Candidate(const ParticleState &state) :
 
 }
 
+bool Candidate::isActive() const {
+	return active;
+}
+
 void Candidate::setActive(bool b) {
 	active = b;
 }
@@ -217,7 +221,11 @@ ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 	if (recursive) {
 		cloned->secondaries.reserve(secondaries.size());
 		for (size_t i = 0; i < secondaries.size(); i++) {
+			#ifdef __CUDACC__
+			ref_ptr<Candidate> s = secondaries[i].operator crpropa::ref_ptr<crpropa::Candidate>()->clone(recursive);
+			#else
 			ref_ptr<Candidate> s = secondaries[i]->clone(recursive);
+			#endif
 			s->parent = cloned;
 			cloned->secondaries.push_back(s);
 		}

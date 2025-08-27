@@ -357,9 +357,82 @@ include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
 if(ENABLE_CUDA)
   # Sets files that should be compiled with NVCC instead if cuda is enabled
+  # file(GLOB_RECURSE CRPROPA_SRCFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
   set_source_files_properties(
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
-    PROPERTIES LANGUAGE CUDA
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
+    # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
+    # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElasticScattering.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
+    # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoPionProduction.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationCK.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
+    # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticFieldGrid.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PolarizedSingleModeMagneticField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PT11Field.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/GridTurbulence.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/HelicalGridTurbulence.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/SimpleGridTurbulence.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/TF17Field.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Cordes.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Massdistribution.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Nakanishi.cpp
+      
+    PROPERTIES 
+    LANGUAGE CUDA
+    CUDA_SEPARABLE_COMPILATION ON
   )
 endif(ENABLE_CUDA)
 
@@ -439,7 +512,7 @@ add_library(crpropa SHARED
 )
 
 target_link_libraries(crpropa ${CRPROPA_EXTRA_LIBRARIES})
-set_property(TARGET crpropa PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+set_target_properties(crpropa PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 
 #------------------------------------------------------------------

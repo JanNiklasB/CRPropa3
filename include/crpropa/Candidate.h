@@ -77,9 +77,7 @@ public:
 	 */
 	Candidate(const ParticleState &state);
 
-	CUDA_CALLABLE_MEMBER inline bool isActive() const{
-		return active;
-	}
+	CUDA_CALLABLE_MEMBER bool isActive() const;
 	void setActive(bool b);
 
 	void setTrajectoryLength(double length);
