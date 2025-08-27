@@ -41,10 +41,6 @@ Candidate::Candidate(const ParticleState &state) :
 
 }
 
-bool Candidate::isActive() const {
-	return active;
-}
-
 void Candidate::setActive(bool b) {
 	active = b;
 }

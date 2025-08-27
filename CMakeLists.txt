@@ -1,7 +1,17 @@
 cmake_minimum_required(VERSION 3.18)
 
-project(CRPropa LANGUAGES Fortran C CXX CUDA)
+project(CRPropa LANGUAGES Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
+
+find_package(CUDAToolkit)
+
+if(CUDAToolkit_FOUND)
+  option(ENABLE_CUDA "Enables the usage of cuda" OFF)  # maybe elaborate more TODO
+  if(ENABLE_CUDA)
+    project(CRPropa LANGUAGES Fortran C CXX CUDA)
+  else()
+  endif(ENABLE_CUDA)
+endif(CUDAToolkit_FOUND)
 
 add_definitions(-w)
 
@@ -207,7 +217,11 @@ endif(ENABLE_OPENMP)
 
 # Additional configuration OMP_SCHEDULE
 set(OMP_SCHEDULE "static,100" CACHE STRING "FORMAT type,chunksize")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
+if(ENABLE_CUDA AND CUDAToolkit_FOUND)
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cu.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cu" @ONLY)
+else()
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
+endif(ENABLE_CUDA AND CUDAToolkit_FOUND)
 
 # Google Performance Tools (optional as possible performance tweak for OpenMP)
 find_package(GooglePerfTools)
@@ -345,7 +359,14 @@ set(CRPROPA_EXTRA_INCLUDES "${CRPROPA_EXTRA_INCLUDES}" CACHE STRING "The include
 mark_as_advanced(CRPROPA_EXTRA_INCLUDES)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
-add_library(crpropa SHARED
+set(CRPROPA_SOURCES)
+if(ENABLE_CUDA)
+  list(APPEND CRPROPA_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cu)
+else()
+  list(APPEND CRPROPA_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp)
+endif(ENABLE_CUDA)
+
+list(APPEND CRPROPA_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
@@ -355,8 +376,6 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cu
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
@@ -417,9 +436,13 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Massdistribution.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Nakanishi.cpp
+)
 
+add_library(crpropa SHARED
+  ${CRPROPA_SOURCES}
   ${CRPROPA_EXTRA_SOURCES}
 )
+
 target_link_libraries(crpropa ${CRPROPA_EXTRA_LIBRARIES})
 set_property(TARGET crpropa PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 

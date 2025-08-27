@@ -61,7 +61,7 @@ public:
 	const_iterator end() const;
 
 	void setInterruptAction(Output* action);
-	void dumpCandidate(Candidate* cand) const;
+	void dumpCandidate(ref_ptr<Candidate> cand) const;
 
 private:
 	module_list_t modules;
@@ -87,7 +87,7 @@ public:
 
 #ifdef __CUDACC__
 __global__ void cudarun(
-	const thrust::device_vector<Candidate*>& candidates,
+	const thrust::device_vector<ref_ptr<Candidate>>& candidates,
 	const ModuleList* ModuleList,
 	bool recursive = true, 
 	bool secondariesFirst = false

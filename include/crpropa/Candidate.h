@@ -38,7 +38,7 @@ public:
 	#ifndef __CUDACC__
 	std::vector<ref_ptr<Candidate> > secondaries; /**< Secondary particles from interactions */
 	#else
-	thrust::device_vector<Candidate*> secondaries;
+	thrust::device_vector<ref_ptr<Candidate>> secondaries;
 	#endif
 
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
@@ -77,7 +77,9 @@ public:
 	 */
 	Candidate(const ParticleState &state);
 
-	bool isActive() const;
+	CUDA_CALLABLE_MEMBER inline bool isActive() const{
+		return active;
+	}
 	void setActive(bool b);
 
 	void setTrajectoryLength(double length);
