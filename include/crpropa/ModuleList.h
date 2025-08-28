@@ -48,6 +48,9 @@ public:
 	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
 	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
 	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
+	#ifdef __CUDACC__
+	void cudarun(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
+	#endif
 
 	std::string getDescription() const;
 	void showModules() const;
@@ -86,7 +89,7 @@ public:
 };
 
 #ifdef __CUDACC__
-__global__ void cudarun(
+__global__ void _cudarun(
 	const thrust::device_vector<ref_ptr<Candidate>>& candidates,
 	const ModuleList* ModuleList,
 	bool recursive = true, 

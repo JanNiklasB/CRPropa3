@@ -154,7 +154,6 @@ void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool 
 	}
 }
 
-#ifndef __CUDACC__
 void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool secondariesFirst) {
 
 	#if _OPENMP
@@ -219,10 +218,9 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 		std::cerr << "############################################################################\n";
 	}
 }
-#endif
 
 #ifdef __CUDACC__
-__global__ void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candidates, const ModuleList* MLIST,
+__global__ void _cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candidates, const ModuleList* MLIST,
 	bool recursive, bool secondariesFirst) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	if (i>=candidates.size()) return;
@@ -237,7 +235,7 @@ __global__ void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candida
 		if (recursive and secondariesFirst and candidate->secondaries.size()!=0) {
 			int threadsPerBlock = MLIST->maxThreadsPerBlock;
 			int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-			cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
+			_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
 		}
 	}
 
@@ -245,12 +243,12 @@ __global__ void cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candida
 	if (recursive and not secondariesFirst and candidate->secondaries.size()!=0) {
 		int threadsPerBlock = MLIST->maxThreadsPerBlock;
 		int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-		cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
+		_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
 	}
 
 }
 
-void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool secondariesFirst) {
+void ModuleList::cudarun(SourceInterface* source, size_t count, bool recursive, bool secondariesFirst) {
 
 	// extract all primaries:
 	candidate_vector_t candidates;
@@ -267,7 +265,7 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 	// start all primaries on gpu:
 	int threadsPerBlock = maxThreadsPerBlock;
 	int blocksPerGrid   = (candidates.size() + threadsPerBlock - 1) / threadsPerBlock;
-	cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, this, recursive, secondariesFirst);
+	_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, this, recursive, secondariesFirst);
 	cudaDeviceSynchronize();
 }
 #endif
