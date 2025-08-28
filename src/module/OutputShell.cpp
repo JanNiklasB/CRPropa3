@@ -6,17 +6,17 @@
 namespace crpropa {
 
 void ShellOutput::process(Candidate* c) const {
-#pragma omp critical(ShellOutput)
+	#ifndef __CUDACC__
+	#pragma omp critical(ShellOutput)
+	#endif
 	{
-		std::cout << std::fixed << std::showpoint << std::setprecision(3)
-				<< std::setw(6);
-		std::cout << c->getTrajectoryLength() / Mpc << " Mpc,  ";
-		std::cout << c->getRedshift() << ",  ";
-		std::cout << c->current.getId() << ",  ";
-		std::cout << c->current.getEnergy() / EeV << " EeV,  ";
-		std::cout << c->current.getPosition() / Mpc << " Mpc,  ";
-		std::cout << c->current.getDirection();
-		std::cout << std::endl;
+		// showpoint is set by "#" width of 6 is set by 6, precision is set by .3
+		printf("%#6.3f Mpc,  ", c->getTrajectoryLength() / Mpc);
+		printf("%#6.3f, ", c->getRedshift());
+		printf("%#6.3f, ", c->current.getId());
+		printf("%#6.3f EeV, ", c->current.getEnergy() / EeV);
+		printf("%#6.3f Mpc, ", c->current.getPosition() / Mpc);
+		printf("%#6.3f\n", c->current.getDirection());
 	}
 }
 
@@ -25,15 +25,15 @@ std::string ShellOutput::getDescription() const {
 }
 
 void ShellOutput1D::process(Candidate* c) const {
-#pragma omp critical(ShellOutput)
+	#ifndef __CUDACC__
+	#pragma omp critical(ShellOutput)
+	#endif
 	{
-		std::cout << std::fixed << std::showpoint << std::setprecision(3)
-				<< std::setw(6);
-		std::cout << c->current.getPosition().x / Mpc << " Mpc,  ";
-		std::cout << c->getRedshift() << ",  ";
-		std::cout << c->current.getId() << ",  ";
-		std::cout << c->current.getEnergy() / EeV << " EeV";
-		std::cout << std::endl;
+		// showpoint is set by "#" width of 6 is set by 6, precision is set by .3
+		printf("%#6.3f Mpc, ", c->current.getPosition() / Mpc);
+		printf("%#6.3f, ", c->getRedshift());
+		printf("%#6.3f, ", c->current.getId());
+		printf("%#6.3f EeV\n", c->current.getEnergy() / EeV);
 	}
 }
 
@@ -43,10 +43,12 @@ std::string ShellOutput1D::getDescription() const {
 
 void ShellPropertyOutput::process(Candidate* c) const {
 	Candidate::PropertyMap::const_iterator i = c->properties.begin();
-#pragma omp critical(ShellOutput)
+	#ifndef __CUDACC__
+	#pragma omp critical(ShellOutput)
+	#endif
 	{
 		for ( ; i != c->properties.end(); i++) {
-			std::cout << "  " << i->first << ", " << i->second << std::endl;
+			printf("  %f, %f\n", i->first, i->second);
 		}
 	}
 }
