@@ -9,7 +9,7 @@ if(CUDAToolkit_FOUND)
   option(ENABLE_CUDA "Enables the usage of cuda" OFF)  # maybe elaborate more TODO
   if(ENABLE_CUDA)
     project(CRPropa LANGUAGES Fortran C CXX CUDA)
-  else()
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${OpenMP_CUDA_FLAGS}")
   endif(ENABLE_CUDA)
 endif(CUDAToolkit_FOUND)
 
