@@ -49,6 +49,10 @@ void Candidate::setActive(bool b) {
 	active = b;
 }
 
+int Candidate::getSize() const {
+	return CudaSecondariesSize;
+}
+
 double Candidate::getRedshift() const {
 	return redshift;
 }

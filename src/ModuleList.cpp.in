@@ -57,12 +57,16 @@ ref_ptr<Module> ModuleList::operator[](const std::size_t i) {
 
 void ModuleList::process(Candidate* candidate) const {
 	module_list_t::const_iterator m;
-	for (m = modules.begin(); m != modules.end(); m++)
+	int counter = 0;
+	for (m = modules.begin(); m != modules.end(); m++){
 		(*m)->process(candidate);
+		counter++;
+	}
+	candidate->setActive(false);
 }
 
 void ModuleList::process(ref_ptr<Candidate> candidate) const {
-	process((Candidate*) candidate);
+	process(candidate.get());
 }
 
 void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst) {
@@ -92,10 +96,6 @@ void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst
 	// dump candidae and secondaries if interrupted.
 	if (candidate->isActive() && (g_cancel_signal_flag != 0)) 
 		dumpCandidate(candidate);
-}
-
-void ModuleList::run(ref_ptr<Candidate> candidate, bool recursive, bool secondariesFirst) {
-	run((Candidate*) candidate, recursive, secondariesFirst);
 }
 
 void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool secondariesFirst) {
@@ -220,53 +220,107 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 }
 
 #ifdef __CUDACC__
-__global__ void _cudarun(const thrust::device_vector<ref_ptr<Candidate>>& candidates, const ModuleList* MLIST,
+
+__global__ void _cudarun(Candidate* candidates, int candidatesSize, const ModuleList* MLIST,
 	bool recursive, bool secondariesFirst) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
-	if (i>=candidates.size()) return;
+	if (i<candidatesSize){
+		Candidate* candidate = &candidates[i];
 
-	ref_ptr<Candidate> candidate = candidates[i].operator crpropa::ref_ptr<crpropa::Candidate>();
+		// need to keep track which secondaries where started to not start them twice
+		// could also add variable to Candidate.h (like bool started)
+		int currentSecondary = 0;
 
-	// propagate primary candidate until finished
-	while (candidate->isActive()) {
-		MLIST->process(candidate);
+		// propagate primary candidate until finished
+		while (candidate->isActive()) {
+			MLIST->process(candidate);
 
-		// propagate all secondaries before next step of primary
-		if (recursive and secondariesFirst and candidate->secondaries.size()!=0) {
-			int threadsPerBlock = MLIST->maxThreadsPerBlock;
-			int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-			_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
+			// propagate all secondaries before next step of primary
+			if (recursive and secondariesFirst) {
+				int count = candidate->getSize() - currentSecondary;
+				if(count>0){
+					int threadsPerBlock = MLIST->maxThreadsPerBlock;
+					int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
+					_cudarun<<<blocksPerGrid, threadsPerBlock>>>(
+						&candidate->CudaSecondaries[currentSecondary],  // we shift CudaSecondaries by currentSecondary
+						count, 
+						MLIST, 
+						recursive, 
+						secondariesFirst
+					);
+					currentSecondary += count;
+				}
+			}
+		}
+
+		// propagate secondaries after completing primary
+		// we do not need to keep track of the started secondaries here since they are never done first
+		if (recursive and not secondariesFirst) {
+			int count = candidate->getSize();
+			if (count>0) {	
+				int threadsPerBlock = MLIST->maxThreadsPerBlock;
+				int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
+				_cudarun<<<blocksPerGrid, threadsPerBlock>>>(
+					candidate->CudaSecondaries, 
+					count, 
+					MLIST, 
+					recursive, 
+					secondariesFirst
+				);
+			}
 		}
 	}
+}
 
-	// propagate secondaries after completing primary
-	if (recursive and not secondariesFirst and candidate->secondaries.size()!=0) {
-		int threadsPerBlock = MLIST->maxThreadsPerBlock;
-		int blocksPerGrid   = (candidate->secondaries.size() + threadsPerBlock - 1) / threadsPerBlock;
-		_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidate->secondaries, MLIST, recursive, secondariesFirst);
+// this might need to copy stuff in more detail, otherwise we will lose data
+__global__ void copySecondary(Candidate* dst, const Candidate* src, int size){
+	int i = blockDim.x*blockIdx.x + threadIdx.x;
+	if (i<size){
+		dst[i] = src[i];
 	}
+}
 
+void ModuleList::copySecondaries(Candidate* candidate){
+	int size = candidate->getSize();
+	if (size>0) {
+		Candidate *tmp = new Candidate[size];
+
+		int threadsPerBlock = maxThreadsPerBlock;
+		int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
+		copySecondary<<<1, size>>>(tmp, candidate->CudaSecondaries, size);
+		cudaDeviceSynchronize();
+
+		for (int i=0; i<size; i++){
+			copySecondaries(&tmp[i]);
+		}
+		cudaFree(candidate->CudaSecondaries);
+		candidate->CudaSecondaries = tmp;
+	}
 }
 
 void ModuleList::cudarun(SourceInterface* source, size_t count, bool recursive, bool secondariesFirst) {
 
 	// extract all primaries:
-	candidate_vector_t candidates;
+	Candidate* candidates = new Candidate[count];
 	for (size_t i = 0; i < count; i++) {
 		ref_ptr<Candidate> candidate;
-
 		candidate = source->getCandidate();
 
 		if (candidate.valid()) {
-			candidates.push_back(candidate);
+			candidates[i] = *candidate.get();
 		}
 	}
 
 	// start all primaries on gpu:
 	int threadsPerBlock = maxThreadsPerBlock;
-	int blocksPerGrid   = (candidates.size() + threadsPerBlock - 1) / threadsPerBlock;
-	_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, this, recursive, secondariesFirst);
+	int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
+	_cudarun<<<blocksPerGrid, threadsPerBlock>>>(candidates, count, this, recursive, secondariesFirst);
 	cudaDeviceSynchronize();
+
+	// copy secondaries which are on the gpu atm:
+	for (size_t i = 0; i < count; i++) {
+		copySecondaries(&candidates[i]);
+	}
 }
 #endif
 
@@ -291,7 +345,11 @@ std::string ModuleList::getDescription() const {
 	ss << "ModuleList\n";
 	crpropa::ModuleList::module_list_t::const_iterator m;
 	for (m = modules.begin(); m != modules.end(); m++)
+		#ifdef __CUDACC__
+		ss << "  " << (*m).operator crpropa::ref_ptr<crpropa::Module>()->getDescription() << "\n";
+		#else
 		ss << "  " << (*m)->getDescription() << "\n";
+		#endif
 	return ss.str();
 }
 
@@ -315,10 +373,10 @@ void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
 		 << cand->getSerialNumber() << std::endl;
 
 	for (int i = 0; i < cand->secondaries.size(); i++) {
-		#ifndef __CUDACC__
-		if (cand->secondaries[i])
+		#ifdef __CUDACC__
+		if (cand->secondaries[i].operator crpropa::ref_ptr<crpropa::Candidate>().valid())
 		#else
-		if (cand->secondaries[i].operator crpropa::ref_ptr<crpropa::Candidate>())
+		if (cand->secondaries[i])
 		#endif
 			dumpCandidate(cand->secondaries[i]);
 	}

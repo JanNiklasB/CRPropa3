@@ -6,9 +6,7 @@
 namespace crpropa {
 
 void ShellOutput::process(Candidate* c) const {
-	#ifndef __CUDACC__
 	#pragma omp critical(ShellOutput)
-	#endif
 	{
 		// showpoint is set by "#" width of 6 is set by 6, precision is set by .3
 		printf("%#6.3f Mpc,  ", c->getTrajectoryLength() / Mpc);
@@ -25,9 +23,7 @@ std::string ShellOutput::getDescription() const {
 }
 
 void ShellOutput1D::process(Candidate* c) const {
-	#ifndef __CUDACC__
 	#pragma omp critical(ShellOutput)
-	#endif
 	{
 		// showpoint is set by "#" width of 6 is set by 6, precision is set by .3
 		printf("%#6.3f Mpc, ", c->current.getPosition() / Mpc);
@@ -43,9 +39,7 @@ std::string ShellOutput1D::getDescription() const {
 
 void ShellPropertyOutput::process(Candidate* c) const {
 	Candidate::PropertyMap::const_iterator i = c->properties.begin();
-	#ifndef __CUDACC__
 	#pragma omp critical(ShellOutput)
-	#endif
 	{
 		for ( ; i != c->properties.end(); i++) {
 			printf("  %f, %f\n", i->first, i->second);

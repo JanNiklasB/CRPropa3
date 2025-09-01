@@ -28,8 +28,9 @@ class ModuleList: public Module {
 public:
 	typedef std::list<ref_ptr<Module> > module_list_t;
 	typedef std::vector<ref_ptr<Candidate> > candidate_vector_t;
+
 	#ifdef __CUDACC__
-	int maxThreadsPerBlock;
+	__shared__ int maxThreadsPerBlock;
 	#endif
 
 	ModuleList();
@@ -49,6 +50,7 @@ public:
 	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
 	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#ifdef __CUDACC__
+	void copySecondaries(Candidate* candidate);
 	void cudarun(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#endif
 
@@ -58,10 +60,10 @@ public:
 	/** iterator goodies */
 	typedef module_list_t::iterator iterator;
 	typedef module_list_t::const_iterator const_iterator;
-	iterator begin();
-	const_iterator begin() const;
-	iterator end();
-	const_iterator end() const;
+	CUDA_CALLABLE_MEMBER iterator begin();
+	CUDA_CALLABLE_MEMBER const_iterator begin() const;
+	CUDA_CALLABLE_MEMBER iterator end();
+	CUDA_CALLABLE_MEMBER const_iterator end() const;
 
 	void setInterruptAction(Output* action);
 	void dumpCandidate(ref_ptr<Candidate> cand) const;
@@ -90,7 +92,8 @@ public:
 
 #ifdef __CUDACC__
 __global__ void _cudarun(
-	const thrust::device_vector<ref_ptr<Candidate>>& candidates,
+	Candidate* candidates,
+	int candidatesSize,
 	const ModuleList* ModuleList,
 	bool recursive = true, 
 	bool secondariesFirst = false

@@ -35,10 +35,9 @@ public:
 	ParticleState current; /**< Current particle state */
 	ParticleState previous; /**< Particle state at the end of the previous step */
 
-	#ifndef __CUDACC__
 	std::vector<ref_ptr<Candidate> > secondaries; /**< Secondary particles from interactions */
-	#else
-	thrust::device_vector<ref_ptr<Candidate>> secondaries;
+	#ifdef __CUDACC__
+	Candidate* CudaSecondaries=NULL;
 	#endif
 
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
@@ -60,6 +59,10 @@ private:
 	static uint64_t nextSerialNumber;
 	uint64_t serialNumber;
 
+	#ifdef __CUDACC__
+	int CudaSecondariesSize=0;
+	#endif
+
 public:
 	Candidate(
 		int id = 0,
@@ -78,7 +81,11 @@ public:
 	Candidate(const ParticleState &state);
 
 	CUDA_CALLABLE_MEMBER bool isActive() const;
-	void setActive(bool b);
+	CUDA_CALLABLE_MEMBER void setActive(bool b);
+
+	#ifdef __CUDACC__
+	CUDA_CALLABLE_MEMBER int getSize() const;
+	#endif
 
 	void setTrajectoryLength(double length);
 	double getTrajectoryLength() const;
