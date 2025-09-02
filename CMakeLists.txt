@@ -378,7 +378,7 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
     # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp

@@ -17,14 +17,14 @@ namespace crpropa {
 /// @class StepLengthModifier
 /// @brief Modifies the steplength of an acceleration module.
 class StepLengthModifier : public Referenced {
-  public:
+public:
 	/// Returns an update of the steplength
 	/// @param steplength 	Modifies step length, e.g., based on scattering 
 	///						model.	
 	/// @param candidate 	Additional candidate properties are usually 
 	///						included in the calculation of the updated
 	///						step length.
-	virtual double modify(double steplength, Candidate *candidate) = 0;
+	CUDA_CALLABLE_MEMBER virtual double modify(double steplength, Candidate *candidate) = 0;
 };
 
 
@@ -35,26 +35,29 @@ class StepLengthModifier : public Referenced {
 ///  for performance reasons. Models for the dependence of the step length of
 ///  the scatter process are set via modifiers.
 class AbstractAccelerationModule : public Module {
-	double stepLength;
-	std::vector<ref_ptr<StepLengthModifier>> modifiers;
+	private:
+		double stepLength;
+		std::vector<ref_ptr<StepLengthModifier>> modifiers;
+		ref_ptr<StepLengthModifier> modifiersPtr=NULL;
+		int modifiersSize=0;
 
-  public:
-	/// The parent's constructor need to be called on initialization!
-	AbstractAccelerationModule(double _stepLength = 1. * parsec);
-	// add a step length modifier to the model
-	void add(StepLengthModifier *modifier);
-	// update the candidate
-	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
+	public:
+		/// The parent's constructor need to be called on initialization!
+		AbstractAccelerationModule(double _stepLength = 1. * parsec);
+		// add a step length modifier to the model
+		void add(StepLengthModifier *modifier);
+		// update the candidate
+		CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 
-	/// Returns the velocity vector of the scatter centers in the rest frame of
-	/// the candidate. Needs to be implemented in inheriting classes.
-	virtual Vector3d scatterCenterVelocity(Candidate *candidate) const = 0;
+		/// Returns the velocity vector of the scatter centers in the rest frame of
+		/// the candidate. Needs to be implemented in inheriting classes.
+		CUDA_CALLABLE_MEMBER virtual Vector3d scatterCenterVelocity(Candidate *candidate) const = 0;
 
-	/// Scatter the candidate with a center with given scatter center
-	/// velocity into a random direction. Assumes that the
-	/// candidate is ultra-relativistic (m = 0).
-	void scatter(Candidate *candidate,
-	             const Vector3d &scatter_center_velocity) const;
+		/// Scatter the candidate with a center with given scatter center
+		/// velocity into a random direction. Assumes that the
+		/// candidate is ultra-relativistic (m = 0).
+		CUDA_CALLABLE_MEMBER void scatter(Candidate *candidate,
+					const Vector3d &scatter_center_velocity) const;
 };
 
 
@@ -62,21 +65,26 @@ class AbstractAccelerationModule : public Module {
 /// @brief  Implements scattering with centers moving in isotropic directions.
 ///   All scatter centers have the same velocity.
 class SecondOrderFermi : public AbstractAccelerationModule {
-	double scatterVelocity;
-	std::vector<double> angle;
-	std::vector<double> angleCDF;
+	private:
+		double scatterVelocity;
+		std::vector<double> angle;
+		double* anglePtr=NULL;
+		int angleSize=0;
+		std::vector<double> angleCDF;
+		double* angleCDFPtr=NULL;
+		int angleCDFSize=0;
 
-  public:
-	/** Constructor
-	@param scatterVelocity			velocity of scattering centers
-	@param stepLength				average mean free path
-	@param sizeOfPitchangleTable	number of precalculated pitch angles
-	*/
-	SecondOrderFermi(double scatterVelocity = .1 * crpropa::c_light,
-	                 double stepLength = 1. * crpropa::parsec,
-	                 unsigned int sizeOfPitchangleTable = 10000);
-	virtual crpropa::Vector3d
-	scatterCenterVelocity(crpropa::Candidate *candidate) const;
+	public:
+		/** Constructor
+		@param scatterVelocity			velocity of scattering centers
+		@param stepLength				average mean free path
+		@param sizeOfPitchangleTable	number of precalculated pitch angles
+		*/
+		SecondOrderFermi(double scatterVelocity = .1 * crpropa::c_light,
+						double stepLength = 1. * crpropa::parsec,
+						unsigned int sizeOfPitchangleTable = 10000);
+		virtual crpropa::Vector3d
+		CUDA_CALLABLE_MEMBER scatterCenterVelocity(crpropa::Candidate *candidate) const;
 };
 
 
@@ -87,18 +95,18 @@ class SecondOrderFermi : public AbstractAccelerationModule {
 ///    Thanks to Aritra Ghosh, Groningn University, for first work in 2017 on
 ///    the shock acceleration in CRPropa leading to this module.
 class DirectedFlowScattering : public AbstractAccelerationModule {
-  private:
-	crpropa::Vector3d __scatterVelocity;
+	private:
+		crpropa::Vector3d __scatterVelocity;
 
-  public:
-  /** Constructor
-   * @param scatterCenterVelocity	velocity of scattering centers
-   * @param stepLength				average mean free path
-  */
-	DirectedFlowScattering(crpropa::Vector3d scatterCenterVelocity,
-	                       double stepLength = 1. * parsec);
-	virtual crpropa::Vector3d
-	scatterCenterVelocity(crpropa::Candidate *candidate) const;
+	public:
+		/** Constructor
+		 * @param scatterCenterVelocity	velocity of scattering centers
+		 * @param stepLength				average mean free path
+		 */
+		DirectedFlowScattering(crpropa::Vector3d scatterCenterVelocity,
+							double stepLength = 1. * parsec);
+		virtual crpropa::Vector3d
+		CUDA_CALLABLE_MEMBER scatterCenterVelocity(crpropa::Candidate *candidate) const;
 };
 
 
@@ -107,15 +115,15 @@ class DirectedFlowScattering : public AbstractAccelerationModule {
 /// particles as headon collisions are more likely than tail=on collisions -
 /// propagating against the flow is harder.
 class DirectedFlowOfScatterCenters : public StepLengthModifier {
-  private:
-	Vector3d __scatterVelocity;
+	private:
+		Vector3d __scatterVelocity;
 
-  public:
-  /** Constructor
-   * @param scatterCenterVelocity	velocity of scattering centers
-  */
-	DirectedFlowOfScatterCenters(const Vector3d &scatterCenterVelocity);
-	double modify(double steplength, Candidate *candidate);
+	public:
+		/** Constructor
+		 * @param scatterCenterVelocity	velocity of scattering centers
+		 */
+		DirectedFlowOfScatterCenters(const Vector3d &scatterCenterVelocity);
+		CUDA_CALLABLE_MEMBER double modify(double steplength, Candidate *candidate);
 };
 
 
@@ -139,22 +147,22 @@ class DirectedFlowOfScatterCenters : public StepLengthModifier {
 ///      The Astrophysical Journal 336 (1989) 264. doi:10.1086/167010.
 class QuasiLinearTheory : public StepLengthModifier {
 	private:
-	double __referenceEnergy;
-	double __turbulenceIndex;
-	double __minimumRigidity;
+		double __referenceEnergy;
+		double __turbulenceIndex;
+		double __minimumRigidity;
 
-  public:
-  /** Constructor
-   * @param referenecEnergy	reference energy - break of power spectrum
-   * @param turbulenceIndex	power law index of the isotropic magnetic 
-   * 						turbulence power spectrum; default is set 
-   * 						to Kolmogorov turbulence.
-   * @param minimumRigidity	minimal rigidity
-  */
-	QuasiLinearTheory(double referenecEnergy = 1. * EeV,
-	                  double turbulenceIndex = 5. / 3,
-	                  double minimumRigidity = 0);
-	double modify(double steplength, Candidate *candidate);
+	public:
+		/** Constructor
+		 * @param referenecEnergy	reference energy - break of power spectrum
+		 * @param turbulenceIndex	power law index of the isotropic magnetic 
+		 * 						turbulence power spectrum; default is set 
+		 * 						to Kolmogorov turbulence.
+		 * @param minimumRigidity	minimal rigidity
+		 */
+		QuasiLinearTheory(double referenecEnergy = 1. * EeV,
+						double turbulenceIndex = 5. / 3,
+						double minimumRigidity = 0);
+		CUDA_CALLABLE_MEMBER double modify(double steplength, Candidate *candidate);
 };
 
 
@@ -180,14 +188,14 @@ class ParticleSplitting : public Module {
 	@param crossingThreshold   Number of crossings after which a particle is split
 	@param numberSplits           Number of particles the candidate is split into
 	@param minWeight           Minimum weight to consider. Particles with
-	                         	a lower weight are not split again.
+								a lower weight are not split again.
 	@param counterid            An unique string to identify the particle
-	                            property used for counting. Useful if
-	                            multiple splitting modules are present.
+								property used for counting. Useful if
+								multiple splitting modules are present.
 	*/
 	ParticleSplitting(Surface *surface, int crossingThreshold = 50,
-	                  int numberSplits = 5, double minWeight = 0.01,
-	                  std::string counterid = "ParticleSplittingCounter");
+					int numberSplits = 5, double minWeight = 0.01,
+					std::string counterid = "ParticleSplittingCounter");
 
 	// update the candidate
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;

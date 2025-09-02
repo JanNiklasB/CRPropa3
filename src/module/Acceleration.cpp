@@ -3,6 +3,8 @@
 #include <crpropa/Random.h>
 #include <cmath>
 
+using namespace std;
+
 namespace crpropa {
 
 AbstractAccelerationModule::AbstractAccelerationModule(double _stepLength)
@@ -11,6 +13,7 @@ AbstractAccelerationModule::AbstractAccelerationModule(double _stepLength)
 
 void AbstractAccelerationModule::add(StepLengthModifier *modifier) {
 	modifiers.push_back(modifier);
+	modifiersSize = modifiers.size();
 }
 
 
@@ -44,8 +47,8 @@ void AbstractAccelerationModule::scatter(
 
 void AbstractAccelerationModule::process(crpropa::Candidate *candidate) const {
 	double currentStepLength = stepLength;
-	for (auto m : modifiers) {
-		currentStepLength = m->modify(currentStepLength, candidate);
+	for (int i=0; i<modifiersSize; i++) {
+		currentStepLength = modifiersPtr[i].modify(currentStepLength, candidate);
 	}
 
 	double step = candidate->getCurrentStep();
@@ -68,7 +71,11 @@ SecondOrderFermi::SecondOrderFermi(double scatterVelocity, double stepLength,
 	  scatterVelocity(scatterVelocity) {
 	setDescription("SecondOrderFermi Acceleration");
 	angle.resize(sizeOfPitchangleTable);
+	anglePtr = angle.data();
+	angleSize = angle.size();
 	angleCDF.resize(sizeOfPitchangleTable);
+	angleCDFPtr = angleCDF.data();
+	angleCDFSize = angleCDF.size();
 
 	// have a discretized table of beamed pitch angles
 	for (unsigned int i =0; i < sizeOfPitchangleTable; i++) {
@@ -80,7 +87,7 @@ SecondOrderFermi::SecondOrderFermi(double scatterVelocity, double stepLength,
 
 crpropa::Vector3d SecondOrderFermi::scatterCenterVelocity(crpropa::Candidate *candidate) const
 {
-	size_t idx = crpropa::closestIndex(crpropa::Random::instance().rand(), angleCDF);
+	size_t idx = crpropa::closestIndex(crpropa::Random::instance().rand(), angleCDFPtr, angleCDFSize);
 	crpropa::Vector3d rv = crpropa::Random::instance().randVector();
 	crpropa::Vector3d rotationAxis = candidate->current.getDirection().cross(rv);
 
@@ -130,19 +137,19 @@ double QuasiLinearTheory::modify(double steplength, Candidate* candidate)
 {
 	if (candidate->current.getRigidity() < __minimumRigidity)
 	{
-		return steplength * std::pow(__minimumRigidity /
+		return steplength * pow(__minimumRigidity /
 			(__referenceEnergy / eV), 2. - __turbulenceIndex);
 	}
 	else
 	{
-		return steplength * std::pow(candidate->current.getRigidity() /
+		return steplength * pow(candidate->current.getRigidity() /
 			(__referenceEnergy / eV), 2. - __turbulenceIndex);
 	}
 }
 
 
 ParticleSplitting::ParticleSplitting(Surface *surface, int	crossingThreshold, 
-	int numberSplits, double minWeight, std::string counterid)
+	int numberSplits, double minWeight, string counterid)
 	: surface(surface), crossingThreshold(crossingThreshold),
 	  numberSplits(numberSplits), minWeight(minWeight), counterid(counterid){};
 
