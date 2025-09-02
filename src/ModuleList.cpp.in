@@ -25,6 +25,7 @@ ModuleList::ModuleList() : showProgress(false) {
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop, 0);
 	maxThreadsPerBlock = prop.maxThreadsDim[0];
+	modulesPtr = modules.data();
 	#endif
 }
 
@@ -37,12 +38,14 @@ void ModuleList::setShowProgress(bool show) {
 
 void ModuleList::add(Module *module) {
 	modules.push_back(module);
+	modulesSize=modules.size();
 }
 
 void ModuleList::remove(std::size_t i) {
 	iterator module_i = modules.begin();
 	std::advance(module_i, i);
 	modules.erase(module_i);
+	modulesSize=modules.size();
 }
 
 std::size_t ModuleList::size() const {
@@ -56,13 +59,9 @@ ref_ptr<Module> ModuleList::operator[](const std::size_t i) {
 }
 
 void ModuleList::process(Candidate* candidate) const {
-	module_list_t::const_iterator m;
-	int counter = 0;
-	for (m = modules.begin(); m != modules.end(); m++){
-		(*m)->process(candidate);
-		counter++;
+	for (int i=0; i<modulesSize; i++){
+		modulesPtr[i]->process(candidate);
 	}
-	candidate->setActive(false);
 }
 
 void ModuleList::process(ref_ptr<Candidate> candidate) const {
@@ -96,6 +95,10 @@ void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst
 	// dump candidae and secondaries if interrupted.
 	if (candidate->isActive() && (g_cancel_signal_flag != 0)) 
 		dumpCandidate(candidate);
+}
+
+void ModuleList::run(ref_ptr<Candidate> candidate, bool recursive, bool secondariesFirst){
+	run(candidate.get());
 }
 
 void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool secondariesFirst) {
@@ -237,7 +240,7 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 
 			// propagate all secondaries before next step of primary
 			if (recursive and secondariesFirst) {
-				int count = candidate->getSize() - currentSecondary;
+				int count = candidate->getSecondarySize() - currentSecondary;
 				if(count>0){
 					int threadsPerBlock = MLIST->maxThreadsPerBlock;
 					int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
@@ -256,7 +259,7 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 		// propagate secondaries after completing primary
 		// we do not need to keep track of the started secondaries here since they are never done first
 		if (recursive and not secondariesFirst) {
-			int count = candidate->getSize();
+			int count = candidate->getSecondarySize();
 			if (count>0) {	
 				int threadsPerBlock = MLIST->maxThreadsPerBlock;
 				int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
@@ -276,12 +279,12 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 __global__ void copySecondary(Candidate* dst, const Candidate* src, int size){
 	int i = blockDim.x*blockIdx.x + threadIdx.x;
 	if (i<size){
-		dst[i] = src[i];
+		dst[i].cudaCopy(&src[i]);
 	}
 }
 
 void ModuleList::copySecondaries(Candidate* candidate){
-	int size = candidate->getSize();
+	int size = candidate->getSecondarySize();
 	if (size>0) {
 		Candidate *tmp = new Candidate[size];
 
@@ -345,11 +348,7 @@ std::string ModuleList::getDescription() const {
 	ss << "ModuleList\n";
 	crpropa::ModuleList::module_list_t::const_iterator m;
 	for (m = modules.begin(); m != modules.end(); m++)
-		#ifdef __CUDACC__
-		ss << "  " << (*m).operator crpropa::ref_ptr<crpropa::Module>()->getDescription() << "\n";
-		#else
 		ss << "  " << (*m)->getDescription() << "\n";
-		#endif
 	return ss.str();
 }
 
@@ -362,7 +361,7 @@ void ModuleList::setInterruptAction(Output* action) {
 	haveInterruptAction = true;
 }
 
-void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
+void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const { 
 	if (!haveInterruptAction) 
 		return;
 	
@@ -373,11 +372,7 @@ void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
 		 << cand->getSerialNumber() << std::endl;
 
 	for (int i = 0; i < cand->secondaries.size(); i++) {
-		#ifdef __CUDACC__
-		if (cand->secondaries[i].operator crpropa::ref_ptr<crpropa::Candidate>().valid())
-		#else
 		if (cand->secondaries[i])
-		#endif
 			dumpCandidate(cand->secondaries[i]);
 	}
 }

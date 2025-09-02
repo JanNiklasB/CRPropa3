@@ -7,16 +7,11 @@
 #include <vector>
 #include <exception>
 #include <sstream>
-#include <list>
 
 #include "crpropa/Candidate.h"
 #include "crpropa/Module.h"
 #include "crpropa/Source.h"
 #include "crpropa/module/Output.h"
-
-#ifdef __CUDACC__
-#include "thrust/device_vector.h"
-#endif
 
 namespace crpropa {
 
@@ -26,7 +21,7 @@ namespace crpropa {
  */
 class ModuleList: public Module {
 public:
-	typedef std::list<ref_ptr<Module> > module_list_t;
+	typedef std::vector<ref_ptr<Module> > module_list_t;
 	typedef std::vector<ref_ptr<Candidate> > candidate_vector_t;
 
 	#ifdef __CUDACC__
@@ -60,10 +55,10 @@ public:
 	/** iterator goodies */
 	typedef module_list_t::iterator iterator;
 	typedef module_list_t::const_iterator const_iterator;
-	CUDA_CALLABLE_MEMBER iterator begin();
-	CUDA_CALLABLE_MEMBER const_iterator begin() const;
-	CUDA_CALLABLE_MEMBER iterator end();
-	CUDA_CALLABLE_MEMBER const_iterator end() const;
+	iterator begin();
+	const_iterator begin() const;
+	iterator end();
+	const_iterator end() const;
 
 	void setInterruptAction(Output* action);
 	void dumpCandidate(ref_ptr<Candidate> cand) const;
@@ -74,6 +69,10 @@ private:
 	Output* interruptAction;
 	bool haveInterruptAction = false;
 	std::vector<int> notFinished; // list with not finished numbers of candidates
+	#ifdef __CUDACC__
+	ref_ptr<Module>* modulesPtr=NULL;
+	int modulesSize=0;
+	#endif
 };
 
 /**

@@ -44,7 +44,7 @@ public:
 	PropertyMap properties; /**< Map of property names and their values. */
 
 	/** Parent candidate. 0 if no parent (initial particle). Must not be a ref_ptr to prevent circular referencing. */
-	Candidate *parent;
+	Candidate *parent=NULL;
 
 private:
 	bool active; /**< Active status */
@@ -84,7 +84,7 @@ public:
 	CUDA_CALLABLE_MEMBER void setActive(bool b);
 
 	#ifdef __CUDACC__
-	CUDA_CALLABLE_MEMBER int getSize() const;
+	CUDA_CALLABLE_MEMBER int getSecondarySize() const;
 	#endif
 
 	void setTrajectoryLength(double length);
@@ -186,6 +186,10 @@ public:
 
 	/** Get the next serial number that will be assigned */
 	static uint64_t getNextSerialNumber();
+
+	#ifdef __CUDACC__
+	__device__ void cudaCopy(const Candidate* Secondary);
+	#endif
 
 	/**
 	 Create an exact clone of candidate

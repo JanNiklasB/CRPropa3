@@ -49,9 +49,11 @@ void Candidate::setActive(bool b) {
 	active = b;
 }
 
-int Candidate::getSize() const {
+#ifdef __CUDACC__
+int Candidate::getSecondarySize() const {
 	return CudaSecondariesSize;
 }
+#endif
 
 double Candidate::getRedshift() const {
 	return redshift;
@@ -207,6 +209,25 @@ std::string Candidate::getDescription() const {
 	return ss.str();
 }
 
+#ifdef __CUDACC__
+void Candidate::cudaCopy(const Candidate* Secondary){
+	source = Secondary->source;
+	created = Secondary->created;
+	current = Secondary->current;
+	previous = Secondary->previous;
+
+	properties = Secondary->properties;
+	active = Secondary->active;
+	redshift = Secondary->redshift;
+	weight = Secondary->weight;
+	trajectoryLength = Secondary->trajectoryLength;
+	time = Secondary->time;
+	currentStep = Secondary->currentStep;
+	nextStep = Secondary->nextStep;
+	parent = Secondary->parent;
+}
+#endif
+
 ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 	ref_ptr<Candidate> cloned = new Candidate;
 	cloned->source = source;
@@ -225,11 +246,7 @@ ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 	if (recursive) {
 		cloned->secondaries.reserve(secondaries.size());
 		for (size_t i = 0; i < secondaries.size(); i++) {
-			#ifdef __CUDACC__
-			ref_ptr<Candidate> s = secondaries[i].operator crpropa::ref_ptr<crpropa::Candidate>()->clone(recursive);
-			#else
 			ref_ptr<Candidate> s = secondaries[i]->clone(recursive);
-			#endif
 			s->parent = cloned;
 			cloned->secondaries.push_back(s);
 		}
