@@ -18,7 +18,8 @@ void AdiabaticCooling::process(Candidate *c) const {
 	double E = c->current.getEnergy(); // Note we use E=p/c (relativistic limit)
     double time = c->getTime();
 	
-	double Div = 0.;	
+	double Div = 0.;
+	#ifndef __CUDACC__
 	try {
 		Div +=  advectionField->getDivergence(pos, time);
 	} 
@@ -26,6 +27,9 @@ void AdiabaticCooling::process(Candidate *c) const {
 		KISS_LOG_ERROR 	<< "AdiabaticCooling: Exception in getDivergence.\n" 
 				<< e.what();
 	}
+	#else
+	Div +=  advectionField->getDivergence(pos, time);
+	#endif
 	
 	double dEdt = -E / 3. * Div; 	// cooling due to advection -p/3 * div(V_wind)
 					// (see e.g. Kopp et al. Computer Physics Communication 183

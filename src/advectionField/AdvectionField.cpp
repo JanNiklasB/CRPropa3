@@ -7,20 +7,22 @@ namespace crpropa {
 
 void AdvectionFieldList::addField(ref_ptr<AdvectionField> field) {
 	fields.push_back(field);
+	fieldsPtr=fields.data();
+	fieldsSize=fields.size();
 }
 
 Vector3d AdvectionFieldList::getField(const Vector3d &position, const double &time) const {
 	Vector3d b(0.);
-	for (int i = 0; i < fields.size(); i++)
-		b += fields[i]->getField(position);
+	for (int i = 0; i < fieldsSize; i++)
+		b += fieldsPtr[i]->getField(position);
 	return b;
 }
 
 double AdvectionFieldList::getDivergence(const Vector3d &position, const double &time) const {
 	double D=0.;
 	// Work on default values for divergence or an error handling
-	for (int i = 0; i < fields.size(); i++)
-		D += fields[i]->getDivergence(position);
+	for (int i = 0; i < fieldsSize; i++)
+		D += fieldsPtr[i]->getDivergence(position);
 	return D;
 }
 

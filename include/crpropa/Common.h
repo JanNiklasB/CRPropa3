@@ -66,13 +66,13 @@ CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size);
 // pow implementation as template for integer exponents pow_integer<2>(x)
 // evaluates to x*x
 template <unsigned int exponent>
-inline double pow_integer(double base)
+CUDA_CALLABLE_MEMBER inline double pow_integer(double base)
 {
   return pow_integer<(exponent >> 1)>(base*base) * (((exponent & 1) > 0) ? base : 1);
 }
 
 template <>
-inline double pow_integer<0>(double base)
+CUDA_CALLABLE_MEMBER inline double pow_integer<0>(double base)
 {
   return 1;
 }

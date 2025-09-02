@@ -38,7 +38,7 @@ public:/** Constructor
 	OneDimensionalTimeDependentShock(double v_sh, double v1, double v0, double l_sh);
 
 	Vector3d getField(const Vector3d &position, const double &time=0) const;
-	double getDivergence(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setShockSpeed(double v_sh);
 	void setSpeeds(double v1, double v0);
@@ -70,7 +70,7 @@ public:/** Constructor
 */
 	SedovTaylorBlastWave(double E0, double rho0, double l_sh);
 	Vector3d getField(const Vector3d &position, const double &time=0) const;
-	double getDivergence(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setShockWidth(double l_sh);
 	void setEnergy(double E0);
