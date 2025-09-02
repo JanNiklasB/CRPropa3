@@ -134,7 +134,23 @@ double interpolateEquidistant(double x, double lo, double hi,
 }
 
 size_t closestIndex(double x, const std::vector<double> &X) {
-	size_t i1 = std::lower_bound(X.begin(), X.end(), x) - X.begin();
+	return closestIndex(x, X.data(), X.size());
+}
+
+size_t closestIndex(double x, const double *X, int size) {
+	int count=size-1, step;
+	double it;
+	size_t i1 = 0;
+	while (count>0) {
+		step = count/2;
+		it = X[step+i1];
+		if (it<x) {
+			i1 = step+1;
+			count -= step+1;
+		}
+		else count = step;
+	}
+
 	if (i1 == 0)
 		return i1;
 	size_t i0 = i1 - 1;

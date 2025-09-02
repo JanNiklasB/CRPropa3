@@ -363,7 +363,7 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp

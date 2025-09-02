@@ -3,6 +3,14 @@
 
 #include <string>
 #include <vector>
+
+#ifdef __CUDACC__
+#define CUDA_CALLABLE_MEMBER __host__ __device__
+#include <cuda_runtime.h>
+#else
+#define CUDA_CALLABLE_MEMBER
+#endif
+
 /**
  @file
  @brief Common helper functions
@@ -48,7 +56,10 @@ double interpolateEquidistant(double x, double lo, double hi,
 		const std::vector<double>& Y);
 
 // Find index of value in a sorted vector X that is closest to x
-size_t closestIndex(double x, const std::vector<double> &X);
+CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const std::vector<double> &X);
+
+// Find index of value in a sorted list X that is closest to x
+CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size);
 /** @}*/
 
 
