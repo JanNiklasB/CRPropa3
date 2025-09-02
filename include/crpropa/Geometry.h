@@ -26,7 +26,7 @@ public:
  	 positive on the other. For closed surfaces it is negative on the inside.
 	 @param point	vector corresponding to the point to which compute the distance
 	 */
-	virtual double distance(const Vector3d& point) const = 0;
+	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d& point) const = 0;
 	/**  Returns the normal to the surface at a point. Negative on the one side,
 	 positive on the other. For closed surfaces it is negative on the inside.
 	 @param point	vector corresponding to the point to which compute the normal vector
@@ -46,7 +46,7 @@ private:
 public:
 	Plane(const Vector3d& x0, const Vector3d& v1,const Vector3d& v2);
 	Plane(const Vector3d& x0, const Vector3d& n);
-	virtual double distance(const Vector3d &x) const;
+	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &x) const;
 	virtual Vector3d normal(const Vector3d& point) const;
 	virtual std::string getDescription() const;
 };
@@ -62,7 +62,7 @@ private:
 	double radius;
 public:
 	Sphere(const Vector3d& center, double radius);
-	virtual double distance(const Vector3d &point) const;
+	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &point) const;
 	virtual Vector3d normal(const Vector3d& point) const;
 	virtual std::string getDescription() const;
 };
@@ -77,7 +77,7 @@ private:
 	Vector3d corner, size;
 public:
 	ParaxialBox(const Vector3d& corner, const Vector3d& size);
-	virtual double distance(const Vector3d &point) const;
+	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &point) const;
 	virtual Vector3d normal(const Vector3d& point) const;
 	virtual std::string getDescription() const;
 };
