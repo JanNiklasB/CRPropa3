@@ -35,10 +35,8 @@ public:
 	ParticleState current; /**< Current particle state */
 	ParticleState previous; /**< Particle state at the end of the previous step */
 
-	std::vector<ref_ptr<Candidate> > secondaries; /**< Secondary particles from interactions */
-	#ifdef __CUDACC__
-	Candidate* CudaSecondaries=NULL;
-	#endif
+	ref_ptr<Candidate>* secondaries=NULL; /**< Secondary particles from interactions */
+	int secondariesSize=0;
 
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
 	PropertyMap properties; /**< Map of property names and their values. */
@@ -59,12 +57,8 @@ private:
 	static uint64_t nextSerialNumber;
 	uint64_t serialNumber;
 
-	#ifdef __CUDACC__
-	int CudaSecondariesSize=0;
-	#endif
-
 public:
-	Candidate(
+	CUDA_CALLABLE_MEMBER Candidate(
 		int id = 0,
 		double energy = 0,
 		Vector3d position = Vector3d(0, 0, 0),
@@ -78,61 +72,59 @@ public:
 	 Creates a candidate, initializing the Candidate::source, Candidate::created,
 	 Candidate::previous and Candidate::current state with the argument.
 	 */
-	Candidate(const ParticleState &state);
+	CUDA_CALLABLE_MEMBER Candidate(const ParticleState &state);
 
 	CUDA_CALLABLE_MEMBER bool isActive() const;
 	CUDA_CALLABLE_MEMBER void setActive(bool b);
 
-	#ifdef __CUDACC__
 	CUDA_CALLABLE_MEMBER int getSecondarySize() const;
-	#endif
 
-	void setTrajectoryLength(double length);
-	double getTrajectoryLength() const;
+	CUDA_CALLABLE_MEMBER void setTrajectoryLength(double length);
+	CUDA_CALLABLE_MEMBER double getTrajectoryLength() const;
 	
-	double getVelocity() const;
+	CUDA_CALLABLE_MEMBER double getVelocity() const;
 
-	void setRedshift(double z);
-	double getRedshift() const;
+	CUDA_CALLABLE_MEMBER void setRedshift(double z);
+	CUDA_CALLABLE_MEMBER double getRedshift() const;
 
 	/**
 	 Sets weight of each candidate.
 	 Weights are calculated for each tracked secondary.
 	 */
-	void setWeight(double weight);
-    void updateWeight(double weight);
-	double getWeight() const;
+	CUDA_CALLABLE_MEMBER void setWeight(double weight);
+	CUDA_CALLABLE_MEMBER void updateWeight(double weight);
+	CUDA_CALLABLE_MEMBER double getWeight() const;
 
 	/**
 	 Sets the current step and increases the trajectory length accordingly.
 	 Only the propagation module should use this.
 	 */
-	void setCurrentStep(double step);
-	double getCurrentStep() const;
+	CUDA_CALLABLE_MEMBER void setCurrentStep(double step);
+	CUDA_CALLABLE_MEMBER double getCurrentStep() const;
 
 	/**
 	 Sets the proposed next step.
 	 Only the propagation module should use this.
 	 */
-	void setNextStep(double step);
-	double getNextStep() const;
+	CUDA_CALLABLE_MEMBER void setNextStep(double step);
+	CUDA_CALLABLE_MEMBER double getNextStep() const;
 
 	/**
 	 Sets the tagOrigin of the candidate. Can be used to trace back the interactions
 	 */
-	void setTagOrigin(std::string tagOrigin);
-	std::string getTagOrigin() const;
+	CUDA_CALLABLE_MEMBER void setTagOrigin(std::string tagOrigin);
+	CUDA_CALLABLE_MEMBER std::string getTagOrigin() const;
 
 	/**
 	 Sets the time of the candidate.
 	 */
-	void setTime(double t);
-	double getTime() const;
+	CUDA_CALLABLE_MEMBER void setTime(double t);
+	CUDA_CALLABLE_MEMBER double getTime() const;
 
 	/**
 	 Make a bid for the next step size: the lowest wins.
 	 */
-	void limitNextStep(double step);
+	CUDA_CALLABLE_MEMBER void limitNextStep(double step);
 
 	void setProperty(const std::string &name, const Variant &value);
 	const Variant &getProperty(const std::string &name) const;
@@ -148,8 +140,8 @@ public:
 	 The secondaries Candidate::created and Candidate::current state are set to the _current_ state of its parent, except for the secondaries current energy and particle id.
 	 Trajectory length and redshift are copied from the parent.
 	 */
-	void addSecondary(Candidate *c);
-	inline void addSecondary(ref_ptr<Candidate> c) { addSecondary(c.get()); };
+	CUDA_CALLABLE_MEMBER void addSecondary(Candidate *c);
+	CUDA_CALLABLE_MEMBER inline void addSecondary(ref_ptr<Candidate> c) { addSecondary(c.get()); };
 	/**
 	 Add a new candidate to the list of secondaries.
 	 @param id			particle ID of the secondary
@@ -157,7 +149,7 @@ public:
 	 @param w			weight of the secondary
 	 @param tagOrigin 	tag of the secondary
 	 */
-	void addSecondary(int id, double energy, double w = 1., std::string tagOrigin = "SEC");
+	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, double w = 1., std::string tagOrigin = "SEC");
 	/**
 	 Add a new candidate to the list of secondaries.
 	 @param id			particle ID of the secondary
@@ -166,42 +158,40 @@ public:
 	 @param w			weight of the secondary
 	 @param tagOrigin 	tag of the secondary
 	 */
-	void addSecondary(int id, double energy, Vector3d position, double w = 1., std::string tagOrigin = "SEC");
-	void clearSecondaries();
+	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, Vector3d position, double w = 1., std::string tagOrigin = "SEC");
+	CUDA_CALLABLE_MEMBER void clearSecondaries();
 
 	std::string getDescription() const;
 
 	/** Unique (inside process) serial number (id) of candidate */
-	uint64_t getSerialNumber() const;
-	void setSerialNumber(const uint64_t snr);
+	CUDA_CALLABLE_MEMBER uint64_t getSerialNumber() const;
+	CUDA_CALLABLE_MEMBER void setSerialNumber(const uint64_t snr);
 
 	/** Serial number of candidate at source*/
-	uint64_t getSourceSerialNumber() const;
+	CUDA_CALLABLE_MEMBER uint64_t getSourceSerialNumber() const;
 
 	/** Serial number of candidate at creation */
-	uint64_t getCreatedSerialNumber() const;
+	CUDA_CALLABLE_MEMBER uint64_t getCreatedSerialNumber() const;
 
 	/** Set the next serial number to use */
-	static void setNextSerialNumber(uint64_t snr);
+	CUDA_CALLABLE_MEMBER static void setNextSerialNumber(uint64_t snr);
 
 	/** Get the next serial number that will be assigned */
-	static uint64_t getNextSerialNumber();
+	CUDA_CALLABLE_MEMBER static uint64_t getNextSerialNumber();
 
-	#ifdef __CUDACC__
-	__device__ void cudaCopy(const Candidate* Secondary);
-	#endif
+	CUDA_CALLABLE_MEMBER void copy(const Candidate* Secondary);
 
 	/**
 	 Create an exact clone of candidate
 	 @param recursive	recursively clone and add the secondaries
 	 */
-	ref_ptr<Candidate> clone(bool recursive = false) const;
+	CUDA_CALLABLE_MEMBER ref_ptr<Candidate> clone(bool recursive = false) const;
 
 	/**
 	 Copy the source particle state to the current state
 	 and activate it if inactive, e.g. restart it
 	*/
-	void restart();
+	CUDA_CALLABLE_MEMBER void restart();
 };
 
 /** @}*/

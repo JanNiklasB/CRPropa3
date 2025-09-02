@@ -7,7 +7,7 @@
 namespace crpropa {
 
 Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
-  redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0) {
+redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0) {
 	ParticleState state(id, E, pos, dir);
 	source = state;
 	created = state;
@@ -49,11 +49,9 @@ void Candidate::setActive(bool b) {
 	active = b;
 }
 
-#ifdef __CUDACC__
 int Candidate::getSecondarySize() const {
-	return CudaSecondariesSize;
+	return secondariesSize;
 }
-#endif
 
 double Candidate::getRedshift() const {
 	return redshift;
@@ -92,7 +90,7 @@ void Candidate::setWeight(double w) {
 }
 
 void Candidate::updateWeight(double w) {
-  weight *= w;
+	weight *= w;
 }
 
 void Candidate::setCurrentStep(double lstep) {
@@ -152,7 +150,14 @@ bool Candidate::hasProperty(const std::string &name) const {
 }
 
 void Candidate::addSecondary(Candidate *c) {
-	secondaries.push_back(c);
+	ref_ptr<Candidate>* tmp = new ref_ptr<Candidate>[secondariesSize+1];
+	for(int i=0; i<secondariesSize; i++)
+		tmp[i] = secondaries[i];
+	tmp[secondariesSize] = c;
+
+	delete[] secondaries;
+	secondaries = tmp;
+	secondariesSize++;
 }
 
 void Candidate::addSecondary(int id, double energy, double w, std::string tagOrigin) {
@@ -172,7 +177,7 @@ void Candidate::addSecondary(int id, double energy, double w, std::string tagOri
 	secondary->current.setId(id);
 	secondary->current.setEnergy(energy);
 	secondary->parent = this;
-	secondaries.push_back(secondary);
+	addSecondary(secondary);
 }
 
 void Candidate::addSecondary(int id, double energy, Vector3d position, double w, std::string tagOrigin) {
@@ -194,11 +199,13 @@ void Candidate::addSecondary(int id, double energy, Vector3d position, double w,
 	secondary->current.setPosition(position);
 	secondary->created.setPosition(position);
 	secondary->parent = this;
-	secondaries.push_back(secondary);
+	addSecondary(secondary);
 }
 
 void Candidate::clearSecondaries() {
-	secondaries.clear();
+	delete[] secondaries;
+	secondaries = NULL;
+	secondariesSize = 0;
 }
 
 std::string Candidate::getDescription() const {
@@ -209,46 +216,31 @@ std::string Candidate::getDescription() const {
 	return ss.str();
 }
 
-#ifdef __CUDACC__
-void Candidate::cudaCopy(const Candidate* Secondary){
-	source = Secondary->source;
-	created = Secondary->created;
-	current = Secondary->current;
-	previous = Secondary->previous;
+void Candidate::copy(const Candidate* C){
+	source = C->source;
+	created = C->created;
+	current = C->current;
+	previous = C->previous;
 
-	properties = Secondary->properties;
-	active = Secondary->active;
-	redshift = Secondary->redshift;
-	weight = Secondary->weight;
-	trajectoryLength = Secondary->trajectoryLength;
-	time = Secondary->time;
-	currentStep = Secondary->currentStep;
-	nextStep = Secondary->nextStep;
-	parent = Secondary->parent;
+	properties = C->properties;
+	active = C->active;
+	redshift = C->redshift;
+	weight = C->weight;
+	trajectoryLength = C->trajectoryLength;
+	time = C->time;
+	currentStep = C->currentStep;
+	nextStep = C->nextStep;
+	parent = C->parent;
 }
-#endif
 
 ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 	ref_ptr<Candidate> cloned = new Candidate;
-	cloned->source = source;
-	cloned->created = created;
-	cloned->current = current;
-	cloned->previous = previous;
-
-	cloned->properties = properties;
-	cloned->active = active;
-	cloned->redshift = redshift;
-	cloned->weight = weight;
-	cloned->trajectoryLength = trajectoryLength;
-	cloned->time = time;
-	cloned->currentStep = currentStep;
-	cloned->nextStep = nextStep;
+	cloned->copy(this);
 	if (recursive) {
-		cloned->secondaries.reserve(secondaries.size());
-		for (size_t i = 0; i < secondaries.size(); i++) {
+		for (int i=0; i<secondariesSize; i++){
 			ref_ptr<Candidate> s = secondaries[i]->clone(recursive);
 			s->parent = cloned;
-			cloned->secondaries.push_back(s);
+			cloned->addSecondary(s);
 		}
 	}
 	return cloned;

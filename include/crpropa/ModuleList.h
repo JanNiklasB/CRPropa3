@@ -45,7 +45,7 @@ public:
 	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
 	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#ifdef __CUDACC__
-	void copySecondaries(Candidate* candidate);
+	void copySecondaries(ref_ptr<Candidate> candidate);
 	void cudarun(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#endif
 
@@ -91,7 +91,7 @@ public:
 
 #ifdef __CUDACC__
 __global__ void _cudarun(
-	Candidate* candidates,
+	ref_ptr<Candidate>* candidates,
 	int candidatesSize,
 	const ModuleList* ModuleList,
 	bool recursive = true, 

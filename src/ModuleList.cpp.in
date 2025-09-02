@@ -75,7 +75,7 @@ void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst
 
 		// propagate all secondaries before next step of primary
 		if (recursive and secondariesFirst) {
-			for (size_t i = 0; i < candidate->secondaries.size(); i++) {
+			for (size_t i = 0; i < candidate->getSecondarySize(); i++) {
 				if (g_cancel_signal_flag != 0)
 					break;
 				run(candidate->secondaries[i], recursive, secondariesFirst);
@@ -85,7 +85,7 @@ void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst
 
 	// propagate secondaries after completing primary
 	if (recursive and not secondariesFirst) {
-		for (size_t i = 0; i < candidate->secondaries.size(); i++) {
+		for (size_t i = 0; i < candidate->getSecondarySize(); i++) {
 			if (g_cancel_signal_flag != 0)
 				break;
 			run(candidate->secondaries[i], recursive, secondariesFirst);
@@ -224,11 +224,11 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 
 #ifdef __CUDACC__
 
-__global__ void _cudarun(Candidate* candidates, int candidatesSize, const ModuleList* MLIST,
+__global__ void _cudarun(ref_ptr<Candidate>* candidates, int candidatesSize, const ModuleList* MLIST,
 	bool recursive, bool secondariesFirst) {
 	int i = blockDim.x * blockIdx.x + threadIdx.x;
 	if (i<candidatesSize){
-		Candidate* candidate = &candidates[i];
+		ref_ptr<Candidate> candidate = candidates[i];
 
 		// need to keep track which secondaries where started to not start them twice
 		// could also add variable to Candidate.h (like bool started)
@@ -245,7 +245,7 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 					int threadsPerBlock = MLIST->maxThreadsPerBlock;
 					int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
 					_cudarun<<<blocksPerGrid, threadsPerBlock>>>(
-						&candidate->CudaSecondaries[currentSecondary],  // we shift CudaSecondaries by currentSecondary
+						&candidate->secondaries[currentSecondary],  // we shift CudaSecondaries by currentSecondary
 						count, 
 						MLIST, 
 						recursive, 
@@ -264,7 +264,7 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 				int threadsPerBlock = MLIST->maxThreadsPerBlock;
 				int blocksPerGrid   = (count + threadsPerBlock - 1) / threadsPerBlock;
 				_cudarun<<<blocksPerGrid, threadsPerBlock>>>(
-					candidate->CudaSecondaries, 
+					candidate->secondaries, 
 					count, 
 					MLIST, 
 					recursive, 
@@ -276,41 +276,41 @@ __global__ void _cudarun(Candidate* candidates, int candidatesSize, const Module
 }
 
 // this might need to copy stuff in more detail, otherwise we will lose data
-__global__ void copySecondary(Candidate* dst, const Candidate* src, int size){
+__global__ void copySecondary(ref_ptr<Candidate>* dst, const ref_ptr<Candidate>* src, int size){
 	int i = blockDim.x*blockIdx.x + threadIdx.x;
 	if (i<size){
-		dst[i].cudaCopy(&src[i]);
+		dst[i]->copy(src[i].get());
 	}
 }
 
-void ModuleList::copySecondaries(Candidate* candidate){
+void ModuleList::copySecondaries(ref_ptr<Candidate> candidate){
 	int size = candidate->getSecondarySize();
 	if (size>0) {
-		Candidate *tmp = new Candidate[size];
+		ref_ptr<Candidate>* tmp = new ref_ptr<Candidate>[size];
 
 		int threadsPerBlock = maxThreadsPerBlock;
 		int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;
-		copySecondary<<<1, size>>>(tmp, candidate->CudaSecondaries, size);
+		copySecondary<<<1, size>>>(tmp, candidate->secondaries, size);
 		cudaDeviceSynchronize();
 
 		for (int i=0; i<size; i++){
-			copySecondaries(&tmp[i]);
+			copySecondaries(tmp[i]);
 		}
-		cudaFree(candidate->CudaSecondaries);
-		candidate->CudaSecondaries = tmp;
+		cudaFree(candidate->secondaries);
+		candidate->secondaries = tmp;
 	}
 }
 
 void ModuleList::cudarun(SourceInterface* source, size_t count, bool recursive, bool secondariesFirst) {
 
 	// extract all primaries:
-	Candidate* candidates = new Candidate[count];
+	ref_ptr<Candidate>* candidates = new ref_ptr<Candidate>[count];
 	for (size_t i = 0; i < count; i++) {
 		ref_ptr<Candidate> candidate;
 		candidate = source->getCandidate();
 
 		if (candidate.valid()) {
-			candidates[i] = *candidate.get();
+			candidates[i] = candidate;
 		}
 	}
 
@@ -322,7 +322,7 @@ void ModuleList::cudarun(SourceInterface* source, size_t count, bool recursive, 
 
 	// copy secondaries which are on the gpu atm:
 	for (size_t i = 0; i < count; i++) {
-		copySecondaries(&candidates[i]);
+		copySecondaries(candidates[i]);
 	}
 }
 #endif
@@ -371,7 +371,7 @@ void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
 		KISS_LOG_WARNING << "ModuleList::dumpCandidate is called with a non active candidate. This should not happen for the interrupt action. Please check candidate with serial number " 
 		 << cand->getSerialNumber() << std::endl;
 
-	for (int i = 0; i < cand->secondaries.size(); i++) {
+	for (int i = 0; i < cand->getSecondarySize(); i++) {
 		if (cand->secondaries[i])
 			dumpCandidate(cand->secondaries[i]);
 	}
