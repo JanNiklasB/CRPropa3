@@ -30,9 +30,9 @@ protected:
     bool useRadioArc;
 
     /** Transform observational parameter a1 in model parameter a. Used for the poloidal model*/
-    double getA(double a1) const;
+    CUDA_CALLABLE_MEMBER double getA(double a1) const;
     /** Transform observational parameter a2 in model parameter L. Used for the poloidal model*/
-    double getL(double a2) const;
+    CUDA_CALLABLE_MEMBER double getL(double a2) const;
     
 public:
     CMZField();
@@ -54,7 +54,7 @@ public:
     @param a    fitting parameter for the radial scale height
     @param L    fitting parameter for the z scale height
     @return     magnetic field vector */
-    Vector3d BPol(const Vector3d& position, const Vector3d& mid, double B1, double a, double L) const;
+    CUDA_CALLABLE_MEMBER Vector3d BPol(const Vector3d& position, const Vector3d& mid, double B1, double a, double L) const;
     
     /** Magnetic field in the azimuthal model. Used for molecular clouds (MC)
     @param position position in galactic coordinates with Earth at (-8.5kpc, 0,0)
@@ -63,14 +63,14 @@ public:
     @param eta  ratio between radial and azimuthal component
     @param R    Radius of the cloud
     @return     magnetic field vector*/
-    Vector3d BAz(const Vector3d& position, const Vector3d& mid, double B1, double eta, double R) const;
-     
-    Vector3d getMCField(const Vector3d& pos) const;
-    Vector3d getICField(const Vector3d& pos) const;
-    Vector3d getNTFField(const Vector3d& pos) const;
-    Vector3d getRadioArcField(const Vector3d& pos) const;
+    CUDA_CALLABLE_MEMBER Vector3d BAz(const Vector3d& position, const Vector3d& mid, double B1, double eta, double R) const;
+    
+    CUDA_CALLABLE_MEMBER Vector3d getMCField(const Vector3d& pos) const;
+    CUDA_CALLABLE_MEMBER Vector3d getICField(const Vector3d& pos) const;
+    CUDA_CALLABLE_MEMBER Vector3d getNTFField(const Vector3d& pos) const;
+    CUDA_CALLABLE_MEMBER Vector3d getRadioArcField(const Vector3d& pos) const;
 
-    Vector3d getField(const Vector3d& pos) const;
+    CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
 };
 /** @} */
 

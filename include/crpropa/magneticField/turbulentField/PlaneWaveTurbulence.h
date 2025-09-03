@@ -100,6 +100,22 @@ class PlaneWaveTurbulence : public TurbulentField {
 	std::vector<double> Ak;
 	std::vector<double> k;
 
+	Vector3d* xiPtr=NULL;
+	Vector3d* kappaPtr=NULL;
+	double* phiPtr=NULL;
+	double* costhetaPtr=NULL;
+	double* betaPtr=NULL;
+	double* AkPtr=NULL;
+	double* kPtr=NULL;
+
+	int xiSize=0;
+	int kappaSize=0;
+	int phiSize=0;
+	int costhetaSize=0;
+	int betaSize=0;
+	int AkSize=0;
+	int kSize=0;
+
 	// data for FAST_WAVES
 	int avx_Nm;
 	int align_offset;
@@ -140,7 +156,7 @@ class PlaneWaveTurbulence : public TurbulentField {
 
 	   Theoretical runtime is O(Nm), where Nm is the number of wavemodes.
 	*/
-	Vector3d getField(const Vector3d &pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &pos) const;
 };
 
 /** @} */

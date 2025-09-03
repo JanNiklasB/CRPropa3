@@ -58,7 +58,7 @@ public:
 	bool isUsingBSS();
 	bool isUsingHalo();
 
-	Vector3d getField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
 };
 /**@}*/
 } // namespace crpropa

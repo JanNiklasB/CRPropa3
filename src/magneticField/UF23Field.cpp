@@ -9,7 +9,7 @@
 namespace uf23 {
 
   template<typename T>
-  crpropa::Vector3d CylToCart(const T v, const double cosPhi, const double sinPhi)
+  CUDA_CALLABLE_MEMBER crpropa::Vector3d CylToCart(const T v, const double cosPhi, const double sinPhi)
   {
     return crpropa::Vector3d(v[0] * cosPhi - v[1] * sinPhi,
                              v[0] * sinPhi + v[1] * cosPhi,
@@ -17,7 +17,7 @@ namespace uf23 {
   }
 
   template<typename T>
-  crpropa::Vector3d CartToCyl(const T v, const double cosPhi, const double sinPhi)
+  CUDA_CALLABLE_MEMBER crpropa::Vector3d CartToCyl(const T v, const double cosPhi, const double sinPhi)
   {
     return crpropa::Vector3d(v[0] * cosPhi + v[1] * sinPhi,
                              -v[0] * sinPhi + v[1] * cosPhi,
@@ -27,7 +27,7 @@ namespace uf23 {
   // logistic sigmoid function
   inline
   double
-  Sigmoid(const double x, const double x0, const double w)
+  CUDA_CALLABLE_MEMBER Sigmoid(const double x, const double x0, const double w)
   {
     return 1 / (1 + exp(-(x-x0)/w));
   }
@@ -35,7 +35,7 @@ namespace uf23 {
   // angle between v0 = (cos(phi0), sin(phi0)) and v1 = (cos(phi1), sin(phi1))
   inline
   double
-  DeltaPhi(const double phi0, const double phi1)
+  CUDA_CALLABLE_MEMBER DeltaPhi(const double phi0, const double phi1)
   {
     return acos(cos(phi1)*cos(phi0) + sin(phi1)*sin(phi0));
   }
@@ -44,16 +44,16 @@ namespace uf23 {
   // Convert to crpropa with e.g. uf23::kpc / crpropa::kpc.
   // The conversion is, however, only needed in the single non-private
   // getField() method, all other functions use uf23 units.
-  const double kPi = 3.1415926535897932384626;
-  const double kTwoPi = 2*kPi;
-  const double degree = kPi/180.;
-  const double kpc = 1;
-  const double microgauss = 1;
-  const double megayear = 1;
-  const double Gpc = 1e6*kpc;
-  const double pc = 1e-3*kpc;
-  const double second  = megayear / (1e6*60*60*24*365.25);
-  const double kilometer = kpc / 3.0856775807e+16;
+  CUDA_CONSTANT const double kPi = 3.1415926535897932384626;
+  CUDA_CONSTANT const double kTwoPi = 2*kPi;
+  CUDA_CONSTANT const double degree = kPi/180.;
+  CUDA_CONSTANT const double kpc = 1;
+  CUDA_CONSTANT const double microgauss = 1;
+  CUDA_CONSTANT const double megayear = 1;
+  CUDA_CONSTANT const double Gpc = 1e6*kpc;
+  CUDA_CONSTANT const double pc = 1e-3*kpc;
+  CUDA_CONSTANT const double second  = megayear / (1e6*60*60*24*365.25);
+  CUDA_CONSTANT const double kilometer = kpc / 3.0856775807e+16;
 }
 
 namespace crpropa {
@@ -408,8 +408,10 @@ UF23Field::getPoloidalHaloField(const double x, const double y, const double z)
   double a = 0;
   if (ap < 0) {
     if (r > std::numeric_limits<double>::min()) {
+      #ifndef __CUDACC__
       // this should never happen
       throw std::runtime_error("ap = " + std::to_string(ap));
+      #endif
     }
     else
       a = 0;

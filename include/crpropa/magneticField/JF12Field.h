@@ -117,25 +117,25 @@ public:
 	bool isUsingToroidalHaloField();
 	bool isUsingXField();
 
-	double logisticFunction(const double& x, const double& x0, const double& w) const;
+	CUDA_CALLABLE_MEMBER double logisticFunction(const double& x, const double& x0, const double& w) const;
 
 	// Regular field components
-	Vector3d getRegularField(const Vector3d& pos) const;
-	virtual Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
-	Vector3d getToroidalHaloField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const;
-	virtual Vector3d getXField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER Vector3d getRegularField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER virtual Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER Vector3d getToroidalHaloField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER virtual Vector3d getXField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const;
 
 	// Regular and striated field component
-	Vector3d getStriatedField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getStriatedField(const Vector3d& pos) const;
 
 	// Brms of the turbulent field
-	double getTurbulentStrength(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER double getTurbulentStrength(const Vector3d& pos) const;
 
 	// Turbulent field component
-	Vector3d getTurbulentField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getTurbulentField(const Vector3d& pos) const;
 
 	// All set field components
-	Vector3d getField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
 };
 /** @} */
 

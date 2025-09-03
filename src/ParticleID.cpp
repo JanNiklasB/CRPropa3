@@ -10,7 +10,7 @@
 // HepPID library by Lynn Garren and then slightly modified for cuda use
 namespace HepPID{
 
-enum location { nj=1, nq3, nq2, nq1, nl, nr, n, n8, n9, n10 };
+CUDA_CALLABLE_MEMBER enum location { nj=1, nq3, nq2, nq1, nl, nr, n, n8, n9, n10 };
 CUDA_CALLABLE_MEMBER unsigned short digit( location loc, const int & pid );
 CUDA_CALLABLE_MEMBER int A(const int & pid );
 CUDA_CALLABLE_MEMBER int Z(const int & pid );

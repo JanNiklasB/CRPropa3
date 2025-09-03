@@ -35,7 +35,7 @@ inline int digit(const int& value, const int& d) {
 
 // Return value xclip which is the closest to x, so that lower <= xclip <= upper
 template <typename T>
-T clip(const T& x, const T& lower, const T& upper) {
+CUDA_CALLABLE_MEMBER T clip(const T& x, const T& lower, const T& upper) {
 	return std::max(lower, std::min(x, upper));
 }
 
@@ -56,10 +56,10 @@ double interpolateEquidistant(double x, double lo, double hi,
 		const std::vector<double>& Y);
 
 // Find index of value in a sorted vector X that is closest to x
-CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const std::vector<double> &X);
+CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const std::vector<double> &X) noexcept;
 
 // Find index of value in a sorted list X that is closest to x
-CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size);
+CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size) noexcept;
 /** @}*/
 
 

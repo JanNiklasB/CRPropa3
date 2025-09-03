@@ -25,7 +25,7 @@ public:
 	}
 	QuimbyMagneticField(quimby::MagneticField *field) : field(field) {
 	}
-	Vector3d getField(const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const {
 		quimby::Vector3f b, r = quimby::Vector3f(position.x, position.y, position.z);
 		bool isGood = field->getField(r / kpc, b);
 		if (!isGood) {

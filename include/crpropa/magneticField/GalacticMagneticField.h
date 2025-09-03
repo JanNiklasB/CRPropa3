@@ -39,7 +39,7 @@ public:
 		this->r0 = r0;
 	}
 
-	Vector3d getField(Vector3d pos) {
+	CUDA_CALLABLE_MEMBER Vector3d getField(Vector3d pos) {
 		double r = sqrt(pos.x * pos.x + pos.y * pos.y) / r0; // in-plane radius in units of the radial scale
 		double b = b0 / (1 + pow((std::fabs(pos.z) - z0) / z1, 2)) * r * exp(1 - r);
 		double phi = pos.getPhi(); // azimuth
@@ -114,7 +114,7 @@ public:
 		updatePhase();
 	}
 
-	Vector3d getField(Vector3d pos) const {
+	CUDA_CALLABLE_MEMBER Vector3d getField(Vector3d pos) const {
 		double r = sqrt(pos.x * pos.x + pos.y * pos.y); // in-plane radius
 		double b = b0 / cosPhase * rsol / std::max(r, rc);
 

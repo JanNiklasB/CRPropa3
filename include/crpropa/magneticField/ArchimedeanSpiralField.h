@@ -45,7 +45,7 @@ public:
 */
 	ArchimedeanSpiralField(double B_0, double R_0, double Omega, double V_w);
 
-	Vector3d getField(const Vector3d &pos) const;	
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &pos) const;	
 		
 	void setB0(double B);
 	void setR0(double R);

@@ -23,10 +23,10 @@ class MagneticField: public Referenced {
 public:
 	CUDA_CALLABLE_MEMBER virtual ~MagneticField() {
 	}
-	virtual Vector3d getField(const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER virtual Vector3d getField(const Vector3d &position) const {
 		return Vector3d(0,0,0);
 	};
-	virtual Vector3d getField(const Vector3d &position, double z) const {
+	CUDA_CALLABLE_MEMBER virtual Vector3d getField(const Vector3d &position, double z) const {
 		return getField(position);
 	};
 };
@@ -71,7 +71,7 @@ public:
 	void setExtends(const Vector3d &origin);
 	bool isReflective();
 	void setReflective(bool reflective);
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 
 /**
@@ -80,9 +80,11 @@ public:
  */
 class MagneticFieldList: public MagneticField {
 	std::vector<ref_ptr<MagneticField> > fields;
+	ref_ptr<MagneticField>* fieldsPtr=NULL;
+	int fieldsSize=0;
 public:
 	void addField(ref_ptr<MagneticField> field);
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 
 /**
@@ -99,7 +101,7 @@ public:
 	 * @param m cosmic evolution parameter 
 	*/
 	MagneticFieldEvolution(ref_ptr<MagneticField> field, double m);
-	Vector3d getField(const Vector3d &position, double z = 0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, double z = 0) const;
 };
 
 /**
@@ -116,7 +118,7 @@ public:
 	UniformMagneticField(const Vector3d &value) :
 			value(value) {
 	}
-	Vector3d getField(const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const {
 		return value;
 	}
 };
@@ -140,7 +142,7 @@ public:
 	MagneticDipoleField(const Vector3d &origin, const Vector3d &moment, const double radius) :
 			origin(origin), moment(moment), radius(radius) {
 	}
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 
 #ifdef CRPROPA_HAVE_MUPARSER
@@ -162,7 +164,7 @@ public:
 	*/
 	RenormalizeMagneticField(ref_ptr<MagneticField> field, std::string expression);
 	CUDA_CALLABLE_MEMBER ~RenormalizeMagneticField() { delete p;	}
-	Vector3d getField(const Vector3d &position);
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position);
 };
 #endif
 

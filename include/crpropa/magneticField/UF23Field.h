@@ -49,7 +49,7 @@ public:
   /// no default constructor
   UF23Field() = delete;
 
-  Vector3d getField(const Vector3d& pos) const;
+  CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
 
 private:
 
@@ -58,7 +58,7 @@ private:
      @param posInKpc position with components given in kpc
      @return coherent field in microgauss
   */
-  Vector3d operator()(const Vector3d& posInKpc) const;
+  CUDA_CALLABLE_MEMBER Vector3d operator()(const Vector3d& posInKpc) const;
 
   /// model parameters, see Table 3 of UF23 paper
   enum EPar {
@@ -132,20 +132,20 @@ private:
   double fTanPitch  = 0;
 
   /// major field components
-  Vector3d getDiskField(const Vector3d& pos) const;
-  Vector3d getHaloField(const Vector3d& pos) const;
+  CUDA_CALLABLE_MEMBER Vector3d getDiskField(const Vector3d& pos) const;
+  CUDA_CALLABLE_MEMBER Vector3d getHaloField(const Vector3d& pos) const;
 
   /// sub-components depending on model type
   /// -- Sec. 5.2.2
-  Vector3d getSpiralField(const double x, const double y, const double z) const;
+  CUDA_CALLABLE_MEMBER Vector3d getSpiralField(const double x, const double y, const double z) const;
   /// -- Sec. 5.2.3
-  Vector3d getSpurField(const double x, const double y, const double z) const;
+  CUDA_CALLABLE_MEMBER Vector3d getSpurField(const double x, const double y, const double z) const;
   /// -- Sec. 5.3.1
-  Vector3d getToroidalHaloField(const double x, const double y, const double z) const;
+  CUDA_CALLABLE_MEMBER Vector3d getToroidalHaloField(const double x, const double y, const double z) const;
   /// -- Sec. 5.3.2
-  Vector3d getPoloidalHaloField(const double x, const double y, const double z) const;
+  CUDA_CALLABLE_MEMBER Vector3d getPoloidalHaloField(const double x, const double y, const double z) const;
   /// -- Sec. 5.3.3
-  Vector3d getTwistedHaloField(const double x, const double y, const double z) const;
+  CUDA_CALLABLE_MEMBER Vector3d getTwistedHaloField(const double x, const double y, const double z) const;
 
 };
 /** @} */

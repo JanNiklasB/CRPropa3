@@ -58,7 +58,7 @@ public:
 	*/
 	PolarizedSingleModeMagneticField(const double &B_0, const double &wavelength, const double &sigma, const Vector3d &r_0, const Vector3d &e_1, const Vector3d &e_2, std::string flagAmplitudeRms, std::string flagPolarizationHelicity, std::string flagMode);
 
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 /** @} */
 

@@ -111,6 +111,22 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 	Ak = std::vector<double>(Nm, 0.);
 	k = std::vector<double>(Nm, 0.);
 
+	xiPtr = xi.data();
+	kappaPtr = kappa.data();
+	phiPtr = phi.data();
+	costhetaPtr = costheta.data();
+	betaPtr = beta.data();
+	AkPtr = Ak.data();
+	kPtr = k.data();
+
+	xiSize = xi.size();
+	kappaSize = kappa.size();
+	phiSize = phi.size();
+	costhetaSize = costheta.size();
+	betaSize = beta.size();
+	AkSize = Ak.size();
+	kSize = k.size();
+
 	double delta = log10(kmax / kmin);
 	for (int i = 0; i < Nm; i++) {
 		k[i] = pow(10, log10(kmin) + ((double)i) / ((double)(Nm - 1)) * delta);
@@ -233,8 +249,8 @@ Vector3d PlaneWaveTurbulence::getField(const Vector3d &pos) const {
 #ifndef ENABLE_FAST_WAVES
 	Vector3d B(0.);
 	for (int i = 0; i < Nm; i++) {
-		double z_ = pos.dot(kappa[i]);
-		B += xi[i] * Ak[i] * cos(k[i] * z_ + beta[i]);
+		double z_ = pos.dot(kappaPtr[i]);
+		B += xiPtr[i] * AkPtr[i] * cos(kPtr[i] * z_ + betaPtr[i]);
 	}
 	return B;
 

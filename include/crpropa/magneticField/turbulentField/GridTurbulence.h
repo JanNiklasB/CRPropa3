@@ -37,7 +37,7 @@ class GridTurbulence : public TurbulentField {
 	GridTurbulence(const TurbulenceSpectrum &spectrum,
 	               const GridProperties &gridProp, unsigned int seed = 0);
 
-	Vector3d getField(const Vector3d &pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &pos) const;
 
 	/** Return a const reference to the grid */
 	const ref_ptr<Grid3f> &getGrid() const;

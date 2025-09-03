@@ -406,22 +406,22 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
-    # # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticField.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticFieldGrid.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PolarizedSingleModeMagneticField.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PT11Field.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/GridTurbulence.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/HelicalGridTurbulence.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/SimpleGridTurbulence.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/TF17Field.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticField.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticFieldGrid.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PolarizedSingleModeMagneticField.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PT11Field.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/GridTurbulence.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/HelicalGridTurbulence.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/SimpleGridTurbulence.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/TF17Field.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp

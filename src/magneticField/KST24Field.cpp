@@ -287,10 +287,10 @@ Vector3d KST24Field::get_logspiral(const Vector3d pos_kpc, const double B_gauss,
 	if ((pos_kpc.z < zmin_kpc) or (zmax_kpc < pos_kpc.z))
 		return vals_gauss;
 
-	std::vector<double> pos_v;
-	pos_v.push_back(pos_kpc.x + x_shift_kpc);
-	pos_v.push_back(pos_kpc.y + y_shift_kpc);
-	pos_v.push_back(pos_kpc.z);
+	double pos_v[3];
+	pos_v[0] = pos_kpc.x + x_shift_kpc;
+	pos_v[1] = pos_kpc.y + y_shift_kpc;
+	pos_v[2] = pos_kpc.z;
 
 	double r = sqrt(pos_v[0]*pos_v[0] + pos_v[1]*pos_v[1]);
 	if ((r < rmin_kpc) or (rmax_kpc < r))

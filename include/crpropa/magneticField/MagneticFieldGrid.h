@@ -26,7 +26,7 @@ public:
 	MagneticFieldGrid(ref_ptr<Grid3f> grid);
 	void setGrid(ref_ptr<Grid3f> grid);
 	ref_ptr<Grid3f> getGrid();
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 
 /**
@@ -55,7 +55,7 @@ public:
 	ref_ptr<Grid3f> getGrid();
 	ref_ptr<Grid1f> getModulationGrid();
 	void setReflective(bool gridReflective, bool modGridReflective);
-	Vector3d getField(const Vector3d &position) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position) const;
 };
 /** @} */
 } // namespace crpropa

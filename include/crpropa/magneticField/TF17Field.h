@@ -21,8 +21,8 @@ using namespace std;
 
  */
 
-enum class TF17DiskModel {Ad1, Bd1, Dd1};
-enum class TF17HaloModel {C0, C1};
+CUDA_CALLABLE_MEMBER enum class TF17DiskModel {Ad1, Bd1, Dd1};
+CUDA_CALLABLE_MEMBER enum class TF17HaloModel {C0, C1};
 
 
 class TF17Field: public MagneticField {
@@ -158,9 +158,9 @@ public:
      */
     string getHaloModel() const;
 
-	Vector3d getField(const Vector3d& pos) const;
-	Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
-	Vector3d getHaloField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER Vector3d getHaloField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
 
     /**@brief   Compute the azimuthal field component Bphi as define by equation 28 in TF17
      * @param r     radius in cylindrical coordinates
@@ -169,7 +169,7 @@ public:
      * @param B_z    height component of the magnetic field at position (r,z)
      * @return  the value of the azimuthal field component Bphi
      */
-	double azimuthalFieldComponent(const double& r, const double& z, const double& B_r, const double& B_z) const;
+	CUDA_CALLABLE_MEMBER double azimuthalFieldComponent(const double& r, const double& z, const double& B_r, const double& B_z) const;
 
     /**@brief   Compute the scaling of the disk magnetic field amplitude (equation 30, models Ad1
      * and Bd1)
@@ -181,20 +181,20 @@ public:
      * @param z         cylindrical coordinates
      * @return  the radial field component Br(r1, z1, phi1)
      */
-	double radialFieldScale(const double& B1, const double& phi_star, const double& z1, const double& phi, const double& r, const double& z) const;
+	CUDA_CALLABLE_MEMBER double radialFieldScale(const double& B1, const double& phi_star, const double& z1, const double& phi, const double& r, const double& z) const;
 
     /**@brief   Compute the shifted winding function (equation 23)
      * @param r         cylindrical coordinates
      * @param z         cylindrical coordinates
      * @return  g_phi, the shifted winding function
      */
-	double shiftedWindingFunction(const double& r, const double& z) const;
+	CUDA_CALLABLE_MEMBER double shiftedWindingFunction(const double& r, const double& z) const;
 
     /**@brief   Compute the height scaling appearing numerous times in the equations
      * @param z         cylindrical coordinates
      * @return  z_scale = 1 + (z/Hp)^2
      */
-	double zscale(const double& z) const;
+	CUDA_CALLABLE_MEMBER double zscale(const double& z) const;
 };
 /**@}*/
 } // CRPROPA NAMESPACE

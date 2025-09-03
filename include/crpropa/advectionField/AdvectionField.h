@@ -24,7 +24,7 @@ class AdvectionField: public Referenced {
 public:
 	CUDA_CALLABLE_MEMBER virtual ~AdvectionField() {
 	}
-	virtual Vector3d getField(const Vector3d &position, const double &time=0) const = 0;
+	CUDA_CALLABLE_MEMBER virtual Vector3d getField(const Vector3d &position, const double &time=0) const = 0;
 	CUDA_CALLABLE_MEMBER virtual double getDivergence(const Vector3d &position, const double &time=0) const = 0;
 };
 
@@ -39,7 +39,7 @@ class AdvectionFieldList: public AdvectionField {
 	int fieldsSize=0;
 public:
 	void addField(ref_ptr<AdvectionField> field);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 };
 
@@ -52,7 +52,7 @@ class UniformAdvectionField: public AdvectionField {
 	Vector3d value;
 public:
 	UniformAdvectionField(const Vector3d &value);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	std::string getDescription() const;
@@ -75,7 +75,7 @@ public:
 */
 
 	ConstantSphericalAdvectionField(const Vector3d origin, double vWind);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setOrigin(const Vector3d origin);
@@ -110,7 +110,7 @@ public:
 	@param alpha	Tuning parameter
 */
 	SphericalAdvectionField(const Vector3d origin, double radius, double vMax, double tau, double alpha);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	double getV(const double &r) const;
@@ -146,7 +146,7 @@ public:
 	@param lShock //shock width
 */
 	OneDimensionalCartesianShock(double compressionRatio, double vUp, double lShock);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setComp(double compressionRatio);
@@ -180,7 +180,7 @@ public:
 	@param coolUpstream //flag for upstream cooling
 */
 	OneDimensionalSphericalShock(double rShock, double vUp, double compressionRatio, double lShock, bool coolUpstream);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setComp(double compressionRatio);
@@ -219,7 +219,7 @@ public:
 	
 */
 	ObliqueAdvectionShock(double compressionRatio, double vXUp, double vY, double lShock);
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
 	void setComp(double compressionRatio);
@@ -259,11 +259,11 @@ public:
 */
 	SphericalAdvectionShock(const Vector3d origin, double r_0, double v_0, double lambda);
 
-	Vector3d getField(const Vector3d &position, const double &time=0) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d &position, const double &time=0) const;
 	CUDA_CALLABLE_MEMBER double getDivergence(const Vector3d &position, const double &time=0) const;
 
-	double g(double R) const;
-	double g_prime(double R) const;
+	CUDA_CALLABLE_MEMBER double g(double R) const;
+	CUDA_CALLABLE_MEMBER double g_prime(double R) const;
 
 	void setOrigin(const Vector3d Origin);
 	void setR0(double r);

@@ -43,13 +43,13 @@ Vector3d PeriodicMagneticField::getField(const Vector3d &position) const {
 	Vector3d p = position - origin - n * extends;
 
 	if (reflective) {
-		long mx = (long) ::fabs(n.x) % 2;
+		long mx = (long) fabs(n.x) % 2;
 		if (mx == 1)
 			p.x = extends.x - p.x;
-		long my = (long) ::fabs(n.y) % 2;
+		long my = (long) fabs(n.y) % 2;
 		if (my == 1)
 			p.y = extends.y - p.y;
-		long mz = (long) ::fabs(n.z) % 2;
+		long mz = (long) fabs(n.z) % 2;
 		if (mz == 1)
 			p.z = extends.z - p.z;
 	}
@@ -59,12 +59,14 @@ Vector3d PeriodicMagneticField::getField(const Vector3d &position) const {
 
 void MagneticFieldList::addField(ref_ptr<MagneticField> field) {
 	fields.push_back(field);
+	fieldsPtr = fields.data();
+	fieldsSize = fields.size();
 }
 
 Vector3d MagneticFieldList::getField(const Vector3d &position) const {
 	Vector3d b;
-	for (int i = 0; i < fields.size(); i++)
-		b += fields[i]->getField(position);
+	for (int i = 0; i < fieldsSize; i++)
+		b += fieldsPtr[i]->getField(position);
 	return b;
 }
 

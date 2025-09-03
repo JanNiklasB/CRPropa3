@@ -121,26 +121,26 @@ private:
 	double PerseusArm2_zmax_kpc;
 
 public:
-	Vector3d getField(const Vector3d& pos) const;
+	CUDA_CALLABLE_MEMBER Vector3d getField(const Vector3d& pos) const;
 	KST24Field();
 
-	Vector3d get_toroidal(const Vector3d pos_kpc, const double tor_B_gauss, 
+	CUDA_CALLABLE_MEMBER Vector3d get_toroidal(const Vector3d pos_kpc, const double tor_B_gauss, 
 						  const double tor_zmin_kpc, const double tor_zmax_kpc, 
 						  const double tor_rmin_kpc, const double tor_rmax_kpc) const;
 
-	Vector3d get_Xfield(const Vector3d pos_kpc, const double Xfield_B_gauss, 
+	CUDA_CALLABLE_MEMBER Vector3d get_Xfield(const Vector3d pos_kpc, const double Xfield_B_gauss, 
 						const double Xfield_rmin_kpc, const double Xfield_rmax_kpc, 
 						const double Xfield_theta_rad) const;
 
 	bool is_LB(const Vector3d pos_kpc, const double LB_rmin_kpc, const double LB_dr_kpc,
 			   const double LB_x0_kpc, const double LB_y0_kpc, const double LB_z0_kpc) const;
 
-	Vector3d get_LB(const Vector3d pos_kpc, const double LB_B_gauss, 
+	CUDA_CALLABLE_MEMBER Vector3d get_LB(const Vector3d pos_kpc, const double LB_B_gauss, 
 					const double LB_lB_deg, const double LB_bB_deg, 
 					const double LB_rmin_kpc, const double LB_dr_kpc,
 					const double LB_x0_kpc, const double LB_y0_kpc, const double LB_z0_kpc) const;
 
-	Vector3d get_logspiral(const Vector3d pos_kpc, const double B_gauss,  
+	CUDA_CALLABLE_MEMBER Vector3d get_logspiral(const Vector3d pos_kpc, const double B_gauss,  
 						   const double pitch_deg, const double phi0_deg,
 						   const double x_shift_kpc, const double y_shift_kpc,
 						   const double arc_radius1_kpc, const double arc_radius2_kpc, 
