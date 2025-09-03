@@ -11,6 +11,38 @@
 
 #define index(i,j) ((j)+(i)*Y.size())
 
+CUDA_CALLABLE_MEMBER size_t lower_bound(double x, const double *X, int size) {
+	int count=size-1, step;
+	double it;
+	size_t i1 = 0;
+	while (count>0) {
+		step = count/2;
+		it = X[step+i1];
+		if (it<x) {
+			i1 = step+1;
+			count -= step+1;
+		}
+		else count = step;
+	}
+	return i1;
+}
+
+CUDA_CALLABLE_MEMBER size_t upper_bound(double x, const double *X, int size){
+	int count=size-1, step;
+	double it;
+	size_t i1 = 0;
+	while (count>0) {
+		step = count/2;
+		it = X[step+i1];
+		if (!(x<it)) {
+			i1 = step+1;
+			count -= step+1;
+		}
+		else count = step;
+	}
+	return i1;
+}
+
 namespace crpropa {
 
 std::string getDataPath(std::string filename) {
@@ -79,14 +111,16 @@ std::string getInstallPrefix()
 
 double interpolate(double x, const std::vector<double> &X,
 		const std::vector<double> &Y) {
-	std::vector<double>::const_iterator it = std::upper_bound(X.begin(),
-			X.end(), x);
-	if (it == X.begin())
-		return Y.front();
-	if (it == X.end())
-		return Y.back();
+	return interpolate(x, X.data(), Y.data(), X.size());
+}
 
-	size_t i = it - X.begin() - 1;
+double interpolate(double x, const double* X,
+		const double* Y, int Size) {
+	size_t i = upper_bound(x, X, Size);
+	if (i == 0)
+		return Y[0];
+	if (i == Size-1)
+		return Y[Size-1];
 	return Y[i] + (x - X[i]) * (Y[i + 1] - Y[i]) / (X[i + 1] - X[i]);
 }
 
@@ -122,12 +156,17 @@ double interpolate2d(double x, double y, const std::vector<double> &X,
 
 double interpolateEquidistant(double x, double lo, double hi,
 		const std::vector<double> &Y) {
-	if (x <= lo)
-		return Y.front();
-	if (x >= hi)
-		return Y.back();
+	return interpolateEquidistant(x, lo, hi, Y.data(), Y.size());
+}
 
-	double dx = (hi - lo) / (Y.size() - 1);
+double interpolateEquidistant(double x, double lo, double hi,
+		const double* Y, int YSize) {
+	if (x <= lo)
+		return Y[0];
+	if (x >= hi)
+		return Y[YSize-1];
+
+	double dx = (hi - lo) / (YSize - 1);
 	double p = (x - lo) / dx;
 	size_t i = floor(p);
 	return Y[i] + (p - i) * (Y[i + 1] - Y[i]);
@@ -138,19 +177,7 @@ size_t closestIndex(double x, const std::vector<double> &X) {
 }
 
 size_t closestIndex(double x, const double *X, int size) {
-	int count=size-1, step;
-	double it;
-	size_t i1 = 0;
-	while (count>0) {
-		step = count/2;
-		it = X[step+i1];
-		if (it<x) {
-			i1 = step+1;
-			count -= step+1;
-		}
-		else count = step;
-	}
-
+	size_t i1 = lower_bound(x, X, size);
 	if (i1 == 0)
 		return i1;
 	size_t i0 = i1 - 1;
