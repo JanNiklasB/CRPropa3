@@ -7,6 +7,13 @@
 #include <limits>
 #include <algorithm>
 
+#ifdef __CUDACC__
+#define CUDA_CALLABLE_MEMBER __host__ __device__
+#include <cuda_runtime.h>
+#else
+#define CUDA_CALLABLE_MEMBER
+#endif
+
 namespace crpropa {
 
 /**
@@ -16,15 +23,15 @@ namespace crpropa {
 
 /**
  @class Vector3
- @brief Template class for 3-vectors of type float, double, ...
+@brief Template class for 3-vectors of type float, double, ...
 
- Allows accessing and changing the elements x, y, z directly or  through the
- corresponding get and set methods.
+Allows accessing and changing the elements x, y, z directly or  through the
+corresponding get and set methods.
 
- Angle definitions are
- phi [-pi, pi]: azimuthal angle in the x-y plane, 0 pointing in x-direction
- theta [0, pi]: zenith angle towards the z axis, 0 pointing in z-direction
- */
+Angle definitions are
+phi [-pi, pi]: azimuthal angle in the x-y plane, 0 pointing in x-direction
+theta [0, pi]: zenith angle towards the z axis, 0 pointing in z-direction
+*/
 template<typename T>
 class Vector3 {
 public:
@@ -38,95 +45,95 @@ public:
 		T data[3];
 	};
 
-	Vector3() : data{0., 0., 0.} {
+	CUDA_CALLABLE_MEMBER Vector3() : data{0., 0., 0.} {
 	}
 
-	// avoid creation of default non-conversion constructor
-	Vector3(const Vector3 &v) : data{v.data[0], v.data[1], v.data[2]} {
+	/// avoid creation of default non-conversion constructor
+	CUDA_CALLABLE_MEMBER Vector3(const Vector3 &v) : data{v.data[0], v.data[1], v.data[2]} {
 	}
 
-	// Provides implicit conversion
+	/// Provides implicit conversion
 	template<typename U>
-	Vector3(const Vector3<U> &v) {
+	CUDA_CALLABLE_MEMBER Vector3(const Vector3<U> &v) {
 		data[0] = v.x;
 		data[1] = v.y;
 		data[2] = v.z;
 	}
 
-	~Vector3()
+	CUDA_CALLABLE_MEMBER ~Vector3()
 	{
 	}
 
-	explicit Vector3(const double *v) {
+	CUDA_CALLABLE_MEMBER explicit Vector3(const double *v) {
 		data[0] = v[0];
 		data[1] = v[1];
 		data[2] = v[2];
 	}
 
-	explicit Vector3(const float *v) {
+	CUDA_CALLABLE_MEMBER explicit Vector3(const float *v) {
 		data[0] = v[0];
 		data[1] = v[1];
 		data[2] = v[2];
 	}
 
-	explicit Vector3(const T &X, const T &Y, const T &Z) : data{X, Y, Z} {
+	CUDA_CALLABLE_MEMBER explicit Vector3(const T &X, const T &Y, const T &Z) : data{X, Y, Z} {
 	}
 
-	explicit Vector3(T t) : data{t, t, t} {
+	CUDA_CALLABLE_MEMBER explicit Vector3(T t) : data{t, t, t} {
 	}
 
-	void setX(const T X) {
+	CUDA_CALLABLE_MEMBER void setX(const T X) {
 		x = X;
 	}
 
-	void setY(const T Y) {
+	CUDA_CALLABLE_MEMBER void setY(const T Y) {
 		y = Y;
 	}
 
-	void setZ(const T Z) {
+	CUDA_CALLABLE_MEMBER void setZ(const T Z) {
 		z = Z;
 	}
 
-	void setXYZ(const T X, const T Y, const T Z) {
+	CUDA_CALLABLE_MEMBER void setXYZ(const T X, const T Y, const T Z) {
 		x = X;
 		y = Y;
 		z = Z;
 	}
 
-	void setR(const T r) {
+	CUDA_CALLABLE_MEMBER void setR(const T r) {
 		*this *= r / getR();
 	}
 
-	void setRThetaPhi(const T r, const T theta, const T phi) {
+	CUDA_CALLABLE_MEMBER void setRThetaPhi(const T r, const T theta, const T phi) {
 		x = r * sin(theta) * cos(phi);
 		y = r * sin(theta) * sin(phi);
 		z = r * cos(theta);
 	}
 
-	T getX() const {
+	CUDA_CALLABLE_MEMBER T getX() const {
 		return x;
 	}
 
-	T getY() const {
+	CUDA_CALLABLE_MEMBER T getY() const {
 		return y;
 	}
 
-	T getZ() const {
+	CUDA_CALLABLE_MEMBER T getZ() const {
 		return z;
 	}
 
-	// magnitude (2-norm) of the vector
-	T getR() const {
+	/// magnitude (2-norm) of the vector
+	CUDA_CALLABLE_MEMBER T getR() const {
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
-	// square of magnitude of the vector
-	T getR2() const {
+	/// square of magnitude of the vector
+	CUDA_CALLABLE_MEMBER T getR2() const {
 		return x * x + y * y + z * z;
 	}
 
-	// return the azimuth angle
-	T getPhi() const {
+	/// return the azimuth angle
+	CUDA_CALLABLE_MEMBER T getPhi() const {
 		T eps = std::numeric_limits < T > ::min();
 		if ((fabs(x) < eps) && (fabs(y) < eps))
 			return 0.0;
@@ -134,8 +141,8 @@ public:
 			return std::atan2(y, x);
 	}
 
-	// return the zenith angle
-	T getTheta() const {
+	/// return the zenith angle
+	CUDA_CALLABLE_MEMBER T getTheta() const {
 		T eps = std::numeric_limits < T > ::min();
 		if ((fabs(x) < eps) && (fabs(y) < eps) && (fabs(z) < eps))
 			return 0.0;
@@ -143,26 +150,26 @@ public:
 			return atan2((T) sqrt(x * x + y * y), z);
 	}
 
-	// return the unit-vector e_r
-	Vector3<T> getUnitVector() const {
+	/// return the unit-vector e_r
+	CUDA_CALLABLE_MEMBER Vector3<T> getUnitVector() const {
 		return *this / getR();
 	}
 
-	// return the unit-vector e_theta
-	Vector3<T> getUnitVectorTheta() const {
+	/// return the unit-vector e_theta
+	CUDA_CALLABLE_MEMBER Vector3<T> getUnitVectorTheta() const {
 		T theta = getTheta();
 		T phi = getPhi();
 		return Vector3<T>(cos(theta) * cos(phi), cos(theta) * sin(phi),
 				-sin(theta));
 	}
 
-	// return the unit-vector e_phi
-	Vector3<T> getUnitVectorPhi() const {
+	/// return the unit-vector e_phi
+	CUDA_CALLABLE_MEMBER Vector3<T> getUnitVectorPhi() const {
 		return Vector3<T>(-sin(getPhi()), cos(getPhi()), 0);
 	}
 
-	// return the angle [0, pi] between the vectors
-	T getAngleTo(const Vector3<T> &v) const {
+	/// return the angle [0, pi] between the vectors
+	CUDA_CALLABLE_MEMBER T getAngleTo(const Vector3<T> &v) const {
 		T cosdistance = dot(v) / v.getR() / getR();
 		// In some directions cosdistance is > 1 on some compilers
 		// This ensures that the correct result is returned
@@ -174,39 +181,39 @@ public:
 			return acos(cosdistance);
 	}
 
-	// return true if the angle between the vectors is smaller than a threshold
-	bool isParallelTo(const Vector3<T> &v, T maxAngle) const {
+	/// return true if the angle between the vectors is smaller than a threshold
+	CUDA_CALLABLE_MEMBER bool isParallelTo(const Vector3<T> &v, T maxAngle) const {
 		return getAngleTo(v) < maxAngle;
 	}
 
-	// linear distance to a given vector
-	T getDistanceTo(const Vector3<T> &point) const {
+	/// linear distance to a given vector
+	CUDA_CALLABLE_MEMBER T getDistanceTo(const Vector3<T> &point) const {
 		Vector3<T> d = *this - point;
 		return d.getR();
 	}
 
-	// return the component parallel to a second vector
-	// 0 if the second vector has 0 magnitude
-	Vector3<T> getParallelTo(const Vector3<T> &v) const {
+	/// return the component parallel to a second vector
+	/// 0 if the second vector has 0 magnitude
+	CUDA_CALLABLE_MEMBER Vector3<T> getParallelTo(const Vector3<T> &v) const {
 		T vmag = v.getR();
 		if (vmag == std::numeric_limits < T > ::min())
 			return Vector3<T>(0.);
 		return v * dot(v) / vmag;
 	}
 
-	// return the component perpendicular to a second vector
-	// 0 if the second vector has 0 magnitude
-	Vector3<T> getPerpendicularTo(const Vector3<T> &v) const {
+	/// return the component perpendicular to a second vector
+	/// 0 if the second vector has 0 magnitude
+	CUDA_CALLABLE_MEMBER Vector3<T> getPerpendicularTo(const Vector3<T> &v) const {
 		if (v.getR() == std::numeric_limits < T > ::min())
 			return Vector3<T>(0.);
 		return (*this) - getParallelTo(v);
 	}
 
-	// rotate the vector around a given axis by a given angle
-	Vector3<T> getRotated(const Vector3<T> &axis, T angle) const {
+	/// rotate the vector around a given axis by a given angle
+	CUDA_CALLABLE_MEMBER Vector3<T> getRotated(const Vector3<T> &axis, T angle) const {
 		Vector3<T> u = axis;
-                if (u.getR() != 0.)
-                        u = u / u.getR();
+				if (u.getR() != 0.)
+						u = u / u.getR();
 		T c = cos(angle);
 		T s = sin(angle);
 		Vector3<T> Rx(c + u.x * u.x * (1 - c), u.x * u.y * (1 - c) - u.z * s,
@@ -218,8 +225,8 @@ public:
 		return Vector3<T>(dot(Rx), dot(Ry), dot(Rz));
 	}
 
-	// return vector with values limited to the range [lower, upper]
-	Vector3<T> clip(T lower, T upper) const {
+	/// return vector with values limited to the range [lower, upper]
+	CUDA_CALLABLE_MEMBER Vector3<T> clip(T lower, T upper) const {
 		Vector3<T> out;
 		out.x = std::max(lower, std::min(x, upper));
 		out.y = std::max(lower, std::min(y, upper));
@@ -227,44 +234,49 @@ public:
 		return out;
 	}
 
-	// return vector with absolute values
-	Vector3<T> abs() const {
+	/// return vector with absolute values
+	CUDA_CALLABLE_MEMBER Vector3<T> abs() const {
 		return Vector3<T>(std::abs(x), std::abs(y), std::abs(z));
 	}
 
-	// return vector with floored values
-	Vector3<T> floor() const {
+	/// return vector with floored values
+	CUDA_CALLABLE_MEMBER Vector3<T> floor() const {
 		return Vector3<T>(std::floor(x), std::floor(y), std::floor(z));
 	}
 
-	// return vector with ceiled values
-	Vector3<T> ceil() const {
+	/// return vector with ceiled values
+	CUDA_CALLABLE_MEMBER Vector3<T> ceil() const {
 		return Vector3<T>(std::ceil(x), std::ceil(y), std::ceil(z));
 	}
 
-	// minimum element
-	T min() const {
+	/// return vector with round values
+	CUDA_CALLABLE_MEMBER Vectro3<T> round() const {
+		return Vector3<T>(std::round(x), std::round(y), std::round(z));
+	}
+
+	/// minimum element
+	CUDA_CALLABLE_MEMBER T min() const {
 		return std::min(x, std::min(y, z));
 	}
 
-	// maximum element
-	T max() const {
+	/// maximum element
+	CUDA_CALLABLE_MEMBER T max() const {
 		return std::max(x, std::max(y, z));
 	}
 
-	// dot product
-	T dot(const Vector3<T> &v) const {
+	/// dot product
+	CUDA_CALLABLE_MEMBER T dot(const Vector3<T> &v) const {
 		return x * v.x + y * v.y + z * v.z;
 	}
 
-	// cross product
-	Vector3<T> cross(const Vector3<T> &v) const {
+	/// cross product
+	CUDA_CALLABLE_MEMBER Vector3<T> cross(const Vector3<T> &v) const {
 		return Vector3<T>(y * v.z - v.y * z, z * v.x - v.z * x,
 				x * v.y - v.x * y);
 	}
 
-	// returns true if all elements of the two vectors are equal
-	bool operator ==(const Vector3<T> &v) const {
+	/// returns true if all elements of the two vectors are equal
+	CUDA_CALLABLE_MEMBER bool operator ==(const Vector3<T> &v) const {
 		if (x != v.x)
 			return false;
 		if (y != v.y)
@@ -274,137 +286,137 @@ public:
 		return true;
 	}
 
-	Vector3<T> operator +(const Vector3<T> &v) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator +(const Vector3<T> &v) const {
 		return Vector3(x + v.x, y + v.y, z + v.z);
 	}
 
-	Vector3<T> operator +(const T &f) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator +(const T &f) const {
 		return Vector3(x + f, y + f, z + f);
 	}
 
-	Vector3<T> operator -(const Vector3<T> &v) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator -(const Vector3<T> &v) const {
 		return Vector3(x - v.x, y - v.y, z - v.z);
 	}
 
-	Vector3<T> operator -(const T &f) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator -(const T &f) const {
 		return Vector3(x - f, y - f, z - f);
 	}
 
-	// element-wise multiplication
-	Vector3<T> operator *(const Vector3<T> &v) const {
+	/// element-wise multiplication
+	CUDA_CALLABLE_MEMBER Vector3<T> operator *(const Vector3<T> &v) const {
 		return Vector3(x * v.x, y * v.y, z * v.z);
 	}
 
-	Vector3<T> operator *(T v) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator *(T v) const {
 		return Vector3(data[0] * v, data[1] * v, data[2] * v);
 	}
 
-	// element-wise division
-	Vector3<T> operator /(const Vector3<T> &v) const {
+	/// element-wise division
+	CUDA_CALLABLE_MEMBER Vector3<T> operator /(const Vector3<T> &v) const {
 		return Vector3(x / v.x, y / v.y, z / v.z);
 	}
 
-	Vector3<T> operator /(const T &f) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator /(const T &f) const {
 		return Vector3(x / f, y / f, z / f);
 	}
 
-	// element-wise modulo operation
-	Vector3<T> operator %(const Vector3<T> &v) const {
+	/// element-wise modulo operation
+	CUDA_CALLABLE_MEMBER Vector3<T> operator %(const Vector3<T> &v) const {
 		return Vector3(fmod(x, v.x), fmod(y, v.y), fmod(z, v.z));
 	}
 
-	Vector3<T> operator %(const T &f) const {
+	CUDA_CALLABLE_MEMBER Vector3<T> operator %(const T &f) const {
 		return Vector3(fmod(x, f), fmod(y, f), fmod(z, f));
 	}
 
-	Vector3<T> &operator -=(const Vector3<T> &v) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator -=(const Vector3<T> &v) {
 		data[0] -= v.x;
 		data[1] -= v.y;
 		data[2] -= v.z;
 		return *this;
 	}
 
-	Vector3<T> &operator -=(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator -=(const T &f) {
 		data[0] -= f;
 		data[1] -= f;
 		data[2] -= f;
 		return *this;
 	}
 
-	Vector3<T> &operator +=(const Vector3<T> &v) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator +=(const Vector3<T> &v) {
 		data[0] += v.x;
 		data[1] += v.y;
 		data[2] += v.z;
 		return *this;
 	}
 
-	Vector3<T> &operator +=(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator +=(const T &f) {
 		data[0] += f;
 		data[1] += f;
 		data[2] += f;
 		return *this;
 	}
 
-	// element-wise multiplication
-	Vector3<T> &operator *=(const Vector3<T> &v) {
+	/// element-wise multiplication
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator *=(const Vector3<T> &v) {
 		data[0] *= v.x;
 		data[1] *= v.y;
 		data[2] *= v.z;
 		return *this;
 	}
 
-	Vector3<T> &operator *=(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator *=(const T &f) {
 		data[0] *= f;
 		data[1] *= f;
 		data[2] *= f;
 		return *this;
 	}
 
-	// element-wise division
-	Vector3<T> &operator /=(const Vector3<T> &v) {
+	/// element-wise division
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator /=(const Vector3<T> &v) {
 		data[0] /= v.x;
 		data[1] /= v.y;
 		data[2] /= v.z;
 		return *this;
 	}
 
-	Vector3<T> &operator /=(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator /=(const T &f) {
 		data[0] /= f;
 		data[1] /= f;
 		data[2] /= f;
 		return *this;
 	}
 
-	// element-wise modulo operation
-	Vector3<T> &operator %=(const Vector3<T> &v) {
+	/// element-wise modulo operation
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator %=(const Vector3<T> &v) {
 		data[0] = fmod(x, v.x);
 		data[1] = fmod(y, v.y);
 		data[2] = fmod(z, v.z);
 		return *this;
 	}
 
-	Vector3<T> &operator %=(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator %=(const T &f) {
 		data[0] = fmod(x, f);
 		data[1] = fmod(y, f);
 		data[2] = fmod(z, f);
 		return *this;
 	}
 
-	Vector3<T> &operator =(const Vector3<T> &v) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator =(const Vector3<T> &v) {
 		data[0] = v.x;
 		data[1] = v.y;
 		data[2] = v.z;
 		return *this;
 	}
 
-	//Vector3<T> &operator =(Vector3<T> &&v) noexcept {
-	//	data[0] = v.data[0];
-	//	data[1] = v.data[1];
-	//	data[2] = v.data[2];
-	//	return *this;
-	//}
+	// CUDA_CALLABLE_MEMBER Vector3<T> &operator =(Vector3<T> &&v) noexcept {
+	// 	data[0] = v.data[0];
+	// 	data[1] = v.data[1];
+	// 	data[2] = v.data[2];
+	// 	return *this;
+	// }
 
-	Vector3<T> &operator =(const T &f) {
+	CUDA_CALLABLE_MEMBER Vector3<T> &operator =(const T &f) {
 		data[0] = f;
 		data[1] = f;
 		data[2] = f;
@@ -427,7 +439,7 @@ inline std::istream &operator >>(std::istream &in, Vector3<T> &v) {
 #endif
 
 template<typename T>
-inline Vector3<T> operator *(T f, const Vector3<T> &v) {
+CUDA_CALLABLE_MEMBER inline Vector3<T> operator *(T f, const Vector3<T> &v) {
 	return Vector3<T>(v.x * f, v.y * f, v.z * f);
 }
 
