@@ -55,8 +55,8 @@ public:
 	 @param r		value corresponding to the radius of the shell
 	 */
 	ReflectiveShell(Vector3d center, double r);
-	double distance(const Vector3d &point) const;
-	Vector3d normal(const Vector3d &point) const;
+	CUDA_CALLABLE_MEMBER double distance(const Vector3d &point) const;
+	CUDA_CALLABLE_MEMBER Vector3d normal(const Vector3d &point) const;
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	void setCenter(Vector3d center);
 	void setRadius(double r);
