@@ -176,19 +176,21 @@ void DiffusionSDE::process(Candidate *candidate) const {
     // Deactivate candidate.
 	bool NaN = std::isnan(PO.getR());
 	if (NaN == true){
-		  candidate->setActive(false);
-		  KISS_LOG_WARNING
+		candidate->setActive(false);
+		#ifndef __CUDACC__
+		KISS_LOG_WARNING
 			<< "\nCandidate with 'nan'-position occured: \n"
-		 	<< "position = " << PO << "\n"
-		  	<< "PosIn = " << PosIn << "\n"
-		  	<< "TVec = " << TVec << "\n"
-		  	<< "TStep = " << std::abs(TStep) << "\n"
-		  	<< "NVec = " << NVec << "\n"
-		  	<< "NStep = " << NStep << "\n"
-		  	<< "BVec = " << BVec << "\n"
-		  	<< "BStep = " << BStep << "\n"
+			<< "position = " << PO << "\n"
+			<< "PosIn = " << PosIn << "\n"
+			<< "TVec = " << TVec << "\n"
+			<< "TStep = " << std::abs(TStep) << "\n"
+			<< "NVec = " << NVec << "\n"
+			<< "NStep = " << NStep << "\n"
+			<< "BVec = " << BVec << "\n"
+			<< "BStep = " << BStep << "\n"
 			<< "Candidate is deactivated!\n";
-		  return;
+		#endif
+		return;
 	}
 
 	//DirOut = (PO - PosIn - LinProp).getUnitVector(); //Advection does not change the momentum vector
@@ -351,6 +353,7 @@ ref_ptr<MagneticField> DiffusionSDE::getMagneticField() const {
 
 Vector3d DiffusionSDE::getMagneticFieldAtPosition(Vector3d pos, double z) const {
 	Vector3d B(0, 0, 0);
+	#ifndef __CUDACC__
 	try {
 		// check if field is valid and use the field vector at the
 		// position pos with the redshift z
@@ -360,7 +363,11 @@ Vector3d DiffusionSDE::getMagneticFieldAtPosition(Vector3d pos, double z) const 
 	catch (std::exception &e) {
 		KISS_LOG_ERROR 	<< "DiffusionSDE: Exception in DiffusionSDE::getMagneticFieldAtPosition.\n"
 				<< e.what();
-	}	
+	}
+	#else
+	if (magneticField.valid())
+		B = magneticField->getField(pos, z);
+	#endif
 	return B;
 }
 
@@ -370,6 +377,7 @@ ref_ptr<AdvectionField> DiffusionSDE::getAdvectionField() const {
 
 Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d pos, double t) const {
 	Vector3d AdvField(0.);
+	#ifndef __CUDACC__
 	try {
 		// check if field is valid and use the field vector at the
 		// position pos
@@ -380,6 +388,10 @@ Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d pos, double t) const
 		KISS_LOG_ERROR 	<< "DiffusionSDE: Exception in DiffusionSDE::getAdvectionFieldAtPosition.\n"
 				<< e.what();
 	}
+	#else
+	if (advectionField.valid())
+			AdvField = advectionField->getField(pos, t);
+	#endif
 	return AdvField;
 }
 
