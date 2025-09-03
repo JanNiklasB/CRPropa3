@@ -19,7 +19,7 @@ class Module: public Referenced {
 	std::string description;
 public:
 	Module();
-	CUDA_CALLABLE_MEMBER virtual ~Module() {
+	virtual ~Module() {
 	}
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);
@@ -41,22 +41,22 @@ protected:
 	std::string rejectFlagKey, rejectFlagValue;
 	std::string acceptFlagKey, acceptFlagValue;
 
-	void reject(Candidate *candidate) const;
-	inline void reject(ref_ptr<Candidate> candidate) const {
+	CUDA_CALLABLE_MEMBER void reject(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER inline void reject(ref_ptr<Candidate> candidate) const {
 		reject(candidate.get());
 	}
 
-	void accept(Candidate *candidate) const;
-	inline void accept(ref_ptr<Candidate> candidate) const {
+	CUDA_CALLABLE_MEMBER void accept(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER inline void accept(ref_ptr<Candidate> candidate) const {
 		accept(candidate.get());
 	}
 
 public:
 	AbstractCondition();
-	void onReject(Module *rejectAction);
-	void onAccept(Module *acceptAction);
-	void setMakeRejectedInactive(bool makeInactive);
-	void setMakeAcceptedInactive(bool makeInactive);
+	CUDA_CALLABLE_MEMBER void onReject(Module *rejectAction);
+	CUDA_CALLABLE_MEMBER void onAccept(Module *acceptAction);
+	CUDA_CALLABLE_MEMBER void setMakeRejectedInactive(bool makeInactive);
+	CUDA_CALLABLE_MEMBER void setMakeAcceptedInactive(bool makeInactive);
 	void setRejectFlag(std::string key, std::string value);
 	void setAcceptFlag(std::string key, std::string value);
 

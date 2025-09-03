@@ -29,8 +29,10 @@ void AbstractCondition::reject(Candidate *candidate) const {
 	if (rejectAction.valid())
 		rejectAction->process(candidate);
 
+	#ifndef __CUDACC__
 	if (!rejectFlagKey.empty())
 		candidate->setProperty(rejectFlagKey, rejectFlagValue);
+	#endif
 
 	if (makeRejectedInactive)
 		candidate->setActive(false);
@@ -43,8 +45,10 @@ void AbstractCondition::accept(Candidate *candidate) const {
 	if (acceptAction.valid())
 		acceptAction->process(candidate);
 
+	#ifndef __CUDACC__
 	if (!acceptFlagKey.empty())
 		candidate->setProperty(acceptFlagKey, acceptFlagValue);
+	#endif
 
 	if (makeAcceptedInactive)
 		candidate->setActive(false);
