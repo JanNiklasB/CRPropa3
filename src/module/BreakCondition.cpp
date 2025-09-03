@@ -20,6 +20,8 @@ double MaximumTrajectoryLength::getMaximumTrajectoryLength() const {
 
 void MaximumTrajectoryLength::addObserverPosition(const Vector3d& position) {
 	observerPositions.push_back(position);
+	observerPositionsPtr = observerPositions.data();
+	observerPositionsSize = observerPositions.size();
 }
 
 const std::vector<Vector3d>& MaximumTrajectoryLength::getObserverPositions() const {
@@ -43,10 +45,10 @@ void MaximumTrajectoryLength::process(Candidate *c) const {
 	double length = c->getTrajectoryLength();
 	Vector3d position = c->current.getPosition();
 
-	if(observerPositions.size()) {
+	if(observerPositionsSize) {
 		bool inRange = false;
-		for (size_t i = 0; i < observerPositions.size(); i++) {
-			double distance = position.getDistanceTo(observerPositions[i]);
+		for (size_t i = 0; i < observerPositionsSize; i++) {
+			double distance = position.getDistanceTo(observerPositionsPtr[i]);
 			if (distance + length < maxLength)
 				inRange = true;
 		}
@@ -188,7 +190,11 @@ MinimumEnergyPerParticleId::MinimumEnergyPerParticleId(double minEnergyOthers) {
 
 void MinimumEnergyPerParticleId::add(int id, double energy) {
 	particleIds.push_back(id);
+	particleIdsPtr = particleIds.data();
+	particleIdsSize = particleIds.size();
 	minEnergies.push_back(energy);
+	minEnergiesPtr = minEnergies.data();
+	minEnergiesSize = minEnergies.size();
 }
 
 void MinimumEnergyPerParticleId::setMinimumEnergyOthers(double energy) {
@@ -200,9 +206,9 @@ double MinimumEnergyPerParticleId::getMinimumEnergyOthers() const {
 }
 
 void MinimumEnergyPerParticleId::process(Candidate *c) const {
-	for (int i = 0; i < particleIds.size(); i++) {
-		if (c->current.getId() == particleIds[i]) {
-			if (c->current.getEnergy() < minEnergies[i])
+	for (int i = 0; i < particleIdsSize; i++) {
+		if (c->current.getId() == particleIdsPtr[i]) {
+			if (c->current.getEnergy() < minEnergiesPtr[i])
 				reject(c);
 			else
 				return;

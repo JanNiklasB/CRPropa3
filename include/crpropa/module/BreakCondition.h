@@ -20,6 +20,8 @@ namespace crpropa {
 class MaximumTrajectoryLength: public AbstractCondition {
 	double maxLength;
 	std::vector<Vector3d> observerPositions;
+	Vector3d* observerPositionsPtr=NULL;
+	int observerPositionsSize=0;
 public:
 	MaximumTrajectoryLength(double length = 0);
 	void setMaximumTrajectoryLength(double length);
@@ -111,7 +113,11 @@ public:
  */
 class MinimumEnergyPerParticleId: public AbstractCondition {
 	std::vector<double> minEnergies;
+	double* minEnergiesPtr=NULL;
+	int minEnergiesSize=0;
 	std::vector<int> particleIds;
+	int* particleIdsPtr=NULL;
+	int particleIdsSize=0;
 	double minEnergyOthers;
 public:
 	MinimumEnergyPerParticleId(double minEnergyOthers = 0);

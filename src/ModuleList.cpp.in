@@ -25,7 +25,6 @@ ModuleList::ModuleList() : showProgress(false) {
 	cudaDeviceProp prop;
 	cudaGetDeviceProperties(&prop, 0);
 	maxThreadsPerBlock = prop.maxThreadsDim[0];
-	modulesPtr = modules.data();
 	#endif
 }
 
@@ -38,14 +37,17 @@ void ModuleList::setShowProgress(bool show) {
 
 void ModuleList::add(Module *module) {
 	modules.push_back(module);
-	modulesSize=modules.size();
+	modulesPtr = modules.data();
+	modulesSize = modules.size();
 }
 
 void ModuleList::remove(std::size_t i) {
 	iterator module_i = modules.begin();
 	std::advance(module_i, i);
 	modules.erase(module_i);
-	modulesSize=modules.size();
+	modulesSize = modules.size();
+	if (modules.size()==0) modulesPtr = NULL;
+	else modulesPtr = modules.data();
 }
 
 std::size_t ModuleList::size() const {
