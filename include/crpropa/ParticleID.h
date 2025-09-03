@@ -5,6 +5,13 @@
 #include <vector>
 #include <string>
 
+#ifdef __CUDACC__
+#define CUDA_CALLABLE_MEMBER __host__ __device__
+#include <cuda_runtime.h>
+#else
+#define CUDA_CALLABLE_MEMBER
+#endif
+
 namespace crpropa {
 /**
  * \addtogroup PhysicsDefinitions
@@ -23,11 +30,11 @@ namespace crpropa {
  * L is the total number of strange quarks.
  * I is the isomer number, with I=0 corresponding to the ground state.
  */
-int nucleusId(int a, int z);
-int chargeNumber(int id);
-int massNumber(int id);
+CUDA_CALLABLE_MEMBER int nucleusId(int a, int z);
+CUDA_CALLABLE_MEMBER int chargeNumber(int id);
+CUDA_CALLABLE_MEMBER int massNumber(int id);
 
-bool isNucleus(int id);
+CUDA_CALLABLE_MEMBER bool isNucleus(int id);
 
 /* Additional modules */
 std::string convertIdToName(int id); 

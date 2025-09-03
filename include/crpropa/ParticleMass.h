@@ -1,6 +1,13 @@
 #ifndef CRPROPA_PARTICLE_MASS_H
 #define CRPROPA_PARTICLE_MASS_H
 
+#ifdef __CUDACC__
+#define CUDA_CALLABLE_MEMBER __host__ __device__
+#include <cuda_runtime.h>
+#else
+#define CUDA_CALLABLE_MEMBER
+#endif
+
 namespace crpropa {
 /**
  * \addtogroup PhysicsDefinitions
@@ -14,7 +21,7 @@ namespace crpropa {
  @param id		id of the particle following the PDG numbering scheme
  @returns The mass of a the particle
  */
- double particleMass(int id);
+CUDA_CALLABLE_MEMBER double particleMass(int id);
  
 /** Get the nucleus mass by lookup from a table.
  The masses are the atomic masses from the NIST database: 
@@ -25,7 +32,7 @@ namespace crpropa {
  @param id		id of the particle following the PDG numbering scheme
  @returns The mass of a the nucleus
  */
-double nuclearMass(int id);
+CUDA_CALLABLE_MEMBER double nuclearMass(int id);
 
 /** Get the nucleus mass by lookup from a table.
  The masses are the atomic masses from the NIST database: 
@@ -37,7 +44,7 @@ double nuclearMass(int id);
  @param Z		atomic number of the nucleus
  @returns The mass of a the nucleus
  */
-double nuclearMass(int A, int Z);
+CUDA_CALLABLE_MEMBER double nuclearMass(int A, int Z);
 
 /** @}*/
 } // namespace crpropa

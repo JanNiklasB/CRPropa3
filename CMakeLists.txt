@@ -369,9 +369,9 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
@@ -422,8 +422,8 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Cordes.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp

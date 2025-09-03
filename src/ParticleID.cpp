@@ -9,6 +9,7 @@
 namespace crpropa {
 
 int nucleusId(int a, int z) {
+	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error(
 				"crpropa::Nucleus: no nucleus with Z < 0, A=" + kiss::str(a) + " Z="
@@ -21,6 +22,7 @@ int nucleusId(int a, int z) {
 		throw std::runtime_error(
 				"crpropa::Nucleus: no nucleus with A < Z, A=" + kiss::str(a) + " Z="
 						+ kiss::str(z));
+	#endif
 	return 1000000000 + z * 10000 + a * 10;
 }
 

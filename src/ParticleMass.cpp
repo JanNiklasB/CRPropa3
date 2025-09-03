@@ -14,11 +14,12 @@
 namespace crpropa {
 
 struct NuclearMassTable {
-	bool initialized;
 	std::vector<double> table;
+	double* tablePtr = NULL;
+	int tableSize = 0;
 
 	NuclearMassTable() {
-		initialized = false;
+		init();
 	}
 
 	void init() {
@@ -34,24 +35,21 @@ struct NuclearMassTable {
 			if (infile.peek() != '#') {
 				infile >> Z >> N >> mass;
 				table.push_back(mass);
+				tablePtr = table.data();
+				tableSize = table.size();
 			}
 			infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 		}
 
 		infile.close();
-		initialized = true;
 	}
 
-	double getMass(std::size_t idx) {
-		if (!initialized) {
-#pragma omp critical(init)
-			init();
-		}
+	CUDA_CALLABLE_MEMBER double getMass(std::size_t idx) {
 		return table[idx];
 	}
 };
 
-static NuclearMassTable nuclearMassTable;
+CUDA_CALLABLE_MEMBER static NuclearMassTable nuclearMassTable;
 
 double particleMass(int id) {
 	if (isNucleus(id))
@@ -69,10 +67,12 @@ double nuclearMass(int id) {
 
 double nuclearMass(int A, int Z) {
 	if ((A < 1) or (A > 56) or (Z < 0) or (Z > 26) or (Z > A)) {
+		#ifndef __CUDACC__
 		KISS_LOG_WARNING <<
 		"nuclearMass: nuclear mass not found in the mass table for " <<
 	        "A = " << A << ", Z = " << Z << ". " <<
 		"Approximated value used A * amu - Z * m_e instead.";
+		#endif
 		return A * amu - Z * mass_electron;
 	}
 	int N = A - Z;
