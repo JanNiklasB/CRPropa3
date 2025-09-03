@@ -42,7 +42,7 @@ public:
 	 (cf. CRPropa3-data/calc_scaling.py)
 	 @param z		redshift
 	 */
-	virtual double getRedshiftScaling(double z) const {
+	CUDA_CALLABLE_MEMBER virtual double getRedshiftScaling(double z) const {
 		return 1.;
 	};
 
@@ -73,7 +73,7 @@ public:
 	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true);
 
 	double getPhotonDensity(double ePhoton, double z = 0.) const;
-	double getRedshiftScaling(double z) const;
+	CUDA_CALLABLE_MEMBER double getRedshiftScaling(double z) const;
 	double getMinimumPhotonEnergy(double z) const;
 	double getMaximumPhotonEnergy(double z) const;
 
@@ -88,6 +88,17 @@ protected:
 	std::vector<double> photonDensity;
 	std::vector<double> redshifts;
 	std::vector<double> redshiftScalings;
+
+	double* photonEnergiesPtr=NULL;
+	double* photonDensityPtr=NULL;
+	double* redshiftsPtr=NULL;
+	double* redshiftScalingsPtr=NULL;
+
+	int photonEnergiesSize=0;
+	int photonDensitySize=0;
+	int redshiftsSize=0;
+	int redshiftScalingsSize=0;
+
 };
 
 /**

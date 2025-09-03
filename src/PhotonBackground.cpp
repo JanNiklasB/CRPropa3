@@ -51,13 +51,13 @@ double TabularPhotonField::getRedshiftScaling(double z) const {
 	if (!this->isRedshiftDependent)
 		return 1.;
  
-	if (z < this->redshifts.front())
+	if (z < this->redshiftsPtr[0])
 		return 1.;
  
-	if (z > this->redshifts.back())
+	if (z > this->redshiftsPtr[redshiftsSize-1])
 		return 0.;
  
-	return interpolate(z, this->redshifts, this->redshiftScalings);
+	return interpolate(z, this->redshiftsPtr, this->redshiftScalingsPtr, redshiftsSize);
 }
 
 double TabularPhotonField::getMinimumPhotonEnergy(double z) const{
@@ -78,6 +78,8 @@ void TabularPhotonField::readPhotonEnergy(std::string filePath) {
 		if ((line.size() > 0) & (line[0] != '#') )
 			this->photonEnergies.push_back(std::stod(line));
 	}
+	photonEnergiesPtr = photonEnergies.data();
+	photonEnergiesSize = photonEnergies.size();
 	infile.close();
 }
 
@@ -91,6 +93,8 @@ void TabularPhotonField::readPhotonDensity(std::string filePath) {
 		if ((line.size() > 0) & (line[0] != '#') )
 			this->photonDensity.push_back(std::stod(line));
 	}
+	photonDensityPtr = photonDensity.data();
+	photonDensitySize = photonDensity.size();
 	infile.close();
 }
 
@@ -104,6 +108,8 @@ void TabularPhotonField::readRedshift(std::string filePath) {
 		if ((line.size() > 0) & (line[0] != '#') )
 			this->redshifts.push_back(std::stod(line));
 	}
+	redshiftsPtr = redshifts.data();
+	redshiftsSize = redshifts.size();
 	infile.close();
 }
 
@@ -122,6 +128,8 @@ void TabularPhotonField::initRedshiftScaling() {
 		}
 		this->redshiftScalings.push_back(n / n0);
 	}
+	redshiftScalingsPtr = redshiftScalings.data();
+	redshiftScalingsSize = redshiftScalings.size();
 }
 
 void TabularPhotonField::checkInputData() const {
