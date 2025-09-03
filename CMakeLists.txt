@@ -381,7 +381,7 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp

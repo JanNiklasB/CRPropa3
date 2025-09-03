@@ -29,6 +29,8 @@ private:
 	double nSplit;
 	double minWeight;
 	std::vector<double> Ebins;
+	double* EbinsPtr=NULL;
+	int EbinsSize=0;
 
 public:
 

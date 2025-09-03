@@ -35,21 +35,21 @@ void CandidateSplitting::process(Candidate *c) const {
 		// minimal weight reached, no splitting
 		return;
 	}
-	if (currE < Ebins[0] || nSplit == 0 ){
+	if (currE < EbinsPtr[0] || nSplit == 0 ){
 		// current energy is smaller than first bin -> no splitting
 		// or, number of splits = 0
 		return;
 	}
-	for (size_t i = 0; i < Ebins.size(); ++i){
+	for (size_t i = 0; i < EbinsSize; ++i){
 		
-		if( prevE < Ebins[i] ){
+		if( prevE < EbinsPtr[i] ){
 			// previous energy is in energy bin [i-1, i]
-			if(currE < Ebins[i]){
+			if(currE < EbinsPtr[i]){
 				//assuming that dE greater than 0, prevE and E in same energy bin -> no splitting
 				return;
 			}
 			// current energy is in energy bin [i,i+1] or higher -> particle splitting for each crossing
-			for (size_t j = i; j < Ebins.size(); ++j ){
+			for (size_t j = i; j < EbinsSize; ++j ){
 
 				// adapted from Acceleration Module:
 				c->updateWeight(1. / nSplit); // * 1/n_split
@@ -61,7 +61,7 @@ void CandidateSplitting::process(Candidate *c) const {
 					new_candidate->previous.setEnergy(currE); // so that new candidate is not split again in next step!
 					c->addSecondary(new_candidate);
 				}
-				if (j < Ebins.size()-1 && currE < Ebins[j+1]){
+				if (j < EbinsSize-1 && currE < EbinsPtr[j+1]){
 					// candidate is in energy bin [j, j+1] -> no further splitting
 					return;
 				}
@@ -85,6 +85,8 @@ void CandidateSplitting::setEnergyBins(double Emin, double Emax, double nBins, b
 			Ebins.push_back(Emin + i * dE);
 		}
 	}
+	EbinsPtr = Ebins.data();
+	EbinsSize = Ebins.size();
 }
 
 void CandidateSplitting::setEnergyBinsDSA(double Emin, double dE, int n) {
@@ -92,6 +94,8 @@ void CandidateSplitting::setEnergyBinsDSA(double Emin, double dE, int n) {
 	for (size_t i = 1; i < n + 1; ++i) {
 		Ebins.push_back(Emin * pow(dE, i));
 	}
+	EbinsPtr = Ebins.data();
+	EbinsSize = Ebins.size();
 }
 
 const std::vector<double>& CandidateSplitting::getEnergyBins() const {
