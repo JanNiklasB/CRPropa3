@@ -28,25 +28,25 @@ enum interpolationType {
 };
 
 /** Lower and upper neighbour in a periodically continued unit grid */
-inline void periodicClamp(double x, int n, int &lo, int &hi) {
+CUDA_CALLABLE_MEMBER inline void periodicClamp(double x, int n, int &lo, int &hi) {
 	lo = ((int(floor(x)) % (n)) + (n)) % (n);
 	hi = (lo + 1) % (n);
 }
 
 /** grid index in a reflective continued unit grid */
-inline int reflectiveBoundary(int index, int n) {
+CUDA_CALLABLE_MEMBER inline int reflectiveBoundary(int index, int n) {
 	while ((index < -0.5) or (index > (n-0.5)))
 		index = 2 * n * (index > (n-0.5)) - index-1;
 	return index;
 }
 
 /** grid index in a periodically continued unit grid */
-inline int periodicBoundary(int index, int n) {
+CUDA_CALLABLE_MEMBER inline int periodicBoundary(int index, int n) {
 	return ((index % (n)) + (n)) % (n);
 }
 
 /** Lower and upper neighbour in a reflectively repeated unit grid */
-inline void reflectiveClamp(double x, int n, int &lo, int &hi, double &res) {
+CUDA_CALLABLE_MEMBER inline void reflectiveClamp(double x, int n, int &lo, int &hi, double &res) {
 	while ((x < -0.5) or (x > (n-0.5)))
 		x = 2 * n * (x > (n-0.5)) -x-1;
 	res = x;
@@ -59,7 +59,7 @@ inline void reflectiveClamp(double x, int n, int &lo, int &hi, double &res) {
 }
 
 /** Symmetrical round */
-inline double round(double r) {
+CUDA_CALLABLE_MEMBER inline double round(double r) {
 	return (r > 0.0) ? floor(r + 0.5) : ceil(r - 0.5);
 }
 
@@ -158,6 +158,8 @@ public:
 template<typename T>
 class Grid: public Referenced {
 	std::vector<T> grid;
+	T* gridPtr=NULL;
+	int gridSize=0;
 	size_t Nx, Ny, Nz; /**< Number of grid points */
 	Vector3d origin; /**< Origin of the volume that is represented by the grid. */
 	Vector3d gridOrigin; /**< Grid origin */
@@ -233,6 +235,8 @@ public:
 		this->Ny = Ny;
 		this->Nz = Nz;
 		grid.resize(Nx * Ny * Nz);
+		gridPtr = grid.data();
+		gridSize = grid.size();
 		setOrigin(origin);
 	}
 
@@ -315,7 +319,7 @@ public:
 	/** Choose the interpolation algorithm based on the set interpolation type.
 	  By default this it the trilinear interpolation. The user can change the
 	  routine with the setInterpolationType function.*/
-	T interpolate(const Vector3d &position) {
+	CUDA_CALLABLE_MEMBER T interpolate(const Vector3d &position) {
 		// check for volume
 		if (clipVolume) {
 			Vector3d edge = origin + Vector3d(Nx, Ny, Nz) * spacing;
@@ -335,27 +339,27 @@ public:
 	}
 
 	/** Inspector & Mutator */
-	T &get(size_t ix, size_t iy, size_t iz) {
-		return grid[ix * Ny * Nz + iy * Nz + iz];
+	CUDA_CALLABLE_MEMBER T &get(size_t ix, size_t iy, size_t iz) {
+		return gridPtr[ix * Ny * Nz + iy * Nz + iz];
 	}
 
 	/** Inspector */
-	const T &get(size_t ix, size_t iy, size_t iz) const {
-		return grid[ix * Ny * Nz + iy * Nz + iz];
+	CUDA_CALLABLE_MEMBER const T &get(size_t ix, size_t iy, size_t iz) const {
+		return gridPtr[ix * Ny * Nz + iy * Nz + iz];
 	}
 
-	const T &periodicGet(size_t ix, size_t iy, size_t iz) const {
+	CUDA_CALLABLE_MEMBER const T &periodicGet(size_t ix, size_t iy, size_t iz) const {
 		ix = periodicBoundary(ix, Nx);
 		iy = periodicBoundary(iy, Ny);
 		iz = periodicBoundary(iz, Nz);
-		return grid[ix * Ny * Nz + iy * Nz + iz];
+		return gridPtr[ix * Ny * Nz + iy * Nz + iz];
 	}
 
-	const T &reflectiveGet(size_t ix, size_t iy, size_t iz) const {
+	CUDA_CALLABLE_MEMBER const T &reflectiveGet(size_t ix, size_t iy, size_t iz) const {
 		ix = reflectiveBoundary(ix, Nx);
 		iy = reflectiveBoundary(iy, Ny);
 		iz = reflectiveBoundary(iz, Nz);
-		return grid[ix * Ny * Nz + iy * Nz + iz];
+		return gridPtr[ix * Ny * Nz + iy * Nz + iz];
 	}
 
 	T getValue(size_t ix, size_t iy, size_t iz) {
@@ -380,7 +384,7 @@ public:
 	}
 
 	/** Value of a grid point that is closest to a given position / nearest neighbour interpolation */
-	T closestValue(const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER T closestValue(const Vector3d &position) const {
 		Vector3d r = (position - gridOrigin) / spacing;
 		int ix, iy, iz;
 		if (reflective) {
@@ -456,7 +460,7 @@ private:
 	}
 	#endif // HAVE_SIMD
 	/** Interpolate the grid tricubic at a given position (see https://www.paulinternet.nl/?page=bicubic, http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf) */
-	Vector3f tricubicInterpolate(Vector3f, const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER Vector3f tricubicInterpolate(Vector3f, const Vector3d &position) const {
 		#ifdef HAVE_SIMD
 		// position on a unit grid
 		Vector3d r = (position - gridOrigin) / spacing;
@@ -491,17 +495,19 @@ private:
 		__m128 result = CubicInterpolate(interpolateVaryX[0], interpolateVaryX[1], interpolateVaryX[2], interpolateVaryX[3], fX);
 		return convertSimdToVector3f(result);
 		#else // HAVE_SIMD
+		#ifndef __CUDACC__
 		throw std::runtime_error( "Tried to use tricubic Interpolation without SIMD_EXTENSION. SIMD Optimization is necessary for tricubic interpolation of vector grids.\n");
+		#endif
 		#endif // HAVE_SIMD	
 	}
 
 	/** Vectorized cubic Interpolator in 1D that returns a scalar (see https://www.paulinternet.nl/?page=bicubic, http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf) */
-	double CubicInterpolateScalar(double p0,double p1,double p2,double p3,double pos) const {
+	CUDA_CALLABLE_MEMBER double CubicInterpolateScalar(double p0,double p1,double p2,double p3,double pos) const {
 		return((-0.5*p0+3/2.*p1-3/2.*p2+0.5*p3)*pos*pos*pos+(p0-5/2.*p1+p2*2-0.5*p3)*pos*pos+(-0.5*p0+0.5*p2)*pos+p1);
 	}
 
   /** Interpolate the grid tricubic at a given position (see https://www.paulinternet.nl/?page=bicubic, http://graphics.cs.cmu.edu/nsp/course/15-462/Fall04/assts/catmullRom.pdf) */
-	double tricubicInterpolate(double, const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER double tricubicInterpolate(double, const Vector3d &position) const {
 		/** position on a unit grid */
 		Vector3d r = (position - gridOrigin) / spacing;
 
@@ -537,7 +543,7 @@ private:
 	}
 
 	/** Interpolate the grid trilinear at a given position */
-	T trilinearInterpolate(const Vector3d &position) const {
+	CUDA_CALLABLE_MEMBER T trilinearInterpolate(const Vector3d &position) const {
 		/** position on a unit grid */
 		Vector3d r = (position - gridOrigin) / spacing;
 
