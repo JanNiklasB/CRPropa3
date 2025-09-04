@@ -33,6 +33,43 @@ inline int digit(const int& value, const int& d) {
 	return (value % (d * 10)) / d;
 }
 
+/// Same Behaviour as std::lower_bound, but accepts the array directly and returns the index instead
+template<typename T>
+CUDA_CALLABLE_MEMBER size_t lower_bound(T x, const T *X, int size) {
+	int count=size-1, step;
+	T it;
+	size_t i1 = 0;
+	while (count>0) {
+		step = count/2;
+		it = X[step+i1];
+		if (it<x) {
+			i1 = step+1;
+			count -= step+1;
+		}
+		else count = step;
+	}
+	return i1;
+}
+
+/// Same Behaviour as std::upper_bound, but accepts the array directly and returns the index instead
+template<typename T>
+CUDA_CALLABLE_MEMBER size_t upper_bound(T x, const T *X, int size) {
+	int count=size-1, step;
+	T it;
+	size_t i1 = 0;
+	while (count>0) {
+		step = count/2;
+		it = X[step+i1];
+		if (!(x<it)) {
+			i1 = step+1;
+			count -= step+1;
+		}
+		else count = step;
+	}
+	return i1;
+}
+
+
 // Return value xclip which is the closest to x, so that lower <= xclip <= upper
 template <typename T>
 CUDA_CALLABLE_MEMBER T clip(const T& x, const T& lower, const T& upper) {
@@ -42,10 +79,12 @@ CUDA_CALLABLE_MEMBER T clip(const T& x, const T& lower, const T& upper) {
 /// Perform linear interpolation on a set of n tabulated data points X[0 .. n-1] -> Y[0 .. n-1]
 /// Returns Y[0] if x < X[0] and Y[n-1] if x > X[n-1]
 double interpolate(double x, const std::vector<double>& X,
-	const std::vector<double>& Y) noexcept;
+	const std::vector<double>& Y);
 
-double interpolate(double x, const double* X,
-	const double* Y, int YSize) noexcept;
+/// Perform linear interpolation on a set of n tabulated data points X[0 .. n-1] -> Y[0 .. n-1]
+/// Returns Y[0] if x < X[0] and Y[n-1] if x > X[n-1]
+CUDA_CALLABLE_MEMBER double interpolate(double x, const double* X,
+	const double* Y, int YSize);
 
 
 /// Perform bilinear interpolation on a set of (n,m) tabulated data points X[0 .. n-1], Y[0 .. m-1] -> Z[0.. n-1*m-1]
@@ -53,19 +92,21 @@ double interpolate(double x, const double* X,
 double interpolate2d(double x, double y, const std::vector<double>& X,
 		const std::vector<double>& Y, const std::vector<double>& Z);
 
+
 /// Perform linear interpolation on equidistant tabulated data
 /// Returns Y[0] if x < lo and Y[n-1] if x > hi
-CUDA_CALLABLE_MEMBER double interpolateEquidistant(double x, double lo, double hi,
-		const std::vector<double>& Y) noexcept;
+double interpolateEquidistant(double x, double lo, double hi,
+		const std::vector<double>& Y);
 
 CUDA_CALLABLE_MEMBER double interpolateEquidistant(double x, double lo, double hi,
-		const double* Y, int YSize) noexcept;
+		const double* Y, int YSize);
+
 
 /// Find index of value in a sorted vector X that is closest to x
-CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const std::vector<double> &X) noexcept;
+size_t closestIndex(double x, const std::vector<double> &X);
+/// Find index of value in a sorted array X that is closest to x
+CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size);
 
-/// Find index of value in a sorted list X that is closest to x
-CUDA_CALLABLE_MEMBER size_t closestIndex(double x, const double* X, int size) noexcept;
 /** @}*/
 
 

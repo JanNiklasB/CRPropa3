@@ -11,38 +11,6 @@
 
 #define index(i,j) ((j)+(i)*Y.size())
 
-CUDA_CALLABLE_MEMBER size_t lower_bound(double x, const double *X, int size) {
-	int count=size-1, step;
-	double it;
-	size_t i1 = 0;
-	while (count>0) {
-		step = count/2;
-		it = X[step+i1];
-		if (it<x) {
-			i1 = step+1;
-			count -= step+1;
-		}
-		else count = step;
-	}
-	return i1;
-}
-
-CUDA_CALLABLE_MEMBER size_t upper_bound(double x, const double *X, int size){
-	int count=size-1, step;
-	double it;
-	size_t i1 = 0;
-	while (count>0) {
-		step = count/2;
-		it = X[step+i1];
-		if (!(x<it)) {
-			i1 = step+1;
-			count -= step+1;
-		}
-		else count = step;
-	}
-	return i1;
-}
-
 namespace crpropa {
 
 std::string getDataPath(std::string filename) {
@@ -116,7 +84,7 @@ double interpolate(double x, const std::vector<double> &X,
 
 double interpolate(double x, const double* X,
 		const double* Y, int Size) {
-	size_t i = upper_bound(x, X, Size);
+	size_t i = upper_bound<double>(x, X, Size);
 	if (i == 0)
 		return Y[0];
 	if (i == Size-1)
@@ -177,7 +145,7 @@ size_t closestIndex(double x, const std::vector<double> &X) {
 }
 
 size_t closestIndex(double x, const double *X, int size) {
-	size_t i1 = lower_bound(x, X, size);
+	size_t i1 = lower_bound<double>(x, X, size);
 	if (i1 == 0)
 		return i1;
 	size_t i0 = i1 - 1;

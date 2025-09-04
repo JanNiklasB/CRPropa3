@@ -63,6 +63,7 @@
 // Not thread safe (unless auto-initialization is avoided and each thread has
 // its own Random object)
 #include "crpropa/Vector3.h"
+#include "Common.h"
 
 #include <iostream>
 #include <limits>
@@ -77,7 +78,7 @@
 
 //necessary for win32
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846264338328
 #endif
 
 namespace crpropa {
@@ -102,103 +103,106 @@ public:
 protected:
 	enum {M = 397}; // period parameter
 	uint32_t state[N];// internal state
-	std::vector<uint32_t> initial_seed;//
+	uint32_t* initial_seed=NULL;
+	int initial_seedSize=0;
 	uint32_t *pNext;// next value to get from state
 	int left;// number of values left before reload needed
 
 //Methods
 public:
 	/// initialize with a simple uint32_t
-	Random( const uint32_t& oneSeed );
+	CUDA_CALLABLE_MEMBER Random( const uint32_t& oneSeed );
 	// initialize with an array
-	Random( uint32_t *const bigSeed, uint32_t const seedLength = N );
+	CUDA_CALLABLE_MEMBER Random( uint32_t *const bigSeed, uint32_t const seedLength = N );
 	/// auto-initialize with /dev/urandom or time() and clock()
 	/// Do NOT use for CRYPTOGRAPHY without securely hashing several returned
 	/// values together, otherwise the generator state can be learned after
 	/// reading 624 consecutive values.
-	Random();
+	CUDA_CALLABLE_MEMBER Random();
 	// Access to 32-bit random numbers
-	double rand();///< real number in [0,1]
-	double rand( const double& n );///< real number in [0,n]
-	double randExc();///< real number in [0,1)
-	double randExc( const double& n );///< real number in [0,n)
-	double randDblExc();///< real number in (0,1)
-	double randDblExc( const double& n );///< real number in (0,n)
+	CUDA_CALLABLE_MEMBER double rand();///< real number in [0,1]
+	CUDA_CALLABLE_MEMBER double rand( const double& n );///< real number in [0,n]
+	CUDA_CALLABLE_MEMBER double randExc();///< real number in [0,1)
+	CUDA_CALLABLE_MEMBER double randExc( const double& n );///< real number in [0,n)
+	CUDA_CALLABLE_MEMBER double randDblExc();///< real number in (0,1)
+	CUDA_CALLABLE_MEMBER double randDblExc( const double& n );///< real number in (0,n)
 	// Pull a 32-bit integer from the generator state
 	// Every other access function simply transforms the numbers extracted here
-	uint32_t randInt();///< integer in [0,2**32-1]
-	uint32_t randInt( const uint32_t& n );///< integer in [0,n] for n < 2**32
+	CUDA_CALLABLE_MEMBER uint32_t randInt();///< integer in [0,2**32-1]
+	CUDA_CALLABLE_MEMBER uint32_t randInt( const uint32_t& n );///< integer in [0,n] for n < 2**32
 
-	uint64_t randInt64(); ///< integer in [0, 2**64 -1]. PROBABLY NOT SECURE TO USE
-	uint64_t randInt64(const uint64_t &n); ///< integer in [0, n] for n < 2**64 -1. PROBABLY NOT SECURE TO USE
+	CUDA_CALLABLE_MEMBER uint64_t randInt64(); ///< integer in [0, 2**64 -1]. PROBABLY NOT SECURE TO USE
+	CUDA_CALLABLE_MEMBER uint64_t randInt64(const uint64_t &n); ///< integer in [0, n] for n < 2**64 -1. PROBABLY NOT SECURE TO USE
 
-	double operator()() {return rand();} ///< same as rand()
+	CUDA_CALLABLE_MEMBER double operator()() {return rand();} ///< same as rand()
 
 	// Access to 53-bit random numbers (capacity of IEEE double precision)
-	double rand53();///< real number in [0,1)  (capacity of IEEE double precision)
+	CUDA_CALLABLE_MEMBER double rand53();///< real number in [0,1)  (capacity of IEEE double precision)
 	///Exponential distribution in (0,inf)
-	double randExponential();
+	CUDA_CALLABLE_MEMBER double randExponential();
 	/// Normal distributed random number
-	double randNorm( const double& mean = 0.0, const double& variance = 1.0 );
+	CUDA_CALLABLE_MEMBER double randNorm( const double& mean = 0.0, const double& variance = 1.0 );
 	/// Uniform distribution in [min, max]
-	double randUniform(double min, double max);
+	CUDA_CALLABLE_MEMBER double randUniform(double min, double max);
 	/// Rayleigh distributed random number
-	double randRayleigh(double sigma);
+	CUDA_CALLABLE_MEMBER double randRayleigh(double sigma);
 	/// Fisher distributed random number
-	double randFisher(double k);
+	CUDA_CALLABLE_MEMBER double randFisher(double k);
 
 	/// Draw a random bin from a (unnormalized) cumulative distribution function, without leading zero.
 	size_t randBin(const std::vector<float> &cdf);
 	size_t randBin(const std::vector<double> &cdf);
+	CUDA_CALLABLE_MEMBER size_t randBin(const float* cdf, int size);
+	CUDA_CALLABLE_MEMBER size_t randBin(const double* cdf, int size);
 
 	/// Random point on a unit-sphere
-	Vector3d randVector();
+	CUDA_CALLABLE_MEMBER Vector3d randVector();
 	/// Random vector with given angular separation around mean direction
-	Vector3d randVectorAroundMean(const Vector3d &meanDirection, double angle);
+	CUDA_CALLABLE_MEMBER Vector3d randVectorAroundMean(const Vector3d &meanDirection, double angle);
 	/// Fisher distributed random vector
-	Vector3d randFisherVector(const Vector3d &meanDirection, double kappa);
+	CUDA_CALLABLE_MEMBER Vector3d randFisherVector(const Vector3d &meanDirection, double kappa);
 	/// Uniform distributed random vector inside a cone
-	Vector3d randConeVector(const Vector3d &meanDirection, double angularRadius);
+	CUDA_CALLABLE_MEMBER Vector3d randConeVector(const Vector3d &meanDirection, double angularRadius);
 	/// Random lamberts distributed vector with theta distribution: sin(t) * cos(t),
 	/// aka cosine law (https://en.wikipedia.org/wiki/Lambert%27s_cosine_law),
 	/// for a surface element with normal vector pointing in positive z-axis (0, 0, 1)
-	Vector3d randVectorLamberts();
+	CUDA_CALLABLE_MEMBER Vector3d randVectorLamberts();
 	/// Same as above but rotated to the respective normalVector of surface element
-	Vector3d randVectorLamberts(const Vector3d &normalVector);
+	CUDA_CALLABLE_MEMBER Vector3d randVectorLamberts(const Vector3d &normalVector);
 	///_Position vector uniformly distributed within propagation step size bin
-	Vector3d randomInterpolatedPosition(const Vector3d &a, const Vector3d &b);
+	CUDA_CALLABLE_MEMBER Vector3d randomInterpolatedPosition(const Vector3d &a, const Vector3d &b);
 
 	/// Power-law distribution of a given differential spectral index
-	double randPowerLaw(double index, double min, double max);
+	CUDA_CALLABLE_MEMBER double randPowerLaw(double index, double min, double max);
 	/// Broken power-law distribution
-	double randBrokenPowerLaw(double index1, double index2, double breakpoint, double min, double max );
+	CUDA_CALLABLE_MEMBER double randBrokenPowerLaw(double index1, double index2, double breakpoint, double min, double max );
 
 	/// Seed the generator with a simple uint32_t
-	void seed( const uint32_t oneSeed );
+	CUDA_CALLABLE_MEMBER void seed( const uint32_t oneSeed );
 	/// Seed the generator with an array of uint32_t's
 	/// There are 2^19937-1 possible initial states.  This function allows
 	/// all of those to be accessed by providing at least 19937 bits (with a
 	/// default seed length of N = 624 uint32_t's).  Any bits above the lower 32
 	/// in each element are discarded.
 	/// Just call seed() if you want to get array from /dev/urandom
-	void seed( uint32_t *const bigSeed, const uint32_t seedLength = N );
+	CUDA_CALLABLE_MEMBER void seed( uint32_t *const bigSeed, const uint32_t seedLength = N );
 	// seed via an b64 encoded string
-	void seed( const std::string &b64Seed);
+	CUDA_CALLABLE_MEMBER void seed( const std::string &b64Seed);
 	/// Seed the generator with an array from /dev/urandom if available
 	/// Otherwise use a hash of time() and clock() values
-	void seed();
+	CUDA_CALLABLE_MEMBER void seed();
 
 	// Saving and loading generator state
-	void save( uint32_t* saveArray ) const;// to array of size SAVE
-	void load( uint32_t *const loadArray );// from such array
+	CUDA_CALLABLE_MEMBER void save( uint32_t* saveArray ) const;// to array of size SAVE
+	CUDA_CALLABLE_MEMBER void load( uint32_t *const loadArray );// from such array
 	const std::vector<uint32_t> &getSeed() const; // copy the seed to the array
-	const std::string getSeed_base64() const; // get the base 64 encoded seed
+	CUDA_CALLABLE_MEMBER const std::string getSeed_base64() const; // get the base 64 encoded seed
 
 	friend std::ostream& operator<<( std::ostream& os, const Random& mtrand );
 	friend std::istream& operator>>( std::istream& is, Random& mtrand );
 
-	static Random &instance();
-	static void seedThreads(const uint32_t oneSeed);
+	CUDA_CALLABLE_MEMBER static Random &instance();
+	CUDA_CALLABLE_MEMBER static void seedThreads(const uint32_t oneSeed);
 	static std::vector< std::vector<uint32_t> > getSeedThreads();
 
 protected:
@@ -206,22 +210,22 @@ protected:
 	/// See Knuth TAOCP Vol 2, 3rd Ed, p.106 for multiplier.
 	/// In previous versions, most significant bits (MSBs) of the seed affect
 	/// only MSBs of the state array.  Modified 9 Jan 2002 by Makoto Matsumoto.
-	void initialize( const uint32_t oneSeed );
+	CUDA_CALLABLE_MEMBER void initialize( const uint32_t oneSeed );
 
 	/// Generate N new values in state
 	/// Made clearer and faster by Matthew Bellew (matthew.bellew@home.com)
-	void reload();
-	uint32_t hiBit( const uint32_t& u ) const {return u & 0x80000000UL;}
-	uint32_t loBit( const uint32_t& u ) const {return u & 0x00000001UL;}
-	uint32_t loBits( const uint32_t& u ) const {return u & 0x7fffffffUL;}
-	uint32_t mixBits( const uint32_t& u, const uint32_t& v ) const
+	CUDA_CALLABLE_MEMBER void reload();
+	CUDA_CALLABLE_MEMBER uint32_t hiBit( const uint32_t& u ) const {return u & 0x80000000UL;}
+	CUDA_CALLABLE_MEMBER uint32_t loBit( const uint32_t& u ) const {return u & 0x00000001UL;}
+	CUDA_CALLABLE_MEMBER uint32_t loBits( const uint32_t& u ) const {return u & 0x7fffffffUL;}
+	CUDA_CALLABLE_MEMBER uint32_t mixBits( const uint32_t& u, const uint32_t& v ) const
 	{	return hiBit(u) | loBits(v);}
 
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4146 )
 #endif
-	uint32_t twist( const uint32_t& m, const uint32_t& s0, const uint32_t& s1 ) const
+	CUDA_CALLABLE_MEMBER uint32_t twist( const uint32_t& m, const uint32_t& s0, const uint32_t& s1 ) const
 	{	return m ^ (mixBits(s0,s1)>>1) ^ (-loBit(s1) & 0x9908b0dfUL);}
 
 #ifdef _MSC_VER
@@ -231,7 +235,7 @@ protected:
 	/// Get a uint32_t from t and c
 	/// Better than uint32_t(x) in case x is floating point in [0,1]
 	/// Based on code by Lawrence Kirby (fred@genesis.demon.co.uk)
-	static uint32_t hash( time_t t, clock_t c );
+	CUDA_CALLABLE_MEMBER static uint32_t hash( time_t t, clock_t c );
 
 };
 /** @}*/

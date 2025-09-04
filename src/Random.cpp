@@ -110,7 +110,7 @@ double Random::rand53() {
 // mean and variance by Box-Muller method
 double Random::randNorm(const double& mean, const double& variance) {
 	double r = sqrt(-2.0 * log(1.0 - randDblExc())) * variance;
-	double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
+	double phi = 2.0 * M_PI * randExc();
 	return mean + r * cos(phi);
 }
 
@@ -136,6 +136,14 @@ size_t Random::randBin(const std::vector<double> &cdf) {
 	std::vector<double>::const_iterator it = std::lower_bound(cdf.begin(),
 			cdf.end(), rand() * cdf.back());
 	return it - cdf.begin();
+}
+
+size_t Random::randBin(const float* cdf, int size) {
+	return lower_bound<float>(rand() * cdf[size-1], cdf, size);
+}
+
+size_t Random::randBin(const double* cdf, int size) {
+	return lower_bound<double>(rand() * cdf[size-1], cdf, size);
 }
 
 Vector3d Random::randVector() {
@@ -187,10 +195,12 @@ Vector3d Random::randomInterpolatedPosition(const Vector3d &a, const Vector3d &b
 }
 
 double Random::randPowerLaw(double index, double min, double max) {
+	#ifndef __CUDACC__
 	if ((min < 0) || (max < min)) {
 		throw std::runtime_error(
 				"Power law distribution only possible for 0 <= min <= max");
 	}
+	#endif
 	//check for index -1!
 	if ((std::abs(index + 1.0)) < std::numeric_limits<double>::epsilon()) {
 		double part1 = log(max);
@@ -206,10 +216,12 @@ double Random::randPowerLaw(double index, double min, double max) {
 
 double Random::randBrokenPowerLaw(double index1, double index2,
 		double breakpoint, double min, double max) {
+	#ifndef __CUDACC__
 	if ((min <= 0) || (max < min)) {
 		throw std::runtime_error(
 				"Power law distribution only possible for 0 < min <= max");
 	}
+	#endif
 	if (min >= breakpoint) {
 		return this->randPowerLaw(index2, min, max);
 	} else if (max <= breakpoint) {
@@ -277,14 +289,12 @@ uint32_t Random::randInt(const uint32_t& n) {
 	return i;
 }
 
-
 uint64_t Random::randInt64()
 {
 	int64_t a = randInt();
 	int64_t b = randInt();
 	return (b + a << 32);
 }
-
 
 uint64_t Random::randInt64(const uint64_t &n)
 {
@@ -304,10 +314,12 @@ uint64_t Random::randInt64(const uint64_t &n)
 	return i;
 }
 
-
-
 void Random::seed(const uint32_t oneSeed) {
-	initial_seed.resize(1);
+	if(initial_seed)
+		delete[] initial_seed;
+
+	initial_seed = new uint32_t[1];
+	initial_seedSize = 1;
 	initial_seed[0] = oneSeed;
 	initialize(oneSeed);
 	reload();
@@ -315,7 +327,11 @@ void Random::seed(const uint32_t oneSeed) {
 
 void Random::seed(uint32_t * const bigSeed, const uint32_t seedLength) {
 
-	initial_seed.resize(seedLength);
+	if(initial_seed)
+		delete[] initial_seed;
+	initial_seed = new uint32_t(seedLength);
+	initial_seedSize = seedLength;
+
 	for (size_t i =0; i< seedLength; i++)
 	{
 		initial_seed[i] = bigSeed[i];
@@ -355,7 +371,8 @@ void Random::seed(uint32_t * const bigSeed, const uint32_t seedLength) {
 }
 
 void Random::seed() {
-// First try getting an array from /dev/urandom
+	// First try getting an array from /dev/urandom
+	#ifndef __CUDACC__
 	FILE* urandom = std::fopen("/dev/urandom", "rb");
 	if (urandom) {
 		uint32_t bigSeed[N];
@@ -370,8 +387,9 @@ void Random::seed() {
 			return;
 		}
 	}
+	#endif
 
-// Was not successful, so use time() and clock() instead
+	// Was not successful, so use time() and clock() instead
 	seed(hash(time(NULL), clock()));
 }
 
@@ -428,7 +446,7 @@ void Random::save(uint32_t* saveArray) const {
 
 const std::vector<uint32_t> &Random::getSeed() const
 {
-	return initial_seed;
+	return std::vector<uint32_t>(initial_seed, &initial_seed[initial_seedSize-1]);
 }
 
 void Random::load(uint32_t * const loadArray) {
@@ -515,7 +533,7 @@ std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 
 const std::string Random::getSeed_base64() const
 {
-	return Base64::encode((unsigned char*) &initial_seed[0], sizeof(initial_seed[0]) * initial_seed.size() / sizeof(unsigned char));
+	return Base64::encode((unsigned char*) &initial_seed[0], sizeof(initial_seed[0]) * initial_seedSize / sizeof(unsigned char));
 }
 
 void Random::seed(const std::string &b64Seed)
