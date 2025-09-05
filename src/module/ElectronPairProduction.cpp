@@ -61,6 +61,11 @@ void ElectronPairProduction::initRate(std::string filename) {
 		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
 	}
 	infile.close();
+
+	tabLorentzFactorPtr = tabLorentzFactor.data();
+	tabLorentzFactorSize = tabLorentzFactor.size();
+	tabLossRatePtr = tabLossRate.data();
+	tabLossRateSize = tabLossRate.size();
 }
 
 void ElectronPairProduction::initSpectrum(std::string filename) {
@@ -89,14 +94,14 @@ double ElectronPairProduction::lossLength(int id, double lf, double z) const {
 		return std::numeric_limits<double>::max(); // no pair production on uncharged particles
 
 	lf *= (1 + z);
-	if (lf < tabLorentzFactor.front())
+	if (lf < tabLorentzFactorPtr[0])
 		return std::numeric_limits<double>::max(); // below energy threshold
 
 	double rate;
-	if (lf < tabLorentzFactor.back())
-		rate = interpolate(lf, tabLorentzFactor, tabLossRate); // interpolation
+	if (lf < tabLorentzFactorPtr[tabLorentzFactorSize-1])
+		rate = interpolate(lf, tabLorentzFactorPtr, tabLossRatePtr, tabLossRateSize); // interpolation
 	else
-		rate = tabLossRate.back() * pow(lf / tabLorentzFactor.back(), -0.6); // extrapolation
+		rate = tabLossRatePtr[tabLossRateSize-1] * pow(lf / tabLorentzFactorPtr[tabLorentzFactorSize-1], -0.6); // extrapolation
 
 	double A = nuclearMass(id) / mass_proton; // more accurate than massNumber(Id)
 	rate *= Z * Z / A * pow_integer<3>(1 + z) * photonField->getRedshiftScaling(z);
