@@ -9,7 +9,7 @@
 #include <cmath>
 #include <algorithm>
 
-#define index(i,j) ((j)+(i)*Y.size())
+#define index(i,j) ((j)+(i)*size)
 
 namespace crpropa {
 
@@ -83,33 +83,37 @@ double interpolate(double x, const std::vector<double> &X,
 }
 
 double interpolate(double x, const double* X,
-		const double* Y, int Size) {
-	size_t i = upper_bound<double>(x, X, Size);
+		const double* Y, int size) {
+	size_t i = upper_bound<double>(x, X, size);
 	if (i == 0)
 		return Y[0];
-	if (i == Size-1)
-		return Y[Size-1];
+	if (i == size-1)
+		return Y[size-1];
 	return Y[i] + (x - X[i]) * (Y[i + 1] - Y[i]) / (X[i + 1] - X[i]);
 }
 
 double interpolate2d(double x, double y, const std::vector<double> &X,
 		const std::vector<double> &Y, const std::vector<double> &Z) {
+	
+	return interpolate2d(x, y, X.data(), Y.data(), Z.data(), Z.size());
+}
 
-	std::vector<double>::const_iterator itx = std::upper_bound(X.begin(), X.end(), x);
-	std::vector<double>::const_iterator ity = std::upper_bound(Y.begin(), Y.end(), y);
+double interpolate2d(double x, double y, const double* X,
+		const double* Y, const double* Z, int size) {
 
-	if (x > X.back() || x < X.front())
+	size_t i = upper_bound<double>(x, X, size);
+	size_t j = upper_bound<double>(y, Y, size);
+
+	if (x > X[size-1] || x < X[0])
 		return 0;
-	if (y > Y.back() || y < Y.front())
+	if (y > Y[size-1] || y < Y[0])
 		return 0;
 
-	if (itx == X.begin() && ity == Y.begin())
-		return Z.front();
-	if (itx == X.end() && ity == Y.end())
-		return Z.back();
+	if (X[i] == X[0] && Y[j] == Y[0])
+		return Z[0];
+	if (X[i] == X[size-1] && Y[j] == Y[size-1])
+		return Z[size-1];
 
-	size_t i = itx - X.begin() - 1;
-	size_t j = ity - Y.begin() - 1;
 
 	double Q11 = Z[index(i,j)];
 	double Q12 = Z[index(i,j+1)];
@@ -128,13 +132,13 @@ double interpolateEquidistant(double x, double lo, double hi,
 }
 
 double interpolateEquidistant(double x, double lo, double hi,
-		const double* Y, int YSize) {
+		const double* Y, int size) {
 	if (x <= lo)
 		return Y[0];
 	if (x >= hi)
-		return Y[YSize-1];
+		return Y[size-1];
 
-	double dx = (hi - lo) / (YSize - 1);
+	double dx = (hi - lo) / (size - 1);
 	double p = (x - lo) / dx;
 	size_t i = floor(p);
 	return Y[i] + (p - i) * (Y[i + 1] - Y[i]);

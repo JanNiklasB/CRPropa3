@@ -29,7 +29,7 @@ std::string getDataPath(std::string filename);
 std::string getInstallPrefix();
 
 /// Returns a certain digit from a given integer
-inline int digit(const int& value, const int& d) {
+CUDA_CALLABLE_MEMBER inline int digit(const int& value, const int& d) {
 	return (value % (d * 10)) / d;
 }
 
@@ -84,7 +84,7 @@ double interpolate(double x, const std::vector<double>& X,
 /// Perform linear interpolation on a set of n tabulated data points X[0 .. n-1] -> Y[0 .. n-1]
 /// Returns Y[0] if x < X[0] and Y[n-1] if x > X[n-1]
 CUDA_CALLABLE_MEMBER double interpolate(double x, const double* X,
-	const double* Y, int YSize);
+	const double* Y, int size);
 
 
 /// Perform bilinear interpolation on a set of (n,m) tabulated data points X[0 .. n-1], Y[0 .. m-1] -> Z[0.. n-1*m-1]
@@ -92,6 +92,10 @@ CUDA_CALLABLE_MEMBER double interpolate(double x, const double* X,
 double interpolate2d(double x, double y, const std::vector<double>& X,
 		const std::vector<double>& Y, const std::vector<double>& Z);
 
+/// Perform bilinear interpolation on a set of (n,m) tabulated data points X[0 .. n-1], Y[0 .. m-1] -> Z[0.. n-1*m-1]
+/// Returns 0 if x < X[0] or x > X[n-1] or y < Y[0] or y > Y[m-1]
+CUDA_CALLABLE_MEMBER double interpolate2d(double x, double y, const double* X,
+		const double* Y, const double* Z, int size);
 
 /// Perform linear interpolation on equidistant tabulated data
 /// Returns Y[0] if x < lo and Y[n-1] if x > hi
@@ -99,7 +103,7 @@ double interpolateEquidistant(double x, double lo, double hi,
 		const std::vector<double>& Y);
 
 CUDA_CALLABLE_MEMBER double interpolateEquidistant(double x, double lo, double hi,
-		const double* Y, int YSize);
+		const double* Y, int size);
 
 
 /// Find index of value in a sorted vector X that is closest to x
