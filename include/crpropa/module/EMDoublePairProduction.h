@@ -34,7 +34,11 @@ private:
 
 	// tabulated interaction rate 1/lambda(E)
 	std::vector<double> tabEnergy;  //!< electron energy in [J]
+	double* tabEnergyPtr=NULL;
+	int tabEnergySize=0;
 	std::vector<double> tabRate;  //!< interaction rate in [1/m]
+	double* tabRatePtr=NULL;
+	int tabRateSize=0;
 
 public:
 	/** Constructor
@@ -69,7 +73,7 @@ public:
 
 	void initRate(std::string filename);
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void performInteraction(Candidate *candidate) const;
 };
 /** @}*/
 

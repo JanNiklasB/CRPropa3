@@ -56,6 +56,11 @@ void EMDoublePairProduction::initRate(std::string filename) {
 		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
 	}
 	infile.close();
+
+	tabEnergyPtr = tabEnergy.data();
+	tabEnergySize = tabEnergy.size();
+	tabRatePtr = tabRate.data();
+	tabRateSize = tabRate.size();
 }
 
 
@@ -98,11 +103,11 @@ void EMDoublePairProduction::process(Candidate *candidate) const {
 	double E = (1 + z) * candidate->current.getEnergy();
 
 	// check if in tabulated energy range
-	if (E < tabEnergy.front() or (E > tabEnergy.back()))
+	if (E < tabEnergyPtr[0] or (E > tabEnergyPtr[tabEnergySize-1]))
 		return;
 
 	// interaction rate
-	double rate = interpolate(E, tabEnergy, tabRate);
+	double rate = interpolate(E, tabEnergyPtr, tabRatePtr, tabRateSize);
 	rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
 
 	// check for interaction
