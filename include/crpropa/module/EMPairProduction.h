@@ -37,11 +37,19 @@ private:
 	// tabulated interaction rate 1/lambda(E)
 	std::vector<double> tabEnergy;  //!< electron energy in [J]
 	std::vector<double> tabRate;  //!< interaction rate in [1/m]
+	double *tabEnergyPtr=NULL, *tabRatePtr=NULL;
+	int tabEnergySize=0, tabRateSize=0;
 	
 	// tabulated CDF(s_kin, E) = cumulative differential interaction rate
 	std::vector<double> tabE;  //!< electron energy in [J]
 	std::vector<double> tabs;  //!< s_kin = s - m^2 in [J**2]
+	double *tabEPtr=NULL, *tabsPtr=NULL;
+	int tabESize=0, tabsSize=0;
+
 	std::vector< std::vector<double> > tabCDF;  //!< cumulative interaction rate
+	double **tabCDFPtr = NULL;
+	int tabCDFSize = 0;
+	int *tabCDFInnerSizes=NULL;
 
 public:
 	/** Constructor
@@ -77,7 +85,7 @@ public:
 	void initRate(std::string filename);
 	void initCumulativeRate(std::string filename);
 
-	void performInteraction(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void performInteraction(Candidate *candidate) const;
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 };
 /** @}*/

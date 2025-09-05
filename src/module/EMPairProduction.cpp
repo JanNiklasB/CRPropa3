@@ -60,6 +60,11 @@ void EMPairProduction::initRate(std::string filename) {
 		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
 	}
 	infile.close();
+
+	tabEnergyPtr = tabEnergy.data();
+	tabEnergySize = tabEnergy.size();
+	tabRatePtr = tabRate.data();
+	tabRateSize = tabRate.size();
 }
 
 void EMPairProduction::initCumulativeRate(std::string filename) {
@@ -72,6 +77,7 @@ void EMPairProduction::initCumulativeRate(std::string filename) {
 	tabE.clear();
 	tabs.clear();
 	tabCDF.clear();
+	if (tabCDFPtr) delete[] tabCDFPtr, tabCDFInnerSizes;
 	
 	// skip header
 	while (infile.peek() == '#')
@@ -99,32 +105,55 @@ void EMPairProduction::initCumulativeRate(std::string filename) {
 		tabCDF.push_back(cdf);
 	}
 	infile.close();
+
+	tabEPtr = tabE.data();
+	tabESize = tabE.size();
+	tabsPtr = tabs.data();
+	tabsSize = tabs.size();
+
+	tabCDFPtr = new double*[tabCDF.size()];
+	tabCDFInnerSizes = new int[tabCDF.size()];
+	for (int i=0; i<tabCDF.size(); i++){
+		tabCDFPtr[i] = tabCDF[i].data();
+		tabCDFInnerSizes[i] = tabCDF[i].size();
+	}
+	tabCDFSize = tabCDF.size();
 }
 
 // Hold an data array to interpolate the energy distribution on
 class PPSecondariesEnergyDistribution {
 	private:
-		std::vector<double> tab_s;
-		std::vector< std::vector<double> > data;
+		double* tab_s=NULL;
+		int tab_sSize=0;
+		double** data=NULL;
+		int dataSize=0;
+		int* dataInnerSize=NULL;
 		size_t N;
 
 	public:
 		// differential cross section for pair production for x = Epositron/Egamma, compare Lee 96 arXiv:9604098
-		double dSigmadE_PPx(double x, double beta) {
+		CUDA_CALLABLE_MEMBER double dSigmadE_PPx(double x, double beta) {
 			double A = (x / (1. - x) + (1. - x) / x );
 			double B =  (1. / x + 1. / (1. - x) );
 			double y = (1 - beta * beta);
 			return A + y * B - y * y / 4 * B * B;
 		}
 
-		PPSecondariesEnergyDistribution() {
+		CUDA_CALLABLE_MEMBER PPSecondariesEnergyDistribution() {
 			N = 1000;
 			size_t Ns = 1000;
 			double s_min = 4 * mec2 * mec2;
 			double s_max = 1e23 * eV * eV;
 			double dls = log(s_max / s_min) / Ns;
-			data = std::vector< std::vector<double> >(Ns, std::vector<double>(N));
-			tab_s = std::vector<double>(Ns + 1);
+
+			data = new double*[Ns];
+			dataSize = Ns;
+			dataInnerSize = new int[Ns];
+			for (int i=0; i<Ns; i++){
+				data[i] = new double[N];
+				dataInnerSize[i] = N;
+			}
+			tab_s = new double[Ns+1];
 
 			for (size_t i = 0; i < Ns + 1; ++i)
 				tab_s[i] = s_min * exp(i*dls); // tabulate s bin borders
@@ -136,29 +165,31 @@ class PPSecondariesEnergyDistribution {
 				double dx = log((1 + beta) / (1 - beta)) / N;
 
 				// cumulative midpoint integration
-				std::vector<double> data_i(1000);
-				data_i[0] = dSigmadE_PPx(x0, beta) * expm1(dx);
+				data[i][0] = dSigmadE_PPx(x0, beta) * expm1(dx);
 				for (size_t j = 1; j < N; j++) {
 					double x = x0 * exp(j*dx + 0.5*dx);
 					double binWidth = exp((j+1)*dx)-exp(j*dx);
-					data_i[j] = dSigmadE_PPx(x, beta) * binWidth + data_i[j-1];
+					data[i][j] = dSigmadE_PPx(x, beta) * binWidth + data[i][j-1];
 				}
-				data[i] = data_i;
 			}
 		}
 
+		CUDA_CALLABLE_MEMBER ~PPSecondariesEnergyDistribution() {
+			delete[] tab_s, data, dataInnerSize;
+		}
+
 		// sample positron energy from cdf(E, s_kin)
-		double sample(double E0, double s) {
+		CUDA_CALLABLE_MEMBER double sample(double E0, double s) {
 			// get distribution for given s
-			size_t idx = std::lower_bound(tab_s.begin(), tab_s.end(), s) - tab_s.begin();
-			if (idx > data.size())
+			size_t idx = lower_bound<double>(s, tab_s, tab_sSize);
+			if (idx > dataSize)
 				return NAN;
 				
-			std::vector<double> s0 = data[idx];
+			double* s0 = data[idx];
 
 			// draw random bin
 			Random &random = Random::instance();
-			size_t j = random.randBin(s0) + 1;
+			size_t j = random.randBin(s0, dataInnerSize[idx]) + 1;
 
 			double s_min = 4. * mec2 * mec2;
 			double beta = sqrtl(1. - s_min / s);
@@ -186,15 +217,15 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
 	double E = candidate->current.getEnergy() * (1 + z);
 
 	// check if in tabulated energy range
-	if (E < tabE.front() or (E > tabE.back()))
+	if (E < tabEPtr[0] or (E > tabEPtr[tabESize-1]))
 		return;
 
 	// sample the value of s
 	Random &random = Random::instance();
-	size_t i = closestIndex(E, tabE);  // find closest tabulation point
-	size_t j = random.randBin(tabCDF[i]);
-	double lo = std::max(4 * mec2 * mec2, tabs[j-1]);  // first s-tabulation point below min(s_kin) = (2 me c^2)^2; ensure physical value
-	double hi = tabs[j];
+	size_t i = closestIndex(E, tabEPtr, tabESize);  // find closest tabulation point
+	size_t j = random.randBin(tabCDFPtr[i], tabCDFInnerSizes[i]);
+	double lo = std::max(4 * mec2 * mec2, tabsPtr[j-1]);  // first s-tabulation point below min(s_kin) = (2 me c^2)^2; ensure physical value
+	double hi = tabsPtr[j];
 	double s = lo + random.rand() * (hi - lo);
 
 	// sample electron / positron energy
@@ -230,11 +261,11 @@ void EMPairProduction::process(Candidate *candidate) const {
 	double E = candidate->current.getEnergy() * (1 + z);
 
 	// check if in tabulated energy range
-	if ((E < tabEnergy.front()) or (E > tabEnergy.back()))
+	if ((E < tabEnergyPtr[0]) or (E > tabEnergyPtr[tabEnergySize-1]))
 		return;
 
 	// interaction rate
-	double rate = interpolate(E, tabEnergy, tabRate);
+	double rate = interpolate(E, tabEnergyPtr, tabRatePtr, tabRateSize);
 	rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
 
 	// run this loop at least once to limit the step size 
