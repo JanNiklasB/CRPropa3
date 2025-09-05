@@ -59,6 +59,11 @@ void EMTripletPairProduction::initRate(std::string filename) {
 		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
 	}
 	infile.close();
+
+	tabEnergyPtr = tabEnergy.data();
+	tabEnergySize = tabEnergy.size();
+	tabRatePtr = tabRate.data();
+	tabRateSize = tabRate.size();
 }
 
 void EMTripletPairProduction::initCumulativeRate(std::string filename) {
@@ -72,6 +77,7 @@ void EMTripletPairProduction::initCumulativeRate(std::string filename) {
 	tabE.clear();
 	tabs.clear();
 	tabCDF.clear();
+	if (tabCDFPtr) delete[] tabCDFPtr, tabCDFInnerSizes;
 	
 	// skip header
 	while (infile.peek() == '#')
@@ -99,6 +105,19 @@ void EMTripletPairProduction::initCumulativeRate(std::string filename) {
 		tabCDF.push_back(cdf);
 	}
 	infile.close();
+
+	tabEPtr = tabE.data();
+	tabESize = tabE.size();
+	tabsPtr = tabs.data();
+	tabsSize = tabs.size();
+
+	tabCDFPtr = new double*[tabCDF.size()];
+	tabCDFInnerSizes = new int[tabCDF.size()];
+	for (int i=0; i<tabCDF.size(); i++){
+		tabCDFPtr[i] = tabCDF[i].data();
+		tabCDFInnerSizes[i] = tabCDF[i].size();
+	}
+	tabCDFSize = tabCDF.size();
 }
 
 void EMTripletPairProduction::performInteraction(Candidate *candidate) const {
@@ -110,14 +129,14 @@ void EMTripletPairProduction::performInteraction(Candidate *candidate) const {
 	double z = candidate->getRedshift();
 	double E = candidate->current.getEnergy() * (1 + z);
 
-	if (E < tabE.front() or E > tabE.back())
+	if (E < tabEPtr[0] or E > tabEPtr[tabESize-1])
 		return;
 
 	// sample the value of eps
 	Random &random = Random::instance();
-	size_t i = closestIndex(E, tabE);
-	size_t j = random.randBin(tabCDF[i]);
-	double s_kin = pow(10, log10(tabs[j]) + (random.rand() - 0.5) * 0.1);
+	size_t i = closestIndex(E, tabEPtr, tabESize);
+	size_t j = random.randBin(tabCDFPtr[i], tabCDFInnerSizes[i]);
+	double s_kin = pow(10, log10(tabsPtr[j]) + (random.rand() - 0.5) * 0.1);
 	double eps = s_kin / 4. / E; // random background photon energy
 
 	// Use approximation from A. Mastichiadis et al., Astroph. Journ. 300:178-189 (1986), eq. 30.
@@ -154,12 +173,12 @@ void EMTripletPairProduction::process(Candidate *candidate) const {
 	double E = (1 + z) * candidate->current.getEnergy();
 
 	// check if in tabulated energy range
-	if ((E < tabEnergy.front()) or (E > tabEnergy.back()))
+	if ((E < tabEnergyPtr[0]) or (E > tabEnergyPtr[tabEnergySize-1]))
 		return;
 
 	// cosmological scaling of interaction distance (comoving)
 	double scaling = pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
-	double rate = scaling * interpolate(E, tabEnergy, tabRate);
+	double rate = scaling * interpolate(E, tabEnergyPtr, tabRatePtr, tabRateSize);
 
 	// run this loop at least once to limit the step size
 	double step = candidate->getCurrentStep();
