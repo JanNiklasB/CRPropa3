@@ -183,7 +183,9 @@ class ICSSecondariesEnergyDistribution {
 		}
 
 		CUDA_CALLABLE_MEMBER ~ICSSecondariesEnergyDistribution(){
-			delete[] data, dataInnerSize, s_values;
+			delete[] data;
+			delete[] dataInnerSize;
+			delete[] s_values;
 		}
 
 		// draw random energy for the up-scattered photon Ep(Ee, s)

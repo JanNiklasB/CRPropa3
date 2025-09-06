@@ -27,7 +27,6 @@ NuclearDecay::NuclearDecay(bool electrons, bool photons, bool neutrinos, double 
 		throw std::runtime_error(
 				"crpropa::NuclearDecay: could not open file " + filename);
 
-	decayTable.resize(27 * 31);
 	std::string line;
 	while (std::getline(infile,line)) {
 		std::stringstream stream(line);
@@ -46,10 +45,19 @@ NuclearDecay::NuclearDecay(bool electrons, bool photons, bool neutrinos, double 
 			decay.energy.push_back(gamma[i] * keV);
 			decay.intensity.push_back(gamma[i+1]);
 		}
+		decay.energyPtr = decay.energy.data();
+		decay.energySize = decay.energy.size();
+		decay.intensityPtr = decay.intensity.data();
+		decay.intensitySize = decay.intensity.size();
+
 		if (infile)
-			decayTable[Z * 31 + N].push_back(decay);
+			decayTable.push_back(decay);
 	}
 	infile.close();
+	
+	decayTablePtr = decayTable.data();
+	decayTableSize = decayTable.size();
+	
 }
 
 void NuclearDecay::setHaveElectrons(bool b) {
@@ -83,8 +91,8 @@ void NuclearDecay::process(Candidate *candidate) const {
 		int N = A - Z;
 
 		// check if particle can decay
-		const std::vector<DecayMode> &decays = decayTable[Z * 31 + N];
-		if (decays.size() == 0)
+		const DecayMode* decays = decayTablePtr;
+		if (decayTableSize == 0)
 			return;
 
 		// find interaction mode with minimum random decay distance
@@ -93,7 +101,7 @@ void NuclearDecay::process(Candidate *candidate) const {
 		int channel;
 		double totalRate = 0;
 
-		for (size_t i = 0; i < decays.size(); i++) {
+		for (size_t i = 0; i < decayTableSize; i++) {
 			double rate = decays[i].rate;
 			rate /= candidate->current.getLorentzFactor();  // relativistic time dilation
 			rate /= (1 + z);  // rate per light travel distance -> rate per comoving distance
@@ -147,24 +155,25 @@ void NuclearDecay::gammaEmission(Candidate *candidate, int channel) const {
 	int N = massNumber(id) - Z;
 
 	// get photon energies and emission probabilities for decay channel
-	const std::vector<DecayMode> &decays = decayTable[Z * 31 + N];
-	size_t idecay = decays.size();
+	const DecayMode* decays = decayTablePtr;
+	size_t idecay = decayTableSize;
 	while (idecay-- != 0) {
 		if (decays[idecay].channel == channel)
 			break;
 	}
 
-	const std::vector<double> &energy = decays[idecay].energy;
-	const std::vector<double> &intensity = decays[idecay].intensity;
+	const double* energy = decays[idecay].energyPtr;
+	const int energySize = decays[idecay].energySize;
+	const double* intensity = decays[idecay].intensityPtr;
 
 	// check if photon emission available
-	if (energy.size() == 0)
+	if (energySize == 0)
 		return;
 
 	Random &random = Random::instance();
 	Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
 
-	for (int i = 0; i < energy.size(); ++i) {
+	for (int i = 0; i < energySize; ++i) {
 		// check if photon of specific energy is emitted
 		if (random.rand() > intensity[i])
 			continue;
@@ -193,6 +202,7 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 	}
 
 	// update candidate, nuclear recoil negligible
+	#ifndef __CUDACC__
 	try
 	{
 		candidate->current.setId(nucleusId(A, Z + dZ));
@@ -202,6 +212,9 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 		KISS_LOG_ERROR<< "Something went wrong in the NuclearDecay\n" << "Please report this error on https://github.com/CRPropa/CRPropa3/issues including your simulation setup and the following random seed:\n" << Random::instance().getSeed_base64();
 		throw;
 	}
+	#else
+	candidate->current.setId(nucleusId(A, Z + dZ));
+	#endif
 
 	candidate->current.setLorentzFactor(gamma);
 
@@ -217,19 +230,20 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 	// see Basdevant, Fundamentals in Nuclear Physics, eq. (4.92)
 	// This leads to deviations from theoretical expectations at low 
 	// primary energies.
-	std::vector<double> energies;
-	std::vector<double> densities; // cdf(E), unnormalized
+	double* energies=NULL;
+	double* densities=NULL; // cdf(E), unnormalized
+	int size = 51;
 
-	energies.reserve(51);
-	densities.reserve(51);
+	energies = new double[size];
+	densities = new double[size];
 
 	double me = mass_electron * c_squared;
 	double cdf = 0;
 	for (int i = 0; i <= 50; i++) {
 		double E = me + i / 50. * Q;
 		cdf += E * sqrt(E * E - me * me) * pow(Q + me - E, 2);
-		energies.push_back(E);
-		densities.push_back(cdf);
+		energies[i] = E;
+		densities[i] = cdf;
 	}
 
 	// draw random electron energy and angle
@@ -237,7 +251,7 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 	// leads to deviations from theoretical predictions
 	// is not problematic for usual CRPropa energies E>~TeV
 	Random &random = Random::instance();
-	double E = interpolate(random.rand() * cdf, densities, energies);
+	double E = interpolate(random.rand() * cdf, densities, energies, size);
 	double p = sqrt(E * E - me * me);  // p*c
 	double cosTheta = 2 * random.rand() - 1;
 
@@ -250,6 +264,9 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 		candidate->addSecondary(electronId, Ee, pos, 1., interactionTag);
 	if (haveNeutrinos)
 		candidate->addSecondary(neutrinoId, Enu, pos, 1., interactionTag);
+	
+	delete[] energies;
+	delete[] densities;
 }
 
 void NuclearDecay::nucleonEmission(Candidate *candidate, int dA, int dZ) const {
@@ -259,6 +276,7 @@ void NuclearDecay::nucleonEmission(Candidate *candidate, int dA, int dZ) const {
 	int Z = chargeNumber(id);
 	double EpA = candidate->current.getEnergy() / double(A);
 
+	#ifndef __CUDACC__
 	try
 	{
 		candidate->current.setId(nucleusId(A - dA, Z - dZ));
@@ -268,10 +286,14 @@ void NuclearDecay::nucleonEmission(Candidate *candidate, int dA, int dZ) const {
 		KISS_LOG_ERROR<< "Something went wrong in the NuclearDecay\n" << "Please report this error on https://github.com/CRPropa/CRPropa3/issues including your simulation setup and the following random seed:\n" << Random::instance().getSeed_base64();
 		throw;
 	}
+	#else
+	candidate->current.setId(nucleusId(A - dA, Z - dZ));
+	#endif
 
 	candidate->current.setEnergy(EpA * (A - dA));
 	Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(),candidate->current.getPosition());
 
+	#ifndef __CUDACC__
 	try
 	{
 		candidate->addSecondary(nucleusId(dA, dZ), EpA * dA, pos, 1., interactionTag);
@@ -281,6 +303,9 @@ void NuclearDecay::nucleonEmission(Candidate *candidate, int dA, int dZ) const {
 		KISS_LOG_ERROR<< "Something went wrong in the NuclearDecay\n" << "Please report this error on https://github.com/CRPropa/CRPropa3/issues including your simulation setup and the following random seed:\n" << Random::instance().getSeed_base64();
 		throw;
 	}
+	#else
+	candidate->addSecondary(nucleusId(dA, dZ), EpA * dA, pos, 1., interactionTag);
+	#endif
 
 }
 
@@ -293,13 +318,13 @@ double NuclearDecay::meanFreePath(int id, double gamma) {
 	int N = A - Z;
 
 	// check if particle can decay
-	const std::vector<DecayMode> &decays = decayTable[Z * 31 + N];
-	if (decays.size() == 0)
+	const DecayMode* decays = decayTablePtr;
+	if (decayTableSize == 0)
 		return std::numeric_limits<double>::max();
 
 	double totalRate = 0;
 
-	for (size_t i = 0; i < decays.size(); i++) {
+	for (size_t i = 0; i < decayTableSize; i++) {
 		double rate = decays[i].rate;
 		rate /= gamma;
 		totalRate += rate;

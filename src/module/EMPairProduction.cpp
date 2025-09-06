@@ -77,7 +77,10 @@ void EMPairProduction::initCumulativeRate(std::string filename) {
 	tabE.clear();
 	tabs.clear();
 	tabCDF.clear();
-	if (tabCDFPtr) delete[] tabCDFPtr, tabCDFInnerSizes;
+	if (tabCDFPtr){
+		delete[] tabCDFPtr;
+		delete[] tabCDFInnerSizes;
+	}
 	
 	// skip header
 	while (infile.peek() == '#')

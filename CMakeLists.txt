@@ -374,7 +374,7 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
@@ -383,15 +383,15 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElasticScattering.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp

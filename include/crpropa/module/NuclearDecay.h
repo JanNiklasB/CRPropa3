@@ -32,8 +32,12 @@ private:
 		double rate; // decay rate in [1/m]
 		std::vector<double> energy; // photon energies of ensuing gamma decays
 		std::vector<double> intensity; // probabilities of ensuing gamma decays
+		double *energyPtr=NULL, *intensityPtr=NULL;
+		int energySize=0, intensitySize=0;
 	};
-	std::vector<std::vector<DecayMode> > decayTable; // decayTable[Z * 31 + N] = vector<DecayMode>
+	std::vector<DecayMode> decayTable; // only for Z * 31 + N which is set in constructor
+	DecayMode* decayTablePtr;
+	int decayTableSize=0;
 	std::string interactionTag = "ND";
 
 public:
@@ -66,10 +70,10 @@ public:
 	std::string getInteractionTag() const;
 
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate, int channel) const;
-	void gammaEmission(Candidate *candidate, int channel) const;
-	void betaDecay(Candidate *candidate, bool isBetaPlus) const;
-	void nucleonEmission(Candidate *candidate, int dA, int dZ) const;
+	CUDA_CALLABLE_MEMBER void performInteraction(Candidate *candidate, int channel) const;
+	CUDA_CALLABLE_MEMBER void gammaEmission(Candidate *candidate, int channel) const;
+	CUDA_CALLABLE_MEMBER void betaDecay(Candidate *candidate, bool isBetaPlus) const;
+	CUDA_CALLABLE_MEMBER void nucleonEmission(Candidate *candidate, int dA, int dZ) const;
 
 	/**
 	 Return the mean free path.
@@ -78,7 +82,7 @@ public:
 	 @param gamma   Lorentz factor of particle
 	 @returns The mean free path [in meters]
 	 */
-	double meanFreePath(int id, double gamma);
+	CUDA_CALLABLE_MEMBER double meanFreePath(int id, double gamma);
 };
 /** @}*/
 
