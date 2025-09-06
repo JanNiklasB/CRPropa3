@@ -31,8 +31,8 @@ class ObserverFeature: public Referenced {
 protected:
 	std::string description;
 public:
-	virtual DetectionState checkDetection(Candidate *candidate) const;
-	virtual void onDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER virtual DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER virtual void onDetection(Candidate *candidate) const;
 	virtual std::string getDescription() const;
 };
 
@@ -46,6 +46,8 @@ class Observer: public Module {
 	std::string flagValue;
 private:
 	std::vector<ref_ptr<ObserverFeature> > features;
+	ref_ptr<ObserverFeature>* featuresPtr=NULL;
+	int featuresSize=0;
 	ref_ptr<Module> detectionAction;
 	bool clone;
 	bool makeInactive;
@@ -78,7 +80,7 @@ public:
  */
 class ObserverDetectAll: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -95,7 +97,7 @@ public:
 	 @param surface		object with some specific geometric (see Geometry.h)
 	*/
 	ObserverSurface(Surface* surface);
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -116,7 +118,7 @@ public:
 	 @param stepSize	observer will keep track of particles at every step with this size
 	*/
 	ObserverTracking(Vector3d center, double radius, double stepSize = 0);
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -129,7 +131,7 @@ public:
  */
 class Observer1D: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -155,7 +157,7 @@ public:
 	 @param zmax	upper bound of redshift interval
 	 */
 	ObserverRedshiftWindow(double zmin = 0, double zmax = 0.1);
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -166,7 +168,7 @@ public:
  */
 class ObserverInactiveVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -177,7 +179,7 @@ public:
  */
 class ObserverNucleusVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -188,7 +190,7 @@ public:
  */
 class ObserverNeutrinoVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -199,7 +201,7 @@ public:
  */
 class ObserverPhotonVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -210,7 +212,7 @@ public:
  */
 class ObserverElectronVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -229,7 +231,7 @@ public:
 	 @param id		id of the particle following the PDG numbering scheme
 	 */
 	ObserverParticleIdVeto(int id);
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
 
@@ -252,6 +254,8 @@ protected:
 	 (leave empty if you want to rather use functions)
 	*/
 	std::vector<double> detList;
+	double* detListPtr=NULL;
+	int detListSize=0;
 	/**
 	 A temporary storage for detList, this enables the return of a List in getTimes
 	 without risking to modify detList
@@ -305,7 +309,7 @@ public:
 	 Checks whether to make a detection at the current step of candidate or not.
 	 This function is called in Observer.process with the simulated Candidate.
 	 */
-	DetectionState checkDetection(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	/** Function
 	 @param enableConstruction	if true, constructs detList from range of min, max, numb
 	 when calling addTime
@@ -350,7 +354,7 @@ public:
 
 	 Replaces the previous preconstructed detList and return the time for a specific index
 	 */
-	virtual double getTime(std::size_t index) const;
+	CUDA_CALLABLE_MEMBER virtual double getTime(std::size_t index) const;
 	double getMinimum() const {return minimum;}
 	double getMaximum() const {return maximum;}
 	int getNIntervals() const {return nIntervals;}

@@ -392,7 +392,7 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp

@@ -17,6 +17,8 @@ Observer::Observer() :
 
 void Observer::add(ObserverFeature *feature) {
 	features.push_back(feature);
+	featuresPtr = features.data();
+	featuresSize = features.size();
 }
 
 void Observer::onDetection(Module *action, bool clone_) {
@@ -27,8 +29,8 @@ void Observer::onDetection(Module *action, bool clone_) {
 void Observer::process(Candidate *candidate) const {
 	// loop over all features and have them check the particle
 	DetectionState state = NOTHING;
-	for (int i = 0; i < features.size(); i++) {
-		DetectionState s = features[i]->checkDetection(candidate);
+	for (int i = 0; i < featuresSize; i++) {
+		DetectionState s = featuresPtr[i]->checkDetection(candidate);
 		if (s == VETO)
 			state = VETO;
 		else if ((s == DETECTED) && (state != VETO))
@@ -36,8 +38,8 @@ void Observer::process(Candidate *candidate) const {
 	}
 
 	if (state == DETECTED) {
-		for (int i = 0; i < features.size(); i++) {
-			features[i]->onDetection(candidate);
+		for (int i = 0; i < featuresSize; i++) {
+			featuresPtr[i]->onDetection(candidate);
 		}
 
 		if (detectionAction.valid()) {
@@ -310,23 +312,29 @@ void ObserverTimeEvolution::clear(){
 	detList.clear();
 	detList.resize(0);
 	setNIntervals(0);
+	detListPtr = NULL;
+	detListSize = 0;
 }
 
 void ObserverTimeEvolution::constructDetListIfEmpty(){
 	if (detList.empty() && doDetListConstruction) {
-		std::vector<double> detListTemp;
+		std::vector<double> detListTemp;  // needed since getTime otherwise calls detList
 		size_t counter = 0;
 		while (getTime(counter)<=maximum) {
 			detListTemp.push_back(getTime(counter));
 			counter++;
 		}
 		detList.assign(detListTemp.begin(), detListTemp.end());
+		detListPtr = detList.data();
+		detListSize = detList.size();
 	}
 }
 
 void ObserverTimeEvolution::addTime(const double &time){
 	constructDetListIfEmpty();
 	detList.push_back(time);
+	detListPtr = detList.data();
+	detListSize = detList.size();
 	setNIntervals(nIntervals + 1);  // increase number of entries by one
 }
 
@@ -348,6 +356,8 @@ void ObserverTimeEvolution::addTimeRange(double min, double max, double numb, bo
 
 void ObserverTimeEvolution::setTimes(const std::vector<double> &detList){
 	this->detList.assign(detList.begin(), detList.end());
+	detListPtr = this->detList.data();
+	detListSize = this->detList.size();
 	setNIntervals(detList.size());
 	setMinimum(detList.front());
 	setMaximum(detList.back());
@@ -363,8 +373,8 @@ void ObserverTimeEvolution::setMinimum(double min){
 }
 
 double ObserverTimeEvolution::getTime(size_t index) const {
-	if (!detList.empty()) {
-		return detList.at(index);
+	if (detListSize>0) {
+		return detListPtr[index];
 	} else if (isLogarithmicScaling) {
 		return minimum * pow(maximum / minimum, index / (nIntervals - 1.0));
 	} else {
