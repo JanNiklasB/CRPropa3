@@ -45,8 +45,8 @@ public:
 	ConstantMomentumDiffusion(double Dpp, double limit);
 
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
-	double calculateAScalar(double p) const;
-	double calculateBScalar() const;
+	CUDA_CALLABLE_MEMBER double calculateAScalar(double p) const;
+	CUDA_CALLABLE_MEMBER double calculateBScalar() const;
 
 	void setLimit(double l);
 	void setDpp(double Dpp);
