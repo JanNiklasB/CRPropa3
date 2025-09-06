@@ -23,6 +23,16 @@ PhotoDisintegration::PhotoDisintegration(ref_ptr<PhotonField> f, bool havePhoton
 	this->limit = limit;
 }
 
+PhotoDisintegration::~PhotoDisintegration(){
+	delete[] pdRatePtr;
+	delete[] pdRateInnerSize;
+	delete[] pdBranchPtr;
+	delete[] pdBranchInnerSize;
+	delete[] pdPhotonkeys;
+	delete[] pdPhotonPtr;
+	delete[] pdPhotonInnerSize;
+}
+
 void PhotoDisintegration::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -47,7 +57,13 @@ void PhotoDisintegration::initRate(std::string filename) {
 
 	// clear previously loaded interaction rates
 	pdRate.clear();
+	if(pdRatePtr) delete[] pdRatePtr;
+	if(pdRateInnerSize) delete[] pdRateInnerSize;
+	
 	pdRate.resize(27 * 31);
+	pdRateSize = pdRate.size();
+	pdRatePtr = new double*[pdRateSize];
+	pdRateInnerSize = new int[pdRateSize];
 
 	std::string line;
 	while (std::getline(infile, line)) {
@@ -64,6 +80,8 @@ void PhotoDisintegration::initRate(std::string filename) {
 			lineStream >> r;
 			pdRate[Z * 31 + N].push_back(r / Mpc);
 		}
+		pdRatePtr[Z * 31 + N] = pdRate[Z * 31 + N].data();
+		pdRateInnerSize[Z * 31 + N] = pdRate[Z * 31 + N].size();
 	}
 	infile.close();
 }
@@ -75,7 +93,14 @@ void PhotoDisintegration::initBranching(std::string filename) {
 
 	// clear previously loaded interaction rates
 	pdBranch.clear();
+	if(pdBranchPtr) delete[] pdBranchPtr;
+	if(pdBranchInnerSize) delete[] pdBranchInnerSize;
+
 	pdBranch.resize(27 * 31);
+	pdBranchSize = pdBranch.size();
+	pdBranchPtr = new Branch*[pdBranchSize];
+	pdBranchInnerSize = new int[pdBranchSize];
+
 
 	std::string line;
 	while (std::getline(infile, line)) {
@@ -95,9 +120,12 @@ void PhotoDisintegration::initBranching(std::string filename) {
 		for (size_t i = 0; i < nlg; i++) {
 			lineStream >> r;
 			branch.branchingRatio.push_back(r);
+			branch.branchingRatioPtr = branch.branchingRatio.data();
+			branch.branchingRatioSize = branch.branchingRatio.size();
 		}
-
 		pdBranch[Z * 31 + N].push_back(branch);
+		pdBranchPtr[Z * 31 + N] = pdBranch[Z * 31 + N].data();
+		pdBranchInnerSize[Z * 31 + N] = pdBranch[Z * 31 + N].size();
 	}
 
 	infile.close();
@@ -133,16 +161,33 @@ void PhotoDisintegration::initPhotonEmission(std::string filename) {
 			lineStream >> r;
 			em.emissionProbability.push_back(r);
 		}
-
+		
 		int key = Z * 1000000 + N * 10000 + Zd * 100 + Nd;
+
 		if (pdPhoton.find(key) == pdPhoton.end()) {
 			std::vector<PhotonEmission> emissions;
 			pdPhoton[key] = emissions;
 		}
 		pdPhoton[key].push_back(em);
 	}
-
 	infile.close();
+
+	if(pdPhotonkeys) delete[] pdPhotonkeys;
+	if(pdPhotonPtr) delete[] pdPhotonPtr;
+	if(pdPhotonInnerSize) delete[] pdPhotonInnerSize;
+
+	pdPhotonSize = pdPhoton.size();
+	pdPhotonkeys = new int[pdPhotonSize];
+	pdPhotonPtr = new PhotonEmission*[pdPhotonSize];
+	pdPhotonInnerSize = new int[pdPhotonSize];
+
+	int i=0;
+	for(auto& [key, value] : pdPhoton){
+		pdPhotonkeys[i] = key;
+		pdPhotonPtr[i] = value.data();
+		pdPhotonInnerSize[i] = value.size();
+		i++;
+	}
 }
 
 void PhotoDisintegration::process(Candidate *candidate) const {
@@ -162,7 +207,7 @@ void PhotoDisintegration::process(Candidate *candidate) const {
 		// check if disintegration data available
 		if ((Z > 26) or (N > 30))
 			return;
-		if (pdRate[idx].size() == 0)
+		if (pdRateInnerSize[idx] == 0)
 			return;
 
 		// check if in tabulated energy range
@@ -171,7 +216,7 @@ void PhotoDisintegration::process(Candidate *candidate) const {
 		if ((lg <= lgmin) or (lg >= lgmax))
 			return;
 
-		double rate = interpolateEquidistant(lg, lgmin, lgmax, pdRate[idx]);
+		double rate = interpolateEquidistant(lg, lgmin, lgmax, pdRatePtr[idx], pdRateInnerSize[idx]);
 		rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z); // cosmological scaling, rate per comoving distance
 
 		// check if interaction occurs in this step
@@ -184,12 +229,13 @@ void PhotoDisintegration::process(Candidate *candidate) const {
 		}
 
 		// select channel and interact
-		const std::vector<Branch> &branches = pdBranch[idx];
+		const Branch* branches = pdBranchPtr[idx];
+		const int branchesSize = pdBranchInnerSize[idx];
 		double cmp = random.rand();
 		int l = round((lg - lgmin) / (lgmax - lgmin) * (nlg - 1)); // index of closest tabulation point
 		size_t i = 0;
-		while ((i < branches.size()) and (cmp > 0)) {
-			cmp -= branches[i].branchingRatio[l];
+		while ((i < branchesSize) and (cmp > 0)) {
+			cmp -= branches[i].branchingRatioPtr[l];
 			i++;
 		}
 		performInteraction(candidate, branches[i-1].channel);
@@ -220,8 +266,11 @@ void PhotoDisintegration::performInteraction(Candidate *candidate, int channel) 
 	// create secondaries
 	Random &random = Random::instance();
 	Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
+	#ifndef __CUDACC__
 	try
 	{
+	#endif
+
 		for (size_t i = 0; i < nNeutron; i++)
 			candidate->addSecondary(nucleusId(1, 0), EpA, pos, 1., interactionTag);
 		for (size_t i = 0; i < nProton; i++)
@@ -240,12 +289,14 @@ void PhotoDisintegration::performInteraction(Candidate *candidate, int channel) 
 	  candidate->created = candidate->current;
 		candidate->current.setId(nucleusId(A + dA, Z + dZ));
 		candidate->current.setEnergy(EpA * (A + dA));
+	#ifndef __CUDACC__
 	}
 	catch (std::runtime_error &e)
 	{
 		KISS_LOG_ERROR << "Something went wrong in the PhotoDisentigration\n" << "Please report this error on https://github.com/CRPropa/CRPropa3/issues including your simulation setup and the following random seed:\n" << Random::instance().getSeed_base64();
 		throw;
 	}
+	#endif
 
 	if (not havePhotons)
 		return;
@@ -257,15 +308,20 @@ void PhotoDisintegration::performInteraction(Candidate *candidate, int channel) 
 
 	int l = round((lg - lgmin) / (lgmax - lgmin) * (nlg - 1));  // index of closest tabulation point
 	int key = Z*1e6 + (A-Z)*1e4 + (Z+dZ)*1e2 + (A+dA) - (Z+dZ);
+	
+	#ifdef __CUDACC__
+	namespace std = cuda::std;
+	#endif
+	int idx = *std::find(&pdPhotonkeys[0], &pdPhotonkeys[pdPhotonSize-1], key);
 
-	for (int i = 0; i < pdPhoton[key].size(); i++) {
+	for (int i = 0; i < pdPhotonInnerSize[idx]; i++) {
 		// check for random emission
-		if (random.rand() > pdPhoton[key][i].emissionProbability[l])
+		if (random.rand() > pdPhotonPtr[idx][i].emissionProbabilityPtr[l])
 			continue;
 
 		// boost to lab frame
 		double cosTheta = 2 * random.rand() - 1;
-		double E = pdPhoton[key][i].energy * lf * (1 - cosTheta);
+		double E = pdPhotonPtr[idx][i].energy * lf * (1 - cosTheta);
 		candidate->addSecondary(22, E, pos, 1., interactionTag);
 	}
 }

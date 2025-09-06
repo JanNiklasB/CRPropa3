@@ -27,16 +27,28 @@ private:
 	struct Branch {
 		int channel; // number of emitted (n, p, H2, H3, He3, He4)
 		std::vector<double> branchingRatio; // branching ratio as function of nucleus Lorentz factor
+		double* branchingRatioPtr=NULL;
+		int branchingRatioSize=0;
 	};
 
 	struct PhotonEmission {
 		double energy; // energy of emitted photon [J]
 		std::vector<double> emissionProbability; // emission probability as function of nucleus Lorentz factor
+		double* emissionProbabilityPtr=NULL;
+		int emissionProbabilitySize=0;
 	};
 
 	std::vector<std::vector<double> > pdRate; // pdRate[Z * 31 + N] = total interaction rate
+	double** pdRatePtr=NULL;
+	int pdRateSize=0, *pdRateInnerSize=NULL;
 	std::vector<std::vector<Branch> > pdBranch; // pdTable[Z * 31 + N] = branching ratios
+	Branch** pdBranchPtr=NULL;
+	int pdBranchSize=0, *pdBranchInnerSize=NULL;
+	
 	mutable std::map<int, std::vector<PhotonEmission> > pdPhoton; // map of emitted photon energies and photon emission probabilities
+	int* pdPhotonkeys=NULL, *pdPhotonInnerSize=NULL;
+	PhotonEmission** pdPhotonPtr=NULL;
+	int pdPhotonSize=0;
 
 	static const double lgmin; // minimum log10(Lorentz-factor)
 	static const double lgmax; // maximum log10(Lorentz-factor)
@@ -49,6 +61,8 @@ public:
 	 @param limit			step size limit as fraction of mean free path
 	 */
 	PhotoDisintegration(ref_ptr<PhotonField> photonField, bool havePhotons = false, double limit = 0.1);
+
+	~PhotoDisintegration();
 
 	// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
@@ -72,7 +86,7 @@ public:
 	void initPhotonEmission(std::string filename);
 
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate, int channel) const;
+	CUDA_CALLABLE_MEMBER void performInteraction(Candidate *candidate, int channel) const;
 
 	/**
 	 Calculates the loss length E dx/dE in [m] physical distance.

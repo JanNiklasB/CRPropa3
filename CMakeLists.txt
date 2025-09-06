@@ -396,7 +396,7 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoPionProduction.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp

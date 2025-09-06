@@ -8,6 +8,7 @@
 #ifdef __CUDACC__
 #define CUDA_CALLABLE_MEMBER __host__ __device__
 #include <cuda_runtime.h>
+#include <cuda.h>
 #else
 #define CUDA_CALLABLE_MEMBER
 #endif

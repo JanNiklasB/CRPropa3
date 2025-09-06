@@ -4,8 +4,9 @@
 #include <cmath>
 
 #ifdef __CUDACC__
-#include <cuda_runtime.h>
 #define CUDA_CONSTANT __constant__
+#include <cuda_runtime.h>
+#include <cuda.h>
 #else
 #define CUDA_CONSTANT
 #endif
