@@ -401,10 +401,10 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationCK.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp

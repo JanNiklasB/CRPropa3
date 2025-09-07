@@ -108,6 +108,11 @@ void SynchrotronRadiation::initSpectrum() {
 		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
 	}
 	infile.close();
+
+	tabxPtr = tabx.data();
+	tabxSize = tabx.size();
+	tabCDFPtr = tabCDF.data();
+	tabCDFSize = tabCDF.size();
 }
 
 void SynchrotronRadiation::process(Candidate *candidate) const {
@@ -151,14 +156,15 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 	// if maximumSamples is reached before that, compensate the total energy afterwards
 	Random &random = Random::instance();
 	double dE0 = dE;
-	std::vector<double> energies;
+	double* energies=NULL;
+	int energiesSize=0;
 	int counter = 0;
 	while (dE > 0) {
 		// draw random value between 0 and maximum of corresponding cdf
 		// choose bin of s where cdf(x) = cdf_rand -> x_rand
-		size_t i = random.randBin(tabCDF); // draw random bin (upper bin boundary returned)
-		double binWidth = (tabx[i] - tabx[i-1]);
-		double x = tabx[i-1] + random.rand() * binWidth; // draw random x uniformly distributed in bin
+		size_t i = random.randBin(tabCDFPtr, tabCDFSize); // draw random bin (upper bin boundary returned)
+		double binWidth = (tabxPtr[i] - tabxPtr[i-1]);
+		double x = tabxPtr[i-1] + random.rand() * binWidth; // draw random x uniformly distributed in bin
 		double Ephoton = x * Ecrit;
 
 		// if the remaining energy is not sufficient check for random accepting
@@ -173,8 +179,14 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 				break;			
 		}
 
-		// store energies in array
-		energies.push_back(Ephoton);
+		// store energies in array (the following is the same as push_back)
+		double* tmp = new double[energiesSize+1];
+		for (int j=0; j<energiesSize; j++)
+			tmp[j] = energies[j];
+		tmp[energiesSize] = Ephoton;
+		delete[] energies;
+		energies = tmp;
+		energiesSize++;
 
 		// energy loss
 		dE -= Ephoton;
@@ -189,7 +201,7 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 		w1 = 1. / (1. - dE / dE0); 
 
 	// loop over sampled photons and attribute weights accordingly
-	for (int i = 0; i < energies.size(); i++) {
+	for (int i = 0; i < energiesSize; i++) {
 		double Ephoton = energies[i];
 		double f = Ephoton / (E - dE0);
 		double w = w1 / pow(f, thinning);
