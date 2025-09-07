@@ -108,7 +108,7 @@ Vector3d PT11Field::getField(const Vector3d& pos) const {
 		double bMag = cos(theta - cos_pitch / sin_pitch * log(r / R_sun) + PHI);
 		if (useASS)
 			bMag = fabs(bMag);
-		bMag *= B0_D * R_sun / std::max(r, R_c) / cos_PHI * exp(-fabs(pos.z) / z0_D);
+		bMag *= B0_D * R_sun / crstd::max(r, R_c) / cos_PHI * exp(-fabs(pos.z) / z0_D);
 		b *= bMag;
 	}
 

@@ -10,14 +10,14 @@ void Redshift::process(Candidate *c) const {
 	double z = c->getRedshift();
 
 	// check if z = 0
-	if (z <= std::numeric_limits<double>::min())
+	if (z <= crstd::numeric_limits<double>::min())
 		return;
 
 	// use small step approximation:  dz = H(z) / c * ds
 	double dz = hubbleRate(z) / c_light * c->getCurrentStep();
 
 	// prevent dz > z
-	dz = std::min(dz, z);
+	dz = crstd::min(dz, z);
 
 	// update redshift
 	c->setRedshift(z - dz);

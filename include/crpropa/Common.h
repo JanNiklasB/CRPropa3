@@ -68,7 +68,7 @@ CUDA_CALLABLE_MEMBER size_t upper_bound(T x, const T *X, int size) {
 // Return value xclip which is the closest to x, so that lower <= xclip <= upper
 template <typename T>
 CUDA_CALLABLE_MEMBER T clip(const T& x, const T& lower, const T& upper) {
-	return std::max(lower, std::min(x, upper));
+	return crstd::max(lower, crstd::min(x, upper));
 }
 
 /// Perform linear interpolation on a set of n tabulated data points X[0 .. n-1] -> Y[0 .. n-1]

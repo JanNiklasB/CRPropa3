@@ -97,7 +97,7 @@ void NuclearDecay::process(Candidate *candidate) const {
 
 		// find interaction mode with minimum random decay distance
 		Random &random = Random::instance();
-		double randDistance = std::numeric_limits<double>::max();
+		double randDistance = crstd::numeric_limits<double>::max();
 		int channel;
 		double totalRate = 0;
 
@@ -311,7 +311,7 @@ void NuclearDecay::nucleonEmission(Candidate *candidate, int dA, int dZ) const {
 
 double NuclearDecay::meanFreePath(int id, double gamma) {
 	if (not (isNucleus(id)))
-		return std::numeric_limits<double>::max();
+		return crstd::numeric_limits<double>::max();
 
 	int A = massNumber(id);
 	int Z = chargeNumber(id);
@@ -320,7 +320,7 @@ double NuclearDecay::meanFreePath(int id, double gamma) {
 	// check if particle can decay
 	const DecayMode* decays = decayTablePtr;
 	if (decayTableSize == 0)
-		return std::numeric_limits<double>::max();
+		return crstd::numeric_limits<double>::max();
 
 	double totalRate = 0;
 

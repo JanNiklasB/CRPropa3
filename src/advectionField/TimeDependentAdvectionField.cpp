@@ -4,12 +4,6 @@
 
 namespace crpropa {
 
-#ifdef __CUDACC__
-
-
-
-#endif
-
 OneDimensionalTimeDependentShock::OneDimensionalTimeDependentShock(double v_sh, double v1, double v0, double l_sh){
 
 	setShockSpeed(v_sh);

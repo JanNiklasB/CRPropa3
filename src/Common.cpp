@@ -153,7 +153,7 @@ size_t closestIndex(double x, const double *X, int size) {
 	if (i1 == 0)
 		return i1;
 	size_t i0 = i1 - 1;
-	if (std::fabs(X[i0] - x) < std::fabs(X[i1] - x))
+	if (crstd::fabs(X[i0] - x) < crstd::fabs(X[i1] - x))
 		return i0;
 	else
 		return i1;

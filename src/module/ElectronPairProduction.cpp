@@ -91,11 +91,11 @@ void ElectronPairProduction::initSpectrum(std::string filename) {
 double ElectronPairProduction::lossLength(int id, double lf, double z) const {
 	double Z = chargeNumber(id);
 	if (Z == 0)
-		return std::numeric_limits<double>::max(); // no pair production on uncharged particles
+		return crstd::numeric_limits<double>::max(); // no pair production on uncharged particles
 
 	lf *= (1 + z);
 	if (lf < tabLorentzFactorPtr[0])
-		return std::numeric_limits<double>::max(); // below energy threshold
+		return crstd::numeric_limits<double>::max(); // below energy threshold
 
 	double rate;
 	if (lf < tabLorentzFactorPtr[tabLorentzFactorSize-1])
@@ -116,7 +116,7 @@ void ElectronPairProduction::process(Candidate *c) const {
 	double lf = c->current.getLorentzFactor();
 	double z = c->getRedshift();
 	double losslen = lossLength(id, lf, z);  // energy loss length
-	if (losslen >= std::numeric_limits<double>::max())
+	if (losslen >= crstd::numeric_limits<double>::max())
 		return;
 
 	double step = c->getCurrentStep() / (1 + z); // step size in local frame
@@ -125,7 +125,7 @@ void ElectronPairProduction::process(Candidate *c) const {
 	if (haveElectrons) {
 		double dE = c->current.getEnergy() * loss;  // energy loss
 		int i = round((log10(lf) - 6.05) * 10);  // find closest cdf(Ee|log10(gamma))
-		i = std::min(std::max(i, 0), 69);
+		i = crstd::min(crstd::max(i, 0), 69);
 		Random &random = Random::instance();
 
 		// draw pairs as long as their energy is smaller than the pair production energy loss

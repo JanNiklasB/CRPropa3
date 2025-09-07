@@ -174,7 +174,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
     // Throw error message if something went wrong with propagation.
     // Deactivate candidate.
-	bool NaN = std::isnan(PO.getR());
+	bool NaN = crstd::isnan(PO.getR());
 	if (NaN == true){
 		candidate->setActive(false);
 		#ifndef __CUDACC__
@@ -183,7 +183,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 			<< "position = " << PO << "\n"
 			<< "PosIn = " << PosIn << "\n"
 			<< "TVec = " << TVec << "\n"
-			<< "TStep = " << std::abs(TStep) << "\n"
+			<< "TStep = " << crstd::abs(TStep) << "\n"
 			<< "NVec = " << NVec << "\n"
 			<< "NStep = " << NStep << "\n"
 			<< "BVec = " << BVec << "\n"
@@ -262,7 +262,7 @@ void DiffusionSDE::driftStep(const Vector3d &pos, Vector3d &linProp, double h, d
 
 void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vector3d dir, double z) const {
 
-    double DifCoeff = scale * 6.1e24 * pow((std::abs(r) / 4.0e9), alpha);
+    double DifCoeff = scale * 6.1e24 * pow((crstd::abs(r) / 4.0e9), alpha);
     BTen[0] = pow( 2  * DifCoeff, 0.5);
     BTen[4] = pow(2 * epsilon * DifCoeff, 0.5);
     BTen[8] = pow(2 * epsilon * DifCoeff, 0.5);

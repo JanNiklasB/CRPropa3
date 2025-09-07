@@ -104,7 +104,7 @@ void Candidate::setNextStep(double step) {
 }
 
 void Candidate::limitNextStep(double step) {
-	nextStep = std::min(nextStep, step);
+	nextStep = crstd::min(nextStep, step);
 }
 
 void Candidate::setProperty(const std::string &name, const Variant &value) {

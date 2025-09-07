@@ -227,7 +227,7 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
 	Random &random = Random::instance();
 	size_t i = closestIndex(E, tabEPtr, tabESize);  // find closest tabulation point
 	size_t j = random.randBin(tabCDFPtr[i], tabCDFInnerSizes[i]);
-	double lo = std::max(4 * mec2 * mec2, tabsPtr[j-1]);  // first s-tabulation point below min(s_kin) = (2 me c^2)^2; ensure physical value
+	double lo = crstd::max(4 * mec2 * mec2, tabsPtr[j-1]);  // first s-tabulation point below min(s_kin) = (2 me c^2)^2; ensure physical value
 	double hi = tabsPtr[j];
 	double s = lo + random.rand() * (hi - lo);
 
@@ -238,7 +238,7 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
 	double f = Ep / E;
 
 	// for some backgrounds Ee=nan due to precision limitations.
-	if (not std::isfinite(Ee) || not std::isfinite(Ep))
+	if (not crstd::isfinite(Ee) || not crstd::isfinite(Ep))
 		return;
 
 	// sample random position along current step

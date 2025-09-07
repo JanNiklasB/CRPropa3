@@ -31,13 +31,13 @@ class SimpleTurbulenceSpectrum : public TurbulenceSpectrum {
 	SimpleTurbulenceSpectrum(double Brms, double lMin, double lMax,
 	                         double sIndex = 5. / 3)
 	    : TurbulenceSpectrum(Brms, lMin, lMax, constScaleBendover * lMax, sIndex, 0) {}
-	CUDA_CALLABLE_MEMBER ~SimpleTurbulenceSpectrum() {}
+	~SimpleTurbulenceSpectrum() {}
 
 	/**
 	General energy spectrum for synthetic turbulence models
 	*/
 	double energySpectrum(double k) const {
-		return std::pow(k, -getSindex() - 2);
+		return crstd::pow(k, -getSindex() - 2);
 	}
 
 	/**

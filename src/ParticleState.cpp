@@ -36,7 +36,7 @@ const Vector3d &ParticleState::getDirection() const {
 }
 
 void ParticleState::setEnergy(double newEnergy) {
-	energy = std::max(0., newEnergy); // prevent negative energies
+	energy = crstd::max(0., newEnergy); // prevent negative energies
 }
 
 double ParticleState::getEnergy() const {
@@ -76,7 +76,7 @@ double ParticleState::getLorentzFactor() const {
 }
 
 void ParticleState::setLorentzFactor(double lf) {
-	lf = std::max(0., lf); // prevent negative Lorentz factors
+	lf = crstd::max(0., lf); // prevent negative Lorentz factors
 	energy = lf * pmass * c_squared;
 }
 

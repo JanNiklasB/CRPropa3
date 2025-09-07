@@ -67,14 +67,14 @@ double ParaxialBox::distance(const Vector3d &point) const {
 	// inside the cube
 	if ((fabs(X.x) <= size.x/2.) and (fabs(X.y) <= size.y/2.) and (fabs(X.z) <= size.z/2.)) { 
 		Vector3d Xp = size/2. - X.abs();
-		double d = std::min(Xp.x, std::min(Xp.y, Xp.z));
+		double d = crstd::min(Xp.x, crstd::min(Xp.y, Xp.z));
 
 		return -1. * d;
 	}
 
-	double a = std::max(0., fabs(X.x) - size.x/2.);
-	double b = std::max(0., fabs(X.y) - size.y/2.);
-	double c = std::max(0., fabs(X.z) - size.z/2.);
+	double a = crstd::max(0., fabs(X.x) - size.x/2.);
+	double b = crstd::max(0., fabs(X.y) - size.y/2.);
+	double c = crstd::max(0., fabs(X.z) - size.z/2.);
 
 	return sqrt(a*a + b*b +c*c);
 }

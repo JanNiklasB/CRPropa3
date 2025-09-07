@@ -13,7 +13,7 @@ namespace crpropa {
  */
 class Density: public Referenced {
 public:
-	CUDA_CALLABLE_MEMBER virtual ~Density() {
+	virtual ~Density() {
 	}
 
 	virtual double getDensity(const Vector3d &position) const {  // sum of all densities
