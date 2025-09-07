@@ -30,22 +30,22 @@ public:
 	public:
 		Vector3d x, u; /*< phase-point: position and direction */
 
-		Y() {
+		CUDA_CALLABLE_MEMBER Y() {
 		}
 
-		Y(const Vector3d &x, const Vector3d &u) :
+		CUDA_CALLABLE_MEMBER Y(const Vector3d &x, const Vector3d &u) :
 				x(x), u(u) {
 		}
 
-		Y(double f) :
+		CUDA_CALLABLE_MEMBER Y(double f) :
 				x(Vector3d(f, f, f)), u(Vector3d(f, f, f)) {
 		}
 
-		Y operator *(double f) const {
+		CUDA_CALLABLE_MEMBER Y operator *(double f) const {
 			return Y(x * f, u * f);
 		}
 
-		Y &operator +=(const Y &y) {
+		CUDA_CALLABLE_MEMBER Y &operator +=(const Y &y) {
 			x += y.x;
 			u += y.u;
 			return *this;
@@ -86,7 +86,7 @@ public:
 	 * @param m		current mass of the candidate
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d  pos, Vector3d  dir, double step, double z, double q, double m) const;
+	CUDA_CALLABLE_MEMBER Y dY(Vector3d  pos, Vector3d  dir, double step, double z, double q, double m) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -94,14 +94,14 @@ public:
 	 * @param step	current step size
 	 * @return	  measurement of the error of the step 
 	 */
-	double errorEstimation(const Vector3d x1, const Vector3d x2, double step) const;
+	CUDA_CALLABLE_MEMBER double errorEstimation(const Vector3d x1, const Vector3d x2, double step) const;
 
 	/** Get magnetic field vector at current candidate position
 	 * @param pos   current position of the candidate
 	 * @param z	 current redshift is needed to calculate the magnetic field
 	 * @return	  magnetic field vector at the position pos 
 	 */
-	Vector3d getFieldAtPosition(Vector3d pos, double z) const;
+	CUDA_CALLABLE_MEMBER Vector3d getFieldAtPosition(Vector3d pos, double z) const;
 
 	/** Adapt step size if required and calculates the new position and direction of the particle with the usage of the function dY
 	 * @param y		 current position and direction of candidate
@@ -113,7 +113,7 @@ public:
 	 * @param q		 current charge of the candidate 
 	 * @param m		 current mass of the candidate
 	 */
-	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z, double q, double m) const;
+	CUDA_CALLABLE_MEMBER void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z, double q, double m) const;
 
 	/** Set functions for the parameters of the class PropagationBP */
 

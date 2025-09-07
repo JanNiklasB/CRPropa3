@@ -136,6 +136,7 @@ namespace crpropa {
 
 	Vector3d PropagationBP::getFieldAtPosition(Vector3d pos, double z) const {
 		Vector3d B(0, 0, 0);
+		#ifndef __CUDACC__
 		try {
 			// check if field is valid and use the field vector at the
 			// position pos with the redshift z
@@ -144,7 +145,12 @@ namespace crpropa {
 		} catch (std::exception &e) {
 			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
 					<< e.what();
-		}	
+		}
+		#else
+		if (field.valid())
+			B = field->getField(pos, z);
+		#endif
+
 		return B;
 	}
 
