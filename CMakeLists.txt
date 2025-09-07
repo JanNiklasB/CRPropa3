@@ -406,7 +406,7 @@ if(ENABLE_CUDA)
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp

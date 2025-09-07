@@ -6,6 +6,7 @@
 
 #include <vector>
 #include <set>
+#include <chrono>
 
 namespace crpropa {
 /**
@@ -27,10 +28,12 @@ private:
 	};
 
 	mutable std::vector<_module_info> modules;
+	mutable _module_info* modulesPtr=NULL;
+	mutable int modulesSize=0;
 	mutable size_t calls;
 
 public:
-	CUDA_CALLABLE_MEMBER ~PerformanceModule();
+	~PerformanceModule();
 	void add(Module* module);
 	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;
 	std::string getDescription() const;
@@ -42,10 +45,16 @@ public:
 */
 class ParticleFilter: public AbstractCondition {
 	std::set<int> ids;
+	#ifdef __CUDACC__
+	int* idsPtr=NULL, idsSize=0;
+	void updatePtr();
+	#endif
 
 public:
 	ParticleFilter();
 	ParticleFilter(const std::set<int> &ids);
+	~ParticleFilter();
+
 	void addId(int id);
 	void removeId(int remove);
 	std::set<int> &getIds();
