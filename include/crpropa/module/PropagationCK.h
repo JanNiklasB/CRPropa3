@@ -28,22 +28,22 @@ public:
 	public:
 		Vector3d x, u; /*< phase-point: position and direction */
 
-		Y() {
+		CUDA_CALLABLE_MEMBER Y() {
 		}
 
-		Y(const Vector3d &x, const Vector3d &u) :
+		CUDA_CALLABLE_MEMBER Y(const Vector3d &x, const Vector3d &u) :
 				x(x), u(u) {
 		}
 
-		Y(double f) :
+		CUDA_CALLABLE_MEMBER Y(double f) :
 				x(Vector3d(f, f, f)), u(Vector3d(f, f, f)) {
 		}
 
-		Y operator *(double f) const {
+		CUDA_CALLABLE_MEMBER Y operator *(double f) const {
 			return Y(x * f, u * f);
 		}
 
-		Y &operator +=(const Y &y) {
+		CUDA_CALLABLE_MEMBER Y &operator +=(const Y &y) {
 			x += y.x;
 			u += y.u;
 			return *this;
@@ -51,7 +51,6 @@ public:
 	};
 
 private:
-	std::vector<double> a, b, bs; /*< Cash-Karp coefficients */
 	ref_ptr<MagneticField> field;
 	double tolerance; /*< target relative error of the numerical integration */
 	double minStep; /*< minimum step size of the propagation */
@@ -71,9 +70,9 @@ public:
 
 	// derivative of phase point, dY/dt = d/dt(x, u) = (v, du/dt)
 	// du/dt = q*c^2/E * (u x B)
-	Y dYdt(const Y &y, ParticleState &p, double z) const;
+	CUDA_CALLABLE_MEMBER Y dYdt(const Y &y, ParticleState &p, double z) const;
 
-	void tryStep(const Y &y, Y &out, Y &error, double t,
+	CUDA_CALLABLE_MEMBER void tryStep(const Y &y, Y &out, Y &error, double t,
 			ParticleState &p, double z) const;
 
 	void setField(ref_ptr<MagneticField> field);
@@ -88,7 +87,7 @@ public:
 	 * @param pos   current position of the candidate
 	 * @param z	 current redshift is needed to calculate the magnetic field
 	 * @return	  magnetic field vector at the position pos */
-	Vector3d getFieldAtPosition(Vector3d pos, double z) const;
+	CUDA_CALLABLE_MEMBER Vector3d getFieldAtPosition(Vector3d pos, double z) const;
 
 	double getTolerance() const;
 	double getMinimumStep() const;

@@ -8,7 +8,7 @@
 namespace crpropa {
 
 // Cash-Karp coefficients
-const double cash_karp_a[] = {
+const CUDA_CONSTANT double cash_karp_a[] = {
 	0., 0., 0., 0., 0., 0.,
 	1. / 5., 0., 0., 0., 0., 0.,
 	3. / 40., 9. / 40., 0., 0., 0., 0.,
@@ -17,18 +17,17 @@ const double cash_karp_a[] = {
 	1631. / 55296., 175. / 512., 575. / 13824., 44275. / 110592., 253. / 4096., 0.
 };
 
-const double cash_karp_b[] = {
+const CUDA_CONSTANT double cash_karp_b[] = {
 	37. / 378., 0, 250. / 621., 125. / 594., 0., 512. / 1771.
 };
 
-const double cash_karp_bs[] = {
+const CUDA_CONSTANT double cash_karp_bs[] = {
 	2825. / 27648., 0., 18575. / 48384., 13525. / 55296., 277. / 14336., 1. / 4.
 };
 
 void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 		ParticleState &particle, double z) const {
-	std::vector<Y> k;
-	k.reserve(6);
+	Y k[6];
 
 	out = y;
 	error = Y(0);
@@ -38,13 +37,13 @@ void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 
 		Y y_n = y;
 		for (size_t j = 0; j < i; j++)
-			y_n += k[j] * a[i * 6 + j] * h;
+			y_n += k[j] * cash_karp_a[i * 6 + j] * h;
 
 		// update k_i
 		k[i] = dYdt(y_n, particle, z);
 
-		out += k[i] * b[i] * h;
-		error += k[i] * (b[i] - bs[i]) * h;
+		out += k[i] * cash_karp_b[i] * h;
+		error += k[i] * (cash_karp_b[i] - cash_karp_bs[i]) * h;
 	}
 }
 
@@ -67,11 +66,6 @@ PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
 	setTolerance(tolerance);
 	setMaximumStep(maxStep);
 	setMinimumStep(minStep);
-
-	// load Cash-Karp coefficients
-	a.assign(cash_karp_a, cash_karp_a + 36);
-	b.assign(cash_karp_b, cash_karp_b + 6);
-	bs.assign(cash_karp_bs, cash_karp_bs + 6);
 }
 
 void PropagationCK::process(Candidate *candidate) const {
@@ -145,6 +139,7 @@ ref_ptr<MagneticField> PropagationCK::getField() const {
 
 Vector3d PropagationCK::getFieldAtPosition(Vector3d pos, double z) const {
 	Vector3d B(0, 0, 0);
+	#ifndef __CUDACC__
 	try {
 		// check if field is valid and use the field vector at the
 		// position pos with the redshift z
@@ -153,7 +148,11 @@ Vector3d PropagationCK::getFieldAtPosition(Vector3d pos, double z) const {
 	} catch (std::exception &e) {
 		KISS_LOG_ERROR 	<< "PropagationCK: Exception in PropagationCK::getFieldAtPosition.\n"
 				<< e.what();
-	}	
+	}
+	#else
+	if (field.valid())
+		B = field->getField(pos, z);
+	#endif
 	return B;
 }
 
