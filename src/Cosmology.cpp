@@ -26,6 +26,9 @@ struct Cosmology {
 	std::vector<double> Dl; // luminosity distance [m]
 	std::vector<double> Dt; // light travel distance [m]
 
+	double *ZPtr=NULL, *DcPtr=NULL, *DlPtr=NULL, *DtPtr=NULL;
+	int ZSize=0, DcSize=0, DlSize=0, DtSize=0;
+
 	void update() {
 		double dH = c_light / H0; // Hubble distance
 
@@ -64,6 +67,16 @@ struct Cosmology {
 		Dl[0] = 0;
 		Dt[0] = 0;
 
+		ZPtr = Z.data();
+		DcPtr = Dc.data();
+		DlPtr = Dl.data();
+		DtPtr = Dt.data();
+
+		ZSize = Z.size();
+		DcSize = Dc.size();
+		DlSize = Dl.size();
+		DtSize = Dt.size();
+
 		update();
 	}
 
@@ -75,11 +88,11 @@ struct Cosmology {
 	}
 };
 
-const int Cosmology::n = 1000;
-const double Cosmology::zmin = 0.0001;
-const double Cosmology::zmax = 100;
+const CUDA_CONSTANT int Cosmology::n = 1000;
+const CUDA_CONSTANT double Cosmology::zmin = 0.0001;
+const CUDA_CONSTANT double Cosmology::zmax = 100;
 
-static Cosmology cosmology; // instance is created at runtime
+static CUDA_CONSTANT Cosmology cosmology; // instance is created at runtime
 
 void setCosmologyParameters(double h, double oM) {
 	cosmology.setParameters(h, oM);
@@ -103,67 +116,83 @@ double H0() {
 }
 
 double comovingDistance2Redshift(double d) {
+	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.Dc.back())
+	if (d > cosmology.DcPtr[cosmology.DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
-	return interpolate(d, cosmology.Dc, cosmology.Z);
+	#endif
+	return interpolate(d, cosmology.DcPtr, cosmology.ZPtr, cosmology.ZSize);
 }
 
 double redshift2ComovingDistance(double z) {
+	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
 	if (z > cosmology.zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
-	return interpolate(z, cosmology.Z, cosmology.Dc);
+	#endif
+	return interpolate(z, cosmology.ZPtr, cosmology.DcPtr, cosmology.DcSize);
 }
 
 double luminosityDistance2Redshift(double d) {
+	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.Dl.back())
+	if (d > cosmology.DlPtr[cosmology.DlSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
-	return interpolate(d, cosmology.Dl, cosmology.Z);
+	#endif
+	return interpolate(d, cosmology.DlPtr, cosmology.ZPtr, cosmology.ZSize);
 }
 
 double redshift2LuminosityDistance(double z) {
+	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
 	if (z > cosmology.zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
-	return interpolate(z, cosmology.Z, cosmology.Dl);
+	#endif
+	return interpolate(z, cosmology.ZPtr, cosmology.DlPtr, cosmology.DlSize);
 }
 
 double lightTravelDistance2Redshift(double d) {
+	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.Dt.back())
+	if (d > cosmology.DtPtr[cosmology.DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
-	return interpolate(d, cosmology.Dt, cosmology.Z);
+	#endif
+	return interpolate(d, cosmology.DtPtr, cosmology.ZPtr, cosmology.ZSize);
 }
 
 double redshift2LightTravelDistance(double z) {
+	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
 	if (z > cosmology.zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
-	return interpolate(z, cosmology.Z, cosmology.Dt);
+	#endif
+	return interpolate(z, cosmology.ZPtr, cosmology.DtPtr, cosmology.DtSize);
 }
 
 double comoving2LightTravelDistance(double d) {
+	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.Dc.back())
+	if (d > cosmology.DcPtr[cosmology.DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
-	return interpolate(d, cosmology.Dc, cosmology.Dt);
+	#endif
+	return interpolate(d, cosmology.DcPtr, cosmology.DtPtr, cosmology.DtSize);
 }
 
 double lightTravel2ComovingDistance(double d) {
+	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.Dt.back())
+	if (d > cosmology.DtPtr[cosmology.DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
-	return interpolate(d, cosmology.Dt, cosmology.Dc);
+	#endif
+	return interpolate(d, cosmology.DtPtr, cosmology.DcPtr, cosmology.DcSize);
 }
 
 } // namespace crpropa
