@@ -1,15 +1,9 @@
 #ifndef CRPROPA_UNITS_H
 #define CRPROPA_UNITS_H
 
-#include <cmath>
+#include "__CudaDefines.h"
 
-#ifdef __CUDACC__
-#define CUDA_CONSTANT __constant__
-#include <cuda_runtime.h>
-#include <cuda.h>
-#else
-#define CUDA_CONSTANT
-#endif
+#include <cmath>
 
 namespace crpropa {
 /**

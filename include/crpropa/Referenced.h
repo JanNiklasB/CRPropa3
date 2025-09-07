@@ -1,18 +1,13 @@
 #ifndef CRPROPA_REFERENCED_H
 #define CRPROPA_REFERENCED_H
 
+#include "__CudaDefines.h"
+
 #include <cstddef>
 
 #ifdef DEBUG
 #include <iostream>
 #include <typeinfo>
-#endif
-
-#ifdef __CUDACC__
-#define CUDA_CALLABLE_MEMBER __host__ __device__
-#include <cuda_runtime.h>
-#else
-#define CUDA_CALLABLE_MEMBER
 #endif
 
 namespace crpropa {
@@ -37,16 +32,16 @@ public:
 	/** Default Constructor
 	 * just sets _referenceCount to 0
 	*/
-	inline Referenced() :
+	CUDA_CALLABLE_MEMBER inline Referenced() :
 			_referenceCount(0) {
 	}
 
-	inline Referenced(const Referenced&) :
+	CUDA_CALLABLE_MEMBER inline Referenced(const Referenced&) :
 			_referenceCount(0) {
 	}
 
 	/// Equal operator, does only return this class
-	inline Referenced& operator =(const Referenced&) {
+	CUDA_CALLABLE_MEMBER inline Referenced& operator =(const Referenced&) {
 		return *this;
 	}
 

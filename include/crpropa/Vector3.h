@@ -1,19 +1,13 @@
 #ifndef CRPROPA_VECTOR3_H
 #define CRPROPA_VECTOR3_H
 
+#include "__CudaDefines.h"
+
 #include <iostream>
 #include <cmath>
 #include <vector>
 #include <limits>
 #include <algorithm>
-
-#ifdef __CUDACC__
-#define CUDA_CALLABLE_MEMBER __host__ __device__
-#include <cuda_runtime.h>
-#include <cuda.h>
-#else
-#define CUDA_CALLABLE_MEMBER
-#endif
 
 namespace crpropa {
 

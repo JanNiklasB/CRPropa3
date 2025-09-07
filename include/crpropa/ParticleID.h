@@ -1,17 +1,11 @@
 #ifndef CRPROPA_PARTICLE_ID_H
 #define CRPROPA_PARTICLE_ID_H
 
+#include "__CudaDefines.h"
+
 #include <cstddef>
 #include <vector>
 #include <string>
-
-#ifdef __CUDACC__
-#define CUDA_CALLABLE_MEMBER __host__ __device__
-#include <cuda_runtime.h>
-#include <cuda.h>
-#else
-#define CUDA_CALLABLE_MEMBER
-#endif
 
 namespace crpropa {
 /**
