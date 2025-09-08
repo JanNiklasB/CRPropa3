@@ -2,7 +2,6 @@
 #include "crpropa/Units.h"
 #include "crpropa/Common.h"
 #include "crpropa/ParticleID.h"
-#include "crpropa/ParticleMass.h"
 
 #include "HepPID/ParticleIDMethods.hh"
 
@@ -17,6 +16,7 @@ ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0
 	setEnergy(E);
 	setPosition(pos);
 	setDirection(dir);
+	nuclearMassTable = new NuclearMassTable;
 }
 
 void ParticleState::setPosition(const Vector3d &pos) {
@@ -49,7 +49,7 @@ double ParticleState::getRigidity() const {
 
 void ParticleState::setId(int newId) {
 	id = newId;
-	pmass = particleMass(id);
+	pmass = nuclearMassTable->particleMass(id);
 	if (isNucleus(id)) {
 		charge = chargeNumber(id) * eplus;
 		if (id < 0)

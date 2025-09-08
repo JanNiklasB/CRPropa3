@@ -4,6 +4,7 @@
 #include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/PhotonBackground.h"
+#include "crpropa/ParticleMass.h"
 
 namespace crpropa {
 
@@ -23,6 +24,7 @@ namespace crpropa {
  */
 class ElectronPairProduction: public Module {
 private:
+	ref_ptr<NuclearMassTable> nuclearMassTable;
 	ref_ptr<PhotonField> photonField;
 	std::vector<double> tabLossRate; /*< tabulated energy loss rate in [J/m] for protons at z = 0 */
 	std::vector<double> tabLorentzFactor; /*< tabulated Lorentz factor */

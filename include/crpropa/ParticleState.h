@@ -3,6 +3,7 @@
 
 #include "crpropa/__CudaDefines.h"
 #include "crpropa/Vector3.h"
+#include "crpropa/ParticleMass.h"
 
 namespace crpropa {
 /**
@@ -22,6 +23,7 @@ namespace crpropa {
  */
 class ParticleState {
 private:
+	ref_ptr<NuclearMassTable> nuclearMassTable;
 	int id; ///< particle ID (Particle Data Group numbering scheme)
 	double energy; ///< total energy
 	Vector3d position; ///< position vector in comoving coordinates

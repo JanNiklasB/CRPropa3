@@ -19,6 +19,7 @@ NuclearDecay::NuclearDecay(bool electrons, bool photons, bool neutrinos, double 
 	haveNeutrinos = neutrinos;
 	limit = l;
 	setDescription("NuclearDecay");
+	nuclearMassTable = new NuclearMassTable;
 
 	// load decay table
 	std::string filename = getDataPath("nuclear_decay.txt");
@@ -222,8 +223,8 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 		return;
 
 	// Q-value of the decay, subtract total energy of emitted photons
-	double m1 = nuclearMass(A, Z);
-	double m2 = nuclearMass(A, Z+dZ);
+	double m1 = nuclearMassTable->nuclearMass(A, Z);
+	double m2 = nuclearMassTable->nuclearMass(A, Z+dZ);
 	double Q = (m1 - m2 - mass_electron) * c_squared;
 
 	// generate cdf of electron energy, neglecting Coulomb correction

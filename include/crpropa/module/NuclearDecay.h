@@ -24,6 +24,7 @@ namespace crpropa {
  */
 class NuclearDecay: public Module {
 private:
+	ref_ptr<NuclearMassTable> nuclearMassTable;
 	double limit;
 	bool haveElectrons;
 	bool havePhotons;
