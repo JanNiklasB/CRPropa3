@@ -9,17 +9,15 @@
 // define variable namespace to cuda::std, 
 // only needed in device functions, std still usable
 namespace crpropa{
-	namespace crstd = cuda::std;	
+	namespace crstd = cuda::std;
 }
-
 #else
 #define CUDA_CALLABLE_MEMBER
 #define CUDA_CONSTANT
 // define variable namespace to std
 namespace crpropa{
-	namespace crstd = std;	
+	namespace crstd = std;
 }
-
 #endif
 
 #endif

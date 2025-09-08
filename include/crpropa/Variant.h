@@ -18,9 +18,8 @@
 #include <stdexcept>
 #include <typeinfo>
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Vector3.h"
-
-
 
 // defines copy constructor X(const X&), isX(), asX(), fromX(), toX(), op(), op=, op==, op!=
 #define VARIANT_ADD_TYPE_DECL_POD(NAME, TYPE, VALUE, FIELD) \

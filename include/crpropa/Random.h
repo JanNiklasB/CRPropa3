@@ -62,6 +62,7 @@
 
 // Not thread safe (unless auto-initialization is avoided and each thread has
 // its own Random object)
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Vector3.h"
 #include "Common.h"
 

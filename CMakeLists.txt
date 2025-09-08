@@ -50,13 +50,13 @@ elseif(NOT SIMD_EXTENSIONS STREQUAL "none")
 endif()
 
 SET(FAST_WAVES OFF CACHE BOOL "Enable SIMD optimizations for PlaneWaveTurbulence. Requires that SIMD_EXTENSIONS is set to a compatible value (\"avx\", \"avx+fma\", or -- depending on the build CPU -- \"native\"). The build will fail if this option is set but SIMD_EXTENSIONS is not compatible, so you can adjust your settings.")
-if(FAST_WAVES)
+if(FAST_WAVES AND NOT ENABLE_CUDA)
   if(SIMD_EXTENSIONS STREQUAL "none")
     message(SEND_ERROR "Enabling FAST_WAVES while SIMD_EXTENSIONS is set to \"none\" won't work, since SIMD is required for FAST_WAVES. Please try disabling FAST_WAVES, or try using another option for SIMD_EXTENSIONS.")
   else()
     add_definitions(-DFAST_WAVES)
   endif()
-endif(FAST_WAVES)
+endif(FAST_WAVES AND NOT ENABLE_CUDA)
 
 # Add build type for profiling
 SET(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS} -ggdb -fno-omit-frame-pointer")
@@ -362,7 +362,7 @@ if(ENABLE_CUDA)
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
     ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp

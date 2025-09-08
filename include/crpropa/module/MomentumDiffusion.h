@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MOMENTUMDIFFUSION_H
 #define CRPROPA_MOMENTUMDIFFUSION_H
 
+#include "crpropa/__CudaDefines.h"
 #include <iostream>
 #include <vector>
 #include <cmath>

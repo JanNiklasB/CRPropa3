@@ -1,6 +1,7 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include "crpropa/__CudaDefines.h"
 #include <string>
 #include <cstring>
 #include <stdexcept>

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_TURBULENTFIELD_H
 #define CRPROPA_TURBULENTFIELD_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include <cmath>
 

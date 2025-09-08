@@ -3,7 +3,7 @@
 #ifndef CRPROPA_HDF5OUTPUT_H
 #define CRPROPA_HDF5OUTPUT_H
 
-
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/module/Output.h"
 #include <stdint.h>
 #include <ctime>

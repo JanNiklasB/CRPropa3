@@ -1,6 +1,7 @@
 #ifndef CRPROPA_CANDIDATE_H
 #define CRPROPA_CANDIDATE_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/ParticleState.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/AssocVector.h"

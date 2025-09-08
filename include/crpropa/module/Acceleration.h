@@ -1,6 +1,7 @@
 #ifndef CRPROPA_ACCELERATION
 #define CRPROPA_ACCELERATION
 
+#include "crpropa/__CudaDefines.h"
 #include <crpropa/Candidate.h>
 #include <crpropa/Geometry.h>
 #include <crpropa/Module.h>

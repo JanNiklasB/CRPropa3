@@ -1,6 +1,7 @@
 #ifndef CRPROPA_LOGGING_H
 #define CRPROPA_LOGGING_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Version.h"
 
 #include "kiss/logger.h"

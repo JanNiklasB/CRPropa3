@@ -3,6 +3,7 @@
 
 #ifdef CRPROPA_HAVE_FFTW3F
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Grid.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 

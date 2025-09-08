@@ -1,6 +1,8 @@
 #ifndef CRPROPA_CLOCK_H
 #define CRPROPA_CLOCK_H
 
+#include "crpropa/__CudaDefines.h"
+
 namespace crpropa {
 /**
  * \addtogroup Tools

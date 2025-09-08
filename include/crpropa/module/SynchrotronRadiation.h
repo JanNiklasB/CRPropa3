@@ -1,6 +1,7 @@
 #ifndef CRPROPA_SYNCHROTRONRADIATION_H
 #define CRPROPA_SYNCHROTRONRADIATION_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
 

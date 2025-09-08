@@ -23,6 +23,7 @@
 #ifndef MAGNETICLENS_HH
 #define MAGNETICLENS_HH
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticLens/ModelMatrix.h"
 #include "crpropa/magneticLens/Pixelization.h"
 #include "crpropa/Units.h"

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_PHOTONBACKGROUND_H
 #define CRPROPA_PHOTONBACKGROUND_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Common.h"
 #include "crpropa/Referenced.h"
 

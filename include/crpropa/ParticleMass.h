@@ -1,7 +1,7 @@
 #ifndef CRPROPA_PARTICLE_MASS_H
 #define CRPROPA_PARTICLE_MASS_H
 
-#include "__CudaDefines.h"
+#include "crpropa/__CudaDefines.h"
 
 namespace crpropa {
 /**

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_ADIABATICCOOLING_H
 #define CRPROPA_ADIABATICCOOLING_H
 
+#include "crpropa/__CudaDefines.h"
 #include <string>
 #include <iostream>
 #include <cmath>

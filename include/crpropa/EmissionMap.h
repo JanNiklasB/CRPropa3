@@ -1,6 +1,7 @@
 #ifndef CRPROPA_EMISSION_MAP_H
 #define CRPROPA_EMISSION_MAP_H
 
+#include "crpropa/__CudaDefines.h"
 #include "Referenced.h"
 #include "Candidate.h"
 
@@ -63,8 +64,8 @@ public:
  Use SourceEmissionMap to suppress directions at the source. Use EmissionMapFiller to create EmissionMap from Observer.
  */
 class EmissionMap : public Referenced {
-public:
-	typedef std::pair<int, size_t> key_t;
+public:	
+	typedef crstd::pair<int, size_t> key_t;
 	typedef std::map<key_t, ref_ptr<CylindricalProjectionMap> > map_t;
 
 	EmissionMap();
@@ -129,6 +130,11 @@ protected:
 	double minEnergy, maxEnergy, logStep;
 	size_t nPhi, nTheta, nEnergy;
 	map_t maps;
+
+private:
+	key_t* map_keys=NULL;
+	ref_ptr<CylindricalProjectionMap>* map_Ptr=NULL;
+	int map_Size=0;
 };
 
 } // namespace crpropa

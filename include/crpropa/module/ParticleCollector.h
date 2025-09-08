@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/ModuleList.h"
 

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MAGNETICFIELDGRID_H
 #define CRPROPA_MAGNETICFIELDGRID_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/Grid.h"
 

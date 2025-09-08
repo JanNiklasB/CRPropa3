@@ -1,6 +1,7 @@
 #ifndef CRPROPA_TIMEDEPENDENTADVECTIONFIELD_H
 #define CRPROPA_TIMEDEPENDENTADVECTIONFIELD_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/advectionField/AdvectionField.h"
 
 #include <string>

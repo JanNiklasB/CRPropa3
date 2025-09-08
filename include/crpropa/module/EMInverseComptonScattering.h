@@ -1,6 +1,7 @@
 #ifndef CRPROPA_EMINVERSECOMPTONSCATTERING_H
 #define CRPROPA_EMINVERSECOMPTONSCATTERING_H
 
+#include "crpropa/__CudaDefines.h"
 #include <fstream>
 #include <cmath>
 

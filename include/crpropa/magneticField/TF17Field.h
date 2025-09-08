@@ -1,6 +1,7 @@
 #ifndef CRPROPA_TF17FIELD_H
 #define CRPROPA_TF17FIELD_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticField/MagneticField.h"
 
 namespace crpropa {

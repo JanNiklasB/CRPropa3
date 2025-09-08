@@ -1,6 +1,7 @@
 #ifndef CRPROPA_ELECTRONPAIRPRODUCTION_H
 #define CRPROPA_ELECTRONPAIRPRODUCTION_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/PhotonBackground.h"
 

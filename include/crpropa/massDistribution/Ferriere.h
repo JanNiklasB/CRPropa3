@@ -1,6 +1,7 @@
 #ifndef CRPROPA_FERRIERE_H
 #define CRPROPA_FERRIERE_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/massDistribution/Density.h"
 
 #include <cmath>

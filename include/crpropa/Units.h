@@ -1,7 +1,7 @@
 #ifndef CRPROPA_UNITS_H
 #define CRPROPA_UNITS_H
 
-#include "__CudaDefines.h"
+#include "crpropa/__CudaDefines.h"
 
 #include <cmath>
 

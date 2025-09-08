@@ -1,6 +1,7 @@
 #ifndef CRPROPA_PARTICLEMAPSCONTAINER_HH
 #define CRPROPA_PARTICLEMAPSCONTAINER_HH
 
+#include "crpropa/__CudaDefines.h"
 #include <map>
 #include <vector>
 #include "crpropa/magneticLens/Pixelization.h"

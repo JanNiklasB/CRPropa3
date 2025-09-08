@@ -1,13 +1,13 @@
 #ifndef CRPROPA_ADVECTIONFIELD_H
 #define CRPROPA_ADVECTIONFIELD_H
 
-
 #include <string>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <sstream>
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Vector3.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Units.h"

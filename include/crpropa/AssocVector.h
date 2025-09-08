@@ -28,7 +28,7 @@
 
 // $Id$
 
-
+#include "crpropa/__CudaDefines.h"
 #include <algorithm>
 #include <functional>
 #include <vector>

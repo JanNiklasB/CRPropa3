@@ -1,6 +1,7 @@
 #ifndef _KST24_GMF_H_
 #define _KST24_GMF_H_
 
+#include "crpropa/__CudaDefines.h"
 #include <vector>
 #include "crpropa/magneticField/MagneticField.h"
 

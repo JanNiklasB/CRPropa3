@@ -1,6 +1,7 @@
 #ifndef CRPROPA_EMPAIRPRODUCTION_H
 #define CRPROPA_EMPAIRPRODUCTION_H
 
+#include "crpropa/__CudaDefines.h"
 #include <fstream>
 #include <cmath>
 

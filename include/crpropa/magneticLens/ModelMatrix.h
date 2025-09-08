@@ -23,6 +23,7 @@
 #ifndef MODELMATRIX_HH
 #define MODELMATRIX_HH
 
+#include "crpropa/__CudaDefines.h"
 #include <ctime>
 #include <ctime>
 #include <cmath>

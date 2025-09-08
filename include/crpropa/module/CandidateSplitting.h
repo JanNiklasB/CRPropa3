@@ -1,6 +1,7 @@
 #ifndef CRPROPA_CANDIDATEPLITTING_H
 #define CRPROPA_CANDIDATEPLITTING_H
 
+#include "crpropa/__CudaDefines.h"
 #include <string>
 #include <iostream>
 #include <cmath>

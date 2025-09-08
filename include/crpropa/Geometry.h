@@ -1,6 +1,7 @@
 #ifndef CRPROPA_GEOMETRY_H
 #define CRPROPA_GEOMETRY_H
 
+#include "crpropa/__CudaDefines.h"
 #include <vector>
 #include <string>
 

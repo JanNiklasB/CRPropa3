@@ -1,7 +1,7 @@
 #ifndef CRPROPA_VECTOR3_H
 #define CRPROPA_VECTOR3_H
 
-#include "__CudaDefines.h"
+#include "crpropa/__CudaDefines.h"
 
 #include <iostream>
 #include <cmath>
@@ -245,7 +245,7 @@ public:
 	}
 
 	/// return vector with round values
-	CUDA_CALLABLE_MEMBER Vectro3<T> round() const {
+	CUDA_CALLABLE_MEMBER Vector3<T> round() const {
 		return Vector3<T>(crstd::round(x), crstd::round(y), crstd::round(z));
 	}
 

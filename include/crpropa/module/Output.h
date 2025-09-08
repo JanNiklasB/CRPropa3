@@ -1,6 +1,7 @@
 #ifndef CRPROPA_OUTPUT_H
 #define CRPROPA_OUTPUT_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/Variant.h"
 

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MODULE_LIST_H
 #define CRPROPA_MODULE_LIST_H
 
+#include "crpropa/__CudaDefines.h"
 #include <algorithm>
 #include <csignal>
 #include <iostream>

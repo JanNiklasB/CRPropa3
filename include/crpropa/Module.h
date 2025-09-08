@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MODULE_H
 #define CRPROPA_MODULE_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Candidate.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Common.h"

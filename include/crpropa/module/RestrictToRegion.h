@@ -1,6 +1,7 @@
 #ifndef CRPROPA_RESTRICTTOREGION_H
 #define CRPROPA_RESTRICTTOREGION_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Candidate.h"
 #include "crpropa/Module.h"

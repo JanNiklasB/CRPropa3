@@ -1,6 +1,7 @@
 #ifndef CRPROPA_ELASTICSCATTERING_H
 #define CRPROPA_ELASTICSCATTERING_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/PhotonBackground.h"
 

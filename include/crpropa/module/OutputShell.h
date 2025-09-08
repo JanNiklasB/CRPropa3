@@ -1,6 +1,7 @@
 #ifndef CRPROPA_OUTPUTSHELL_H
 #define CRPROPA_OUTPUTSHELL_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/AssocVector.h"
 #include "crpropa/Variant.h"

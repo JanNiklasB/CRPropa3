@@ -1,6 +1,7 @@
 #ifndef CRPROPA_BOUNDARY_H
 #define CRPROPA_BOUNDARY_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 
 namespace crpropa {

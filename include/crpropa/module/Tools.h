@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MODULETOOLS_H
 #define CRPROPA_MODULETOOLS_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/EmissionMap.h"
 

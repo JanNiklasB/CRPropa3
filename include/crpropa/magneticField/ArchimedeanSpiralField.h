@@ -1,8 +1,8 @@
 #ifndef CRPROPA_ARCHIMEDEANSPIRALFIELD_H
 #define CRPROPA_ARCHIMEDEANSPIRALFIELD_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticField/MagneticField.h"
-
 
 #include <string>
 #include <iostream>

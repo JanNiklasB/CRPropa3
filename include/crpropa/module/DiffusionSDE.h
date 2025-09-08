@@ -1,6 +1,7 @@
 #ifndef CRPROPA_DIFFUSIONSDE_H
 #define CRPROPA_DIFFUSIONSDE_H
 
+#include "crpropa/__CudaDefines.h"
 #include <iostream>
 #include <vector>
 #include <cmath>

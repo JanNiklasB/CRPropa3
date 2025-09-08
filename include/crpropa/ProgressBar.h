@@ -1,6 +1,7 @@
 #ifndef CRPROPA_PROGRESSBAR_H
 #define CRPROPA_PROGRESSBAR_H
 
+#include "crpropa/__CudaDefines.h"
 #include <string>
 #include <ctime>
 

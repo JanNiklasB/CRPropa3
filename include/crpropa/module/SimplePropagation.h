@@ -1,6 +1,7 @@
 #ifndef SIMPLEPROPAGATION_H
 #define SIMPLEPROPAGATION_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/Units.h"
 

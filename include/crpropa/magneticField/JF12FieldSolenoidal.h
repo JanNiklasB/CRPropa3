@@ -1,6 +1,7 @@
 #ifndef CRPROPA_JF12FIELDSOLENOIDAL_H
 #define CRPROPA_JF12FIELDSOLENOIDAL_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/magneticField/JF12Field.h"
 #include "crpropa/Grid.h"
 #include "crpropa/Units.h"

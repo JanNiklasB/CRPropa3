@@ -1,7 +1,7 @@
 #ifndef CRPROPA_PARTICLE_ID_H
 #define CRPROPA_PARTICLE_ID_H
 
-#include "__CudaDefines.h"
+#include "crpropa/__CudaDefines.h"
 
 #include <cstddef>
 #include <vector>

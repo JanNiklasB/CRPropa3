@@ -1,6 +1,7 @@
 #ifndef _UF23Field_h_
 #define _UF23Field_h_
 
+#include "crpropa/__CudaDefines.h"
 #include <vector>
 #include "crpropa/magneticField/MagneticField.h"
 

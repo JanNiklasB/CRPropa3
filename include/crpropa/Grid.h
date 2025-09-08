@@ -1,6 +1,7 @@
 #ifndef CRPROPA_GRID_H
 #define CRPROPA_GRID_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Vector3.h"
 

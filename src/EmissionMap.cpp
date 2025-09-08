@@ -42,7 +42,6 @@ bool CylindricalProjectionMap::checkDirection(const Vector3d &direction) const {
 	return pdf[bin];
 }
 
-
 const std::vector<double>& CylindricalProjectionMap::getPdf() const {
 	return pdf;
 }
@@ -118,6 +117,7 @@ void CylindricalProjectionMap::updateCdf() const {
 	}
 }
 
+
 EmissionMap::EmissionMap() : minEnergy(0.0001 * EeV), maxEnergy(10000 * EeV),
 	nEnergy(8*2), nPhi(360), nTheta(180) {
 	logStep = log10(maxEnergy / minEnergy) / nEnergy;
@@ -189,7 +189,7 @@ bool EmissionMap::checkDirection(const ParticleState& state) const {
 
 bool EmissionMap::hasMap(int pid, double energy) {
     key_t key(pid, binFromEnergy(energy));
-    map_t::iterator i = maps.find(key);
+    map_t::const_iterator i = maps.find(key);
     if (i == maps.end() || !i->second.valid())
 		return false;
 	else

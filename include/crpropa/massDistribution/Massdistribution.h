@@ -1,6 +1,7 @@
 #ifndef CRPROPA_MASSDISTRIBUTION_H
 #define CRPROPA_MASSDISTRIBUTION_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/massDistribution/Density.h"
 #include "crpropa/Vector3.h"
 #include "crpropa/Grid.h"

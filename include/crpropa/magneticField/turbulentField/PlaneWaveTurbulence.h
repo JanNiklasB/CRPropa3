@@ -1,6 +1,7 @@
 #ifndef CRPROPA_PLANEWAVETURBULENCE_H
 #define CRPROPA_PLANEWAVETURBULENCE_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Grid.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 #include <vector>

@@ -1,6 +1,7 @@
 #ifndef CRPROPA_SOURCE_H
 #define CRPROPA_SOURCE_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Candidate.h"
 #include "crpropa/Grid.h"
 #include "crpropa/EmissionMap.h"

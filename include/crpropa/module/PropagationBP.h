@@ -1,6 +1,7 @@
 #ifndef CRPROPA_PROPAGATIONBP_H
 #define CRPROPA_PROPAGATIONBP_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/Units.h"
 #include "crpropa/magneticField/MagneticField.h"

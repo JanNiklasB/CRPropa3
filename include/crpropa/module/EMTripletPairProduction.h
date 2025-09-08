@@ -1,6 +1,7 @@
 #ifndef CRPROPA_EMTRIPLETPAIRPRODUCTION_H
 #define CRPROPA_EMTRIPLETPAIRPRODUCTION_H
 
+#include "crpropa/__CudaDefines.h"
 #include <fstream>
 #include <cmath>
 

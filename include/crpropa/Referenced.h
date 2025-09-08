@@ -1,7 +1,7 @@
 #ifndef CRPROPA_REFERENCED_H
 #define CRPROPA_REFERENCED_H
 
-#include "__CudaDefines.h"
+#include "crpropa/__CudaDefines.h"
 
 #include <cstddef>
 

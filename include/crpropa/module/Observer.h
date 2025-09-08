@@ -1,6 +1,7 @@
 #ifndef CRPROPA_OBSERVER_H
 #define CRPROPA_OBSERVER_H
 
+#include "crpropa/__CudaDefines.h"
 #include <fstream>
 #include <limits>
 #include <string>

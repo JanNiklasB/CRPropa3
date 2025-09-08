@@ -1,6 +1,8 @@
 #ifndef CRPROPA_COSMOLOGY_H
 #define CRPROPA_COSMOLOGY_H
 
+#include "crpropa/__CudaDefines.h"
+
 namespace crpropa {
 /**
  * \addtogroup PhysicsDefinitions
