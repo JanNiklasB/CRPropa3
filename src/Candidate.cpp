@@ -7,6 +7,8 @@
 
 namespace crpropa {
 
+CUDA_CALLABLE_MEMBER uint64_t nextSerialNumberGlobal = 0;
+
 Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
 redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0) {
 	ParticleState state(id, E, pos, dir);
@@ -15,31 +17,33 @@ redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), a
 	previous = state;
 	current = state;
 
-#if defined(OPENMP_3_1)
-		#pragma omp atomic capture
-		{serialNumber = nextSerialNumber++;}
-#elif defined(__GNUC__)
-		{serialNumber = __sync_add_and_fetch(&nextSerialNumber, 1);}
-#else
-		#pragma omp critical(serialNumber)
-		{serialNumber = nextSerialNumber++;}
-#endif
+	nextSerialNumber = &nextSerialNumberGlobal;
 
+	#if defined(OPENMP_3_1)
+		#pragma omp atomic capture
+		{serialNumber = (*nextSerialNumber)++;}
+	#elif defined(__GNUC__)
+		{serialNumber = __sync_add_and_fetch(nextSerialNumber, 1);}
+	#else
+		#pragma omp critical(serialNumber)
+		{serialNumber = (*nextSerialNumber)++;}
+	#endif
 }
 
 Candidate::Candidate(const ParticleState &state) :
 		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin ("PRIM"), time(0) {
+	
+	nextSerialNumber = &nextSerialNumberGlobal;
 
-#if defined(OPENMP_3_1)
+	#if defined(OPENMP_3_1)
 		#pragma omp atomic capture
-		{serialNumber = nextSerialNumber++;}
-#elif defined(__GNUC__)
-		{serialNumber = __sync_add_and_fetch(&nextSerialNumber, 1);}
-#else
+		{serialNumber = (*nextSerialNumber)++;}
+	#elif defined(__GNUC__)
+		{serialNumber = __sync_add_and_fetch(nextSerialNumber, 1);}
+	#else
 		#pragma omp critical(serialNumber)
-		{serialNumber = nextSerialNumber++;}
-#endif
-
+		{serialNumber = (*nextSerialNumber)++;}
+	#endif
 }
 
 bool Candidate::isActive() const {
@@ -263,14 +267,12 @@ uint64_t Candidate::getCreatedSerialNumber() const {
 }
 
 void Candidate::setNextSerialNumber(uint64_t snr) {
-	nextSerialNumber = snr;
+	nextSerialNumberGlobal = snr;
 }
 
 uint64_t Candidate::getNextSerialNumber() {
-	return nextSerialNumber;
+	return nextSerialNumberGlobal;
 }
-
-uint64_t Candidate::nextSerialNumber = 0;
 
 void Candidate::restart() {
 	setActive(true);

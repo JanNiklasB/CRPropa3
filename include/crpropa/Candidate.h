@@ -55,7 +55,7 @@ private:
 	std::string tagOrigin; /**< Name of interaction/source process which created this candidate*/
 	double time; /**< Time [s] that has passed in the laboratory frame of reference */
 
-	static uint64_t nextSerialNumber;
+	uint64_t* nextSerialNumber=NULL;
 	uint64_t serialNumber;
 
 public:
