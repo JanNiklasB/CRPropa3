@@ -2,6 +2,7 @@
 #define CRPROPA_COSMOLOGY_H
 
 #include "crpropa/__CudaDefines.h"
+#include "Referenced.h"
 #include <vector>
 
 namespace crpropa {
@@ -11,15 +12,10 @@ namespace crpropa {
  */
 
 /**
- @file
- @brief Cosmology functions and class
- */
-
-/**
  @class Cosmology
  @brief Cosmology calculations
 */
-struct Cosmology {
+struct Cosmology : public Referenced {
 	private:
 	
 	double H0; // Hubble parameter at z=0
@@ -107,7 +103,6 @@ struct Cosmology {
 
 	// Conversion from light travel distance to comoving distance.
 	CUDA_CALLABLE_MEMBER double lightTravel2ComovingDistance(double distance);
-
 };
 
 /** @}*/

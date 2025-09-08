@@ -268,6 +268,11 @@ uint64_t Candidate::getCreatedSerialNumber() const {
 
 void Candidate::setNextSerialNumber(uint64_t snr) {
 	nextSerialNumberGlobal = snr;
+	#ifdef __CUDACC__
+	// need to update global after modifing, direct modification is only done on host
+	// other modifications are done over pointer to global which is synced automatically
+	cudaMemcpyToSymbol(nextSerialNumberGlobal, &nextSerialNumberGlobal, sizeof(uint64_t));
+	#endif
 }
 
 uint64_t Candidate::getNextSerialNumber() {

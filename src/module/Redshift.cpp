@@ -6,6 +6,18 @@
 
 namespace crpropa {
 
+Redshift::Redshift(){
+	cosmology = new Cosmology;
+}
+
+ref_ptr<Cosmology> Redshift::getCosmology(){
+	return cosmology;
+}
+
+ref_ptr<Cosmology> Redshift::setCosmology(ref_ptr<Cosmology> cosmology){
+	this->cosmology = cosmology;
+}
+
 void Redshift::process(Candidate *c) const {
 	double z = c->getRedshift();
 
@@ -14,7 +26,7 @@ void Redshift::process(Candidate *c) const {
 		return;
 
 	// use small step approximation:  dz = H(z) / c * ds
-	double dz = hubbleRate(z) / c_light * c->getCurrentStep();
+	double dz = cosmology->hubbleRate(z) / c_light * c->getCurrentStep();
 
 	// prevent dz > z
 	dz = crstd::min(dz, z);
@@ -29,9 +41,21 @@ void Redshift::process(Candidate *c) const {
 
 std::string Redshift::getDescription() const {
 	std::stringstream s;
-	s << "Redshift: h0 = " << hubbleRate() / 1e5 * Mpc << ", omegaL = "
-			<< omegaL() << ", omegaM = " << omegaM();
+	s << "Redshift: h0 = " << cosmology->hubbleRate() / 1e5 * Mpc << ", omegaL = "
+			<< cosmology->getOmegaL() << ", omegaM = " << cosmology->getOmegaM();
 	return s.str();
+}
+
+FutureRedshift::FutureRedshift(){
+	cosmology = new Cosmology;
+}
+
+ref_ptr<Cosmology> FutureRedshift::getCosmology(){
+	return cosmology;
+}
+
+ref_ptr<Cosmology> FutureRedshift::setCosmology(ref_ptr<Cosmology> cosmology){
+	this->cosmology = cosmology;
 }
 
 void FutureRedshift::process(Candidate *c) const {
@@ -42,7 +66,7 @@ void FutureRedshift::process(Candidate *c) const {
 		return;
 
 	// use small step approximation:  dz = H(z) / c * ds
-	double dz = hubbleRate(z) / c_light * c->getCurrentStep();
+	double dz = cosmology->hubbleRate(z) / c_light * c->getCurrentStep();
 
 	// update redshift
 	c->setRedshift(z - dz);
@@ -54,8 +78,8 @@ void FutureRedshift::process(Candidate *c) const {
 
 std::string FutureRedshift::getDescription() const {
 	std::stringstream s;
-	s << "FutureRedshift: h0 = " << hubbleRate() / 1e5 * Mpc << ", omegaL = "
-			<< omegaL() << ", omegaM = " << omegaM();
+	s << "FutureRedshift: h0 = " << cosmology->hubbleRate() / 1e5 * Mpc << ", omegaL = "
+			<< cosmology->getOmegaL() << ", omegaM = " << cosmology->getOmegaM();
 	return s.str();
 }
 
