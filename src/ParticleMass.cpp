@@ -13,45 +13,37 @@
 
 namespace crpropa {
 
-struct NuclearMassTable {
-	std::vector<double> table;
-	double* tablePtr = NULL;
-	int tableSize = 0;
+NuclearMassTable::NuclearMassTable() {
+	init();
+}
 
-	NuclearMassTable() {
-		init();
-	}
+void NuclearMassTable::init() {
+	std::string filename = getDataPath("nuclear_mass.txt");
+	std::ifstream infile(filename.c_str());
 
-	void init() {
-		std::string filename = getDataPath("nuclear_mass.txt");
-		std::ifstream infile(filename.c_str());
+	if (!infile.good())
+		throw std::runtime_error("crpropa: could not open file " + filename);
 
-		if (!infile.good())
-			throw std::runtime_error("crpropa: could not open file " + filename);
-
-		int Z, N;
-		double mass;
-		while (infile.good()) {
-			if (infile.peek() != '#') {
-				infile >> Z >> N >> mass;
-				table.push_back(mass);
-				tablePtr = table.data();
-				tableSize = table.size();
-			}
-			infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+	int Z, N;
+	double mass;
+	while (infile.good()) {
+		if (infile.peek() != '#') {
+			infile >> Z >> N >> mass;
+			table.push_back(mass);
+			tablePtr = table.data();
+			tableSize = table.size();
 		}
-
-		infile.close();
+		infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
 
-	CUDA_CALLABLE_MEMBER double getMass(std::size_t idx) {
-		return tablePtr[idx];
-	}
-};
+	infile.close();
+}
 
-static NuclearMassTable nuclearMassTable;
+double NuclearMassTable::getMass(std::size_t idx) {
+	return tablePtr[idx];
+}
 
-double particleMass(int id) {
+double NuclearMassTable::particleMass(int id) {
 	if (isNucleus(id))
 		return nuclearMass(id);
 	if (abs(id) == 11)
@@ -59,13 +51,13 @@ double particleMass(int id) {
 	return 0.0;
 }
 
-double nuclearMass(int id) {
+double NuclearMassTable::nuclearMass(int id) {
 	int A = massNumber(id);
 	int Z = chargeNumber(id);
 	return nuclearMass(A, Z);
 }
 
-double nuclearMass(int A, int Z) {
+double NuclearMassTable::nuclearMass(int A, int Z) {
 	if ((A < 1) or (A > 56) or (Z < 0) or (Z > 26) or (Z > A)) {
 		#ifndef __CUDACC__
 		KISS_LOG_WARNING <<
@@ -76,7 +68,7 @@ double nuclearMass(int A, int Z) {
 		return A * amu - Z * mass_electron;
 	}
 	int N = A - Z;
-	return nuclearMassTable.getMass(Z * 31 + N);
+	return getMass(Z * 31 + N);
 }
 
 } // namespace crpropa
