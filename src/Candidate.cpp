@@ -1,6 +1,7 @@
 #include "crpropa/Candidate.h"
 #include "crpropa/ParticleID.h"
 #include "crpropa/Units.h"
+#include "crpropa/Common.h"
 
 #include <stdexcept>
 
@@ -150,14 +151,7 @@ bool Candidate::hasProperty(const std::string &name) const {
 }
 
 void Candidate::addSecondary(Candidate *c) {
-	ref_ptr<Candidate>* tmp = new ref_ptr<Candidate>[secondariesSize+1];
-	for(int i=0; i<secondariesSize; i++)
-		tmp[i] = secondaries[i];
-	tmp[secondariesSize] = c;
-
-	delete[] secondaries;
-	secondaries = tmp;
-	secondariesSize++;
+	push_back<ref_ptr<Candidate>>(secondaries, secondariesSize, c);
 }
 
 void Candidate::addSecondary(int id, double energy, double w, std::string tagOrigin) {

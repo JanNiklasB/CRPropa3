@@ -31,6 +31,8 @@ protected:
 	std::vector<double> tabRedshifts;  ///< redshifts (optional for haveRedshiftDependence)
 	std::vector<double> tabProtonRate; ///< interaction rate in [1/m] for protons
 	std::vector<double> tabNeutronRate; ///< interaction rate in [1/m] for neutrons
+	double *tabLorentzPtr=NULL, *tabRedshiftsPtr=NULL, *tabProtonRatePtr=NULL, *tabNeutronRatePtr=NULL;
+	int tabLorentzSize=0, tabRedshiftsSize=0, tabProtonRateSize=0, tabNeutronRateSize=0;
 	double limit; ///< fraction of mean free path to limit the next step
 	bool havePhotons;
 	bool haveNeutrinos;
@@ -38,58 +40,59 @@ protected:
 	bool haveAntiNucleons;
 	bool haveRedshiftDependence;
 	std::string interactionTag = "PPP";
+	bool isCMB;
 
 	// called by: sampleEps
 	// - input: s [GeV^2]
 	// - output: (s-p^2) * sigma_(nucleon/gamma) [GeV^2 * mubarn]
-	double functs(double s, bool onProton) const;
+	CUDA_CALLABLE_MEMBER double functs(double s, bool onProton) const;
 
 	// called by: sampleEps, gaussInt
 	// - input: photon energy eps [eV], Ein [GeV]
 	// - output: probability to encounter photon of energy eps
-	double probEps(double eps, bool onProton, double Ein, double z) const;
+	CUDA_CALLABLE_MEMBER double probEps(double eps, bool onProton, double Ein, double z) const;
 
 	/** called by: sampleEps
 	@param onProton	particle type: proton or neutron
 	@param Ein		energy of incoming nucleon
 	- output: labframe energy [eV] of least energetic photon where PPP can occur
 	 */
-	double epsMinInteraction(bool onProton, double Ein) const;
+	CUDA_CALLABLE_MEMBER double epsMinInteraction(bool onProton, double Ein) const;
 
 	/** called by: probEps, epsMinInteraction
 	@param onProton	particle type: proton or neutron
 	@param Ein		energy of incoming nucleon
 	- output: hadron momentum [GeV/c]
 	 */
-	double momentum(bool onProton, double Ein) const;
+	CUDA_CALLABLE_MEMBER double momentum(bool onProton, double Ein) const;
 	
 	// called by: functs
 	// - input: photon energy [eV]
 	// - output: crossection of nucleon-photon-interaction [mubarn]
-	double crossection(double eps, bool onProton) const;
+	CUDA_CALLABLE_MEMBER double crossection(double eps, bool onProton) const;
 
 	// called by: crossection
 	// - input: photon energy [eV], threshold [eV], max [eV], unknown [no unit]
 	// - output: unknown [no unit]
-	double Pl(double eps, double xth, double xMax, double alpha) const;
+	CUDA_CALLABLE_MEMBER double Pl(double eps, double xth, double xMax, double alpha) const;
 
 	// called by: crossection
 	// - input: photon energy [eV], threshold [eV], unknown [eV]
 	// - output: unknown [no unit]
-	double Ef(double eps, double epsTh, double w) const;
+	CUDA_CALLABLE_MEMBER double Ef(double eps, double epsTh, double w) const;
 
 	// called by: crossection
 	// - input: cross section [µbarn], width [GeV], mass [GeV/c^2], rest frame photon energy [GeV]
 	// - output: Breit-Wigner crossection of a resonance of width Gamma
-	double breitwigner(double sigma0, double gamma, double DMM, double epsPrime, bool onProton) const;
+	CUDA_CALLABLE_MEMBER double breitwigner(double sigma0, double gamma, double DMM, double epsPrime, bool onProton) const;
 
 	// called by: probEps, crossection, breitwigner, functs
 	// - input: is proton [bool]
 	// - output: mass [Gev/c^2]
-	double mass(bool onProton) const;
+	CUDA_CALLABLE_MEMBER double mass(bool onProton) const;
 
 	// - output: [GeV^2] head-on collision 
-	double sMin() const;
+	CUDA_CALLABLE_MEMBER double sMin() const;
 
 	bool sampleLog = true;
 	double correctionFactor = 1.6; // increeses the maximum of the propability function
@@ -152,16 +155,16 @@ public:
 	 * @param z 		redshift
 	 * @param onProton 	true for protons, false for neutrons
 	 */
-	double nucleonMFP(double gamma, double z, bool onProton) const;
+	CUDA_CALLABLE_MEMBER double nucleonMFP(double gamma, double z, bool onProton) const;
 
 	/** scaling factor for mean free path of the nucleus (converting the MFP of a single nucleon)
 	 * 
 	 * @param A		mass number of the nucleus
 	 * @param X 	charge number of the nucleus
 	 */
-	double nucleiModification(int A, int X) const;
+	CUDA_CALLABLE_MEMBER double nucleiModification(int A, int X) const;
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate, bool onProton) const;
+	CUDA_CALLABLE_MEMBER void performInteraction(Candidate *candidate, bool onProton) const;
 
 	/**
 	 Calculates the loss length E dx/dE in [m].
@@ -189,7 +192,7 @@ public:
 	 @param E		energy of incoming nucleon [J]
 	 @param z		redshift of incoming nucleon
 	 */
-	double sampleEps(bool onProton, double E, double z) const;
+	CUDA_CALLABLE_MEMBER double sampleEps(bool onProton, double E, double z) const;
 	
 	/** called by: sampleEps
 	@param onProton	particle type: proton or neutron
@@ -199,7 +202,7 @@ public:
 	@param epsMax   maximum photon energy of field
 	- output: maximum probability of all photons in field
 	 */
-	double probEpsMax(bool onProton, double Ein, double z, double epsMin, double epsMax) const;
+	CUDA_CALLABLE_MEMBER double probEpsMax(bool onProton, double Ein, double z, double epsMin, double epsMax) const;
 	
 	// using log or lin spacing of photons in the range between epsMin and
 	// epsMax for computing the maximum probability of photons in field
