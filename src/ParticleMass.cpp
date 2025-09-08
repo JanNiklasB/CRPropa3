@@ -71,4 +71,18 @@ double NuclearMassTable::nuclearMass(int A, int Z) {
 	return getMass(Z * 31 + N);
 }
 
+static NuclearMassTable nuclearMassTable;
+
+double particleMass(int id){
+	return nuclearMassTable.particleMass(id);
+}
+
+double nuclearMass(int id){
+	return nuclearMassTable.nuclearMass(id);
+}
+
+double nuclearMass(int A, int Z){
+	return nuclearMassTable.nuclearMass(A, Z);
+}
+
 } // namespace crpropa
