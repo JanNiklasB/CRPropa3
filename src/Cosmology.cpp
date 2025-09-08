@@ -2,197 +2,163 @@
 #include "crpropa/Units.h"
 #include "crpropa/Common.h"
 
-#include <vector>
 #include <cmath>
 #include <stdexcept>
 
 namespace crpropa {
 
-/**
- @class Cosmology
- @brief Cosmology calculations
- */
-struct Cosmology {
-	double H0; // Hubble parameter at z=0
-	double omegaM; // matter density parameter
-	double omegaL; // vacuum energy parameter
+void Cosmology::update() {
+	double dH = c_light / H0; // Hubble distance
 
-	static const int n;
-	static const double zmin;
-	static const double zmax;
+	std::vector<double> E(n);
+	E[0] = 1;
 
-	std::vector<double> Z;  // redshift
-	std::vector<double> Dc; // comoving distance [m]
-	std::vector<double> Dl; // luminosity distance [m]
-	std::vector<double> Dt; // light travel distance [m]
-
-	double *ZPtr=NULL, *DcPtr=NULL, *DlPtr=NULL, *DtPtr=NULL;
-	int ZSize=0, DcSize=0, DlSize=0, DtSize=0;
-
-	void update() {
-		double dH = c_light / H0; // Hubble distance
-
-		std::vector<double> E(n);
-		E[0] = 1;
-
-		// Relation between comoving distance r and redshift z (cf. J.A. Peacock, Cosmological physics, p. 89 eq. 3.76)
-		// dr = c / H(z) dz, integration using midpoint rule
-		double dlz = log10(zmax) - log10(zmin);
-		for (int i = 1; i < n; i++) {
-			Z[i] = zmin * pow(10, i * dlz / (n - 1)); // logarithmic even spacing
-			double dz = (Z[i] - Z[i - 1]); // redshift step
-			E[i] = sqrt(omegaL + omegaM * pow_integer<3>(1 + Z[i]));
-			Dc[i] = Dc[i - 1] + dH * dz * (1 / E[i] + 1 / E[i - 1]) / 2;
-			Dl[i] = (1 + Z[i]) * Dc[i];
-			Dt[i] = Dt[i - 1]
-					+ dH * dz
-							* (1 / ((1 + Z[i]) * E[i])
-									+ 1 / ((1 + Z[i - 1]) * E[i - 1])) / 2;
-		}
+	// Relation between comoving distance r and redshift z (cf. J.A. Peacock, Cosmological physics, p. 89 eq. 3.76)
+	// dr = c / H(z) dz, integration using midpoint rule
+	double dlz = log10(zmax) - log10(zmin);
+	for (int i = 1; i < n; i++) {
+		Z[i] = zmin * pow(10, i * dlz / (n - 1)); // logarithmic even spacing
+		double dz = (Z[i] - Z[i - 1]); // redshift step
+		E[i] = sqrt(omegaL + omegaM * pow_integer<3>(1 + Z[i]));
+		Dc[i] = Dc[i - 1] + dH * dz * (1 / E[i] + 1 / E[i - 1]) / 2;
+		Dl[i] = (1 + Z[i]) * Dc[i];
+		Dt[i] = Dt[i - 1]
+				+ dH * dz
+						* (1 / ((1 + Z[i]) * E[i])
+								+ 1 / ((1 + Z[i - 1]) * E[i - 1])) / 2;
 	}
-
-	Cosmology() {
-        // Cosmological parameters (K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014))
-		H0 = 67.3 * 1000 * meter / second / Mpc; // default values
-		omegaM = 0.315;
-		omegaL = 1 - omegaM;
-
-		Z.resize(n);
-		Dc.resize(n);
-		Dl.resize(n);
-		Dt.resize(n);
-
-		Z[0] = 0;
-		Dc[0] = 0;
-		Dl[0] = 0;
-		Dt[0] = 0;
-
-		ZPtr = Z.data();
-		DcPtr = Dc.data();
-		DlPtr = Dl.data();
-		DtPtr = Dt.data();
-
-		ZSize = Z.size();
-		DcSize = Dc.size();
-		DlSize = Dl.size();
-		DtSize = Dt.size();
-
-		update();
-	}
-
-	void setParameters(double h, double oM) {
-		H0 = h * 1e5 / Mpc;
-		omegaM = oM;
-		omegaL = 1 - oM;
-		update();
-	}
-};
-
-const int Cosmology::n = 1000;
-const double Cosmology::zmin = 0.0001;
-const double Cosmology::zmax = 100;
-
-static Cosmology cosmology; // instance is created at runtime
-
-void setCosmologyParameters(double h, double oM) {
-	cosmology.setParameters(h, oM);
 }
 
-double hubbleRate(double z) {
-	return cosmology.H0
-			* sqrt(cosmology.omegaL + cosmology.omegaM * pow(1 + z, 3));
+Cosmology::Cosmology() {
+	// Cosmological parameters (K.A. Olive et al. (Particle Data Group), Chin. Phys. C, 38, 090001 (2014))
+	H0 = 67.3 * 1000 * meter / second / Mpc; // default values
+	omegaM = 0.315;
+	omegaL = 1 - omegaM;
+
+	Z.resize(n);
+	Dc.resize(n);
+	Dl.resize(n);
+	Dt.resize(n);
+
+	Z[0] = 0;
+	Dc[0] = 0;
+	Dl[0] = 0;
+	Dt[0] = 0;
+
+	ZPtr = Z.data();
+	DcPtr = Dc.data();
+	DlPtr = Dl.data();
+	DtPtr = Dt.data();
+
+	ZSize = Z.size();
+	DcSize = Dc.size();
+	DlSize = Dl.size();
+	DtSize = Dt.size();
+
+	update();
 }
 
-double omegaL() {
-	return cosmology.omegaL;
+void Cosmology::setParameters(double h, double oM) {
+	H0 = h * 1e5 / Mpc;
+	omegaM = oM;
+	omegaL = 1 - oM;
+	update();
 }
 
-double omegaM() {
-	return cosmology.omegaM;
+double Cosmology::hubbleRate(double z) {
+	return H0 * sqrt(omegaL + omegaM * pow(1 + z, 3));
 }
 
-double H0() {
-	return cosmology.H0;
+double Cosmology::getOmegaL() {
+	return omegaL;
 }
 
-double comovingDistance2Redshift(double d) {
+double Cosmology::getOmegaM() {
+	return omegaM;
+}
+
+double Cosmology::getH0() {
+	return H0;
+}
+
+double Cosmology::comovingDistance2Redshift(double d) {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.DcPtr[cosmology.DcSize-1])
+	if (d > this->DcPtr[this->DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, cosmology.DcPtr, cosmology.ZPtr, cosmology.ZSize);
+	return interpolate(d, this->DcPtr, this->ZPtr, this->ZSize);
 }
 
-double redshift2ComovingDistance(double z) {
+double Cosmology::redshift2ComovingDistance(double z) {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
-	if (z > cosmology.zmax)
+	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, cosmology.ZPtr, cosmology.DcPtr, cosmology.DcSize);
+	return interpolate(z, this->ZPtr, this->DcPtr, this->DcSize);
 }
 
-double luminosityDistance2Redshift(double d) {
+double Cosmology::luminosityDistance2Redshift(double d) {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.DlPtr[cosmology.DlSize-1])
+	if (d > this->DlPtr[this->DlSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, cosmology.DlPtr, cosmology.ZPtr, cosmology.ZSize);
+	return interpolate(d, this->DlPtr, this->ZPtr, this->ZSize);
 }
 
-double redshift2LuminosityDistance(double z) {
+double Cosmology::redshift2LuminosityDistance(double z) {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
-	if (z > cosmology.zmax)
+	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, cosmology.ZPtr, cosmology.DlPtr, cosmology.DlSize);
+	return interpolate(z, this->ZPtr, this->DlPtr, this->DlSize);
 }
 
-double lightTravelDistance2Redshift(double d) {
+double Cosmology::lightTravelDistance2Redshift(double d) {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.DtPtr[cosmology.DtSize-1])
+	if (d > this->DtPtr[this->DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, cosmology.DtPtr, cosmology.ZPtr, cosmology.ZSize);
+	return interpolate(d, this->DtPtr, this->ZPtr, this->ZSize);
 }
 
-double redshift2LightTravelDistance(double z) {
+double Cosmology::redshift2LightTravelDistance(double z) {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
-	if (z > cosmology.zmax)
+	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, cosmology.ZPtr, cosmology.DtPtr, cosmology.DtSize);
+	return interpolate(z, this->ZPtr, this->DtPtr, this->DtSize);
 }
 
-double comoving2LightTravelDistance(double d) {
+double Cosmology::comoving2LightTravelDistance(double d) {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.DcPtr[cosmology.DcSize-1])
+	if (d > this->DcPtr[this->DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, cosmology.DcPtr, cosmology.DtPtr, cosmology.DtSize);
+	return interpolate(d, this->DcPtr, this->DtPtr, this->DtSize);
 }
 
-double lightTravel2ComovingDistance(double d) {
+double Cosmology::lightTravel2ComovingDistance(double d) {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
-	if (d > cosmology.DtPtr[cosmology.DtSize-1])
+	if (d > this->DtPtr[this->DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, cosmology.DtPtr, cosmology.DcPtr, cosmology.DcSize);
+	return interpolate(d, this->DtPtr, this->DcPtr, this->DcSize);
 }
 
 } // namespace crpropa
