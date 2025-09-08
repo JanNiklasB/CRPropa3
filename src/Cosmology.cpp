@@ -58,10 +58,10 @@ Cosmology::Cosmology() {
 	update();
 }
 
-void Cosmology::setParameters(double h, double oM) {
-	H0 = h * 1e5 / Mpc;
-	omegaM = oM;
-	omegaL = 1 - oM;
+void Cosmology::setParameters(double hubbleParameter, double omegaMatter) {
+	H0 = hubbleParameter * 1e5 / Mpc;
+	omegaM = omegaMatter;
+	omegaL = 1 - omegaMatter;
 	update();
 }
 
@@ -159,6 +159,64 @@ double Cosmology::lightTravel2ComovingDistance(double d) {
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
 	return interpolate(d, this->DtPtr, this->DcPtr, this->DcSize);
+}
+
+static Cosmology cosmology;
+
+ref_ptr<Cosmology> getStaticCosmology(){
+	return ref_ptr<Cosmology>(&cosmology);
+}
+
+void setCosmologyParameters(double hubbleParameter, double omegaMatter){
+	cosmology.setParameters(hubbleParameter, omegaMatter);
+}
+
+double hubbleRate(double redshift){
+	return cosmology.hubbleRate(redshift);
+}
+
+double omegaL(){
+	return cosmology.getOmegaL();
+}
+
+double omegaM(){
+	return cosmology.getOmegaM();
+}
+
+double H0(){
+	return cosmology.getH0();
+}
+
+double comovingDistance2Redshift(double distance){
+	return cosmology.comovingDistance2Redshift(distance);
+}
+
+double redshift2ComovingDistance(double redshift){
+	return cosmology.redshift2ComovingDistance(redshift);
+}
+
+double luminosityDistance2Redshift(double distance){
+	return cosmology.luminosityDistance2Redshift(distance);
+}
+
+double redshift2LuminosityDistance(double redshift){
+	return cosmology.redshift2LuminosityDistance(redshift);
+}
+
+double lightTravelDistance2Redshift(double distance){
+	return cosmology.lightTravelDistance2Redshift(distance);
+}
+
+double redshift2LightTravelDistance(double redshift){
+	return cosmology.redshift2LightTravelDistance(redshift);
+}
+
+double comoving2LightTravelDistance(double distance){
+	return cosmology.comoving2LightTravelDistance(distance);
+}
+
+double lightTravel2ComovingDistance(double distance){
+	return cosmology.lightTravel2ComovingDistance(distance);
 }
 
 } // namespace crpropa

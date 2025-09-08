@@ -7,7 +7,11 @@
 namespace crpropa {
 
 Redshift::Redshift(){
+	#ifdef __CUDACC__
 	cosmology = new Cosmology;
+	#else
+	cosmology = getStaticCosmology();
+	#endif
 }
 
 ref_ptr<Cosmology> Redshift::getCosmology(){
@@ -47,7 +51,11 @@ std::string Redshift::getDescription() const {
 }
 
 FutureRedshift::FutureRedshift(){
+	#ifdef __CUDACC__
 	cosmology = new Cosmology;
+	#else
+	cosmology = getStaticCosmology();
+	#endif
 }
 
 ref_ptr<Cosmology> FutureRedshift::getCosmology(){
