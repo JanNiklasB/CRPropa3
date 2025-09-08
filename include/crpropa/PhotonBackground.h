@@ -31,9 +31,9 @@ public:
 	 @param ePhoton		photon energy [J]
 	 @param z			redshift (if redshift dependent, default = 0.)
 	 */
-	virtual double getPhotonDensity(double ePhoton, double z = 0.) const = 0;
-	virtual double getMinimumPhotonEnergy(double z) const = 0;
-	virtual double getMaximumPhotonEnergy(double z) const = 0;
+	CUDA_CALLABLE_MEMBER virtual double getPhotonDensity(double ePhoton, double z = 0.) const = 0;
+	CUDA_CALLABLE_MEMBER virtual double getMinimumPhotonEnergy(double z) const = 0;
+	CUDA_CALLABLE_MEMBER virtual double getMaximumPhotonEnergy(double z) const = 0;
 	virtual std::string getFieldName() const {
 		return this->fieldName;
 	}
@@ -73,10 +73,10 @@ class TabularPhotonField: public PhotonField {
 public:
 	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true);
 
-	double getPhotonDensity(double ePhoton, double z = 0.) const;
+	CUDA_CALLABLE_MEMBER double getPhotonDensity(double ePhoton, double z = 0.) const;
 	CUDA_CALLABLE_MEMBER double getRedshiftScaling(double z) const;
-	double getMinimumPhotonEnergy(double z) const;
-	double getMaximumPhotonEnergy(double z) const;
+	CUDA_CALLABLE_MEMBER double getMinimumPhotonEnergy(double z) const;
+	CUDA_CALLABLE_MEMBER double getMaximumPhotonEnergy(double z) const;
 
 protected:
 	void readPhotonEnergy(std::string filePath);
@@ -306,9 +306,9 @@ public:
 class BlackbodyPhotonField: public PhotonField {
 public:
 	BlackbodyPhotonField(const std::string fieldName, const double blackbodyTemperature);
-	double getPhotonDensity(double ePhoton, double z = 0.) const;
-	double getMinimumPhotonEnergy(double z) const;
-	double getMaximumPhotonEnergy(double z) const;
+	CUDA_CALLABLE_MEMBER double getPhotonDensity(double ePhoton, double z = 0.) const;
+	CUDA_CALLABLE_MEMBER double getMinimumPhotonEnergy(double z) const;
+	CUDA_CALLABLE_MEMBER double getMaximumPhotonEnergy(double z) const;
 	void setQuantile(double q);
 
 protected:

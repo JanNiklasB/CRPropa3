@@ -8,8 +8,6 @@
 // Author:  Lynn Garren
 // the following functions in namespace HepPID were directly taken from the
 // HepPID library by Lynn Garren and then slightly modified for cuda use
-namespace HepPID{
-
 CUDA_CALLABLE_MEMBER enum location { nj=1, nq3, nq2, nq1, nl, nr, n, n8, n9, n10 };
 CUDA_CALLABLE_MEMBER unsigned short digit( location loc, const int & pid );
 CUDA_CALLABLE_MEMBER int A(const int & pid );
@@ -62,8 +60,6 @@ unsigned short digit( location loc, const int & pid )
 //    return (abspid(pid)/numerator)%10;
 }
 
-}
-
 namespace crpropa {
 
 int nucleusId(int a, int z) {
@@ -85,19 +81,19 @@ int nucleusId(int a, int z) {
 }
 
 int chargeNumber(int id) {
-	return HepPID::Z(id);
+	return Z(id);
 }
 
 int massNumber(int id) {
 	if (id == 2112)
 		return 1;
-	return HepPID::A(id);
+	return A(id);
 }
 
 bool isNucleus(int id) {
 	if (id == 2112)
 		return true; // consider neutron as nucleus
-	return HepPID::isNucleus(id);
+	return isNucleus(id);
 }
 
 std::string convertIdToName(int id) {

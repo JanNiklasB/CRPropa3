@@ -22,7 +22,7 @@ namespace crpropa {
  */
 class AdvectionField: public Referenced {
 public:
-	CUDA_CALLABLE_MEMBER virtual ~AdvectionField() {
+	virtual ~AdvectionField() {
 	}
 	CUDA_CALLABLE_MEMBER virtual Vector3d getField(const Vector3d &position, const double &time=0) const = 0;
 	CUDA_CALLABLE_MEMBER virtual double getDivergence(const Vector3d &position, const double &time=0) const = 0;

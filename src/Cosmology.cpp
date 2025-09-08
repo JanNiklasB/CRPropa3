@@ -88,11 +88,11 @@ struct Cosmology {
 	}
 };
 
-const CUDA_CONSTANT int Cosmology::n = 1000;
-const CUDA_CONSTANT double Cosmology::zmin = 0.0001;
-const CUDA_CONSTANT double Cosmology::zmax = 100;
+const int Cosmology::n = 1000;
+const double Cosmology::zmin = 0.0001;
+const double Cosmology::zmax = 100;
 
-static CUDA_CONSTANT Cosmology cosmology; // instance is created at runtime
+static Cosmology cosmology; // instance is created at runtime
 
 void setCosmologyParameters(double h, double oM) {
 	cosmology.setParameters(h, oM);

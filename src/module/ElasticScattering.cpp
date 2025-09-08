@@ -1,5 +1,4 @@
 #include "crpropa/module/ElasticScattering.h"
-#include "crpropa/Units.h"
 #include "crpropa/ParticleID.h"
 #include "crpropa/ParticleMass.h"
 #include "crpropa/Random.h"
@@ -11,14 +10,7 @@
 #include <stdexcept>
 
 namespace crpropa {
-
-const double ElasticScattering::lgmin = 6.;  // minimum log10(Lorentz-factor)
-const double ElasticScattering::lgmax = 14.; // maximum log10(Lorentz-factor)
-const size_t ElasticScattering::nlg = 201;   // number of Lorentz-factor steps
-const double ElasticScattering::epsmin = log10(2 * eV) + 3;    // log10 minimum photon background energy in nucleus rest frame for elastic scattering
-const double ElasticScattering::epsmax = log10(2 * eV) + 8.12; // log10 maximum photon background energy in nucleus rest frame for elastic scattering
-const size_t ElasticScattering::neps = 513; // number of photon background energies in nucleus rest frame
-
+	
 ElasticScattering::ElasticScattering(ref_ptr<PhotonField> f) {
 	setPhotonField(f);
 }

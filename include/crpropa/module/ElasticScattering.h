@@ -4,8 +4,10 @@
 #include "crpropa/__CudaDefines.h"
 #include "crpropa/Module.h"
 #include "crpropa/PhotonBackground.h"
+#include "crpropa/Units.h"
 
 #include <vector>
+#include <cmath>
 
 namespace crpropa {
 
@@ -21,12 +23,12 @@ private:
 	std::vector<std::vector<double> > tabCDF; // CDF as function of background photon energy
 	std::string interactionTag = "ES";
 
-	static const double lgmin; // minimum log10(Lorentz-factor)
-	static const double lgmax; // maximum log10(Lorentz-factor)
-	static const size_t nlg;   // number of Lorentz-factor steps
-	static const double epsmin; // minimum log10(eps / J)
-	static const double epsmax; // maximum log10(eps / J)
-	static const size_t neps;   // number of eps steps
+	const double lgmin = 6.;  // minimum log10(Lorentz-factor)
+	const double lgmax = 14.; // maximum log10(Lorentz-factor)
+	const size_t nlg = 201;   // number of Lorentz-factor steps
+	const double epsmin = log10(2 * eV) + 3;    // log10 minimum photon background energy in nucleus rest frame for elastic scattering
+	const double epsmax = log10(2 * eV) + 8.12; // log10 maximum photon background energy in nucleus rest frame for elastic scattering
+	const size_t neps = 513; // number of photon background energies in nucleus rest frame
 
 public:
 	/** Constructor

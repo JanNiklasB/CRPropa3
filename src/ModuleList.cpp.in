@@ -1,5 +1,6 @@
 #include "crpropa/ModuleList.h"
 #include "crpropa/ProgressBar.h"
+#include "crpropa/Common.h"
 
 #ifndef sighandler_t
 typedef void (*sighandler_t)(int);
@@ -26,9 +27,6 @@ ModuleList::ModuleList() : showProgress(false) {
 	cudaGetDeviceProperties(&prop, 0);
 	maxThreadsPerBlock = prop.maxThreadsDim[0];
 	#endif
-}
-
-ModuleList::~ModuleList() {
 }
 
 void ModuleList::setShowProgress(bool show) {

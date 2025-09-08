@@ -498,7 +498,9 @@ __attribute__ ((aligned(64))) static RANDOM_TLS_ITEM _tls[MAX_THREAD];
 Random &Random::instance() {
 	int i = omp_get_thread_num();
 	if (i >= MAX_THREAD)
+	#ifndef __CUDACC__
 	throw std::runtime_error("crpropa::Random: more than MAX_THREAD threads!");
+	#endif
 	return _tls[i].r;
 }
 
@@ -516,7 +518,7 @@ std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 }
 
 #else
-static Random _random;
+static CUDA_CONSTANT Random _random;
 Random &Random::instance() {
 	return _random;
 }

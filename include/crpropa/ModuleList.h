@@ -30,7 +30,7 @@ public:
 	#endif
 
 	ModuleList();
-	CUDA_CALLABLE_MEMBER virtual ~ModuleList();
+	virtual ~ModuleList(){};
 	void setShowProgress(bool show = true); ///< activate a progress bar
 
 	void add(Module* module);
@@ -70,10 +70,8 @@ private:
 	Output* interruptAction;
 	bool haveInterruptAction = false;
 	std::vector<int> notFinished; // list with not finished numbers of candidates
-	#ifdef __CUDACC__
 	ref_ptr<Module>* modulesPtr=NULL;
 	int modulesSize=0;
-	#endif
 };
 
 /**

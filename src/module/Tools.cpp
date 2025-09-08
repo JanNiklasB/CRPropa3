@@ -33,7 +33,7 @@ void PerformanceModule::add(Module *module) {
 }
 
 void PerformanceModule::process(Candidate *candidate) const {
-	double* times(modulesSize);
+	double* times = new double[modulesSize];
 	for (size_t i = 0; i < modulesSize; i++) {
 		_module_info &m = modulesPtr[i];
 		#ifndef __CUDACC__
@@ -42,11 +42,11 @@ void PerformanceModule::process(Candidate *candidate) const {
 		double end = Clock::getInstance().getMillisecond();
 		times[i] = end - start;
 		#else
-		auto start = cuda::std::chrono::high_resolution_clock::now();
+		auto start = crstd::chrono::high_resolution_clock::now();
 		m.module->process(candidate);
-		auto end = cuda::std::chrono::high_resolution_clock::now();
-		cuda::std::chrono::duration time = end - start;
-		times[i] = cuda::std::chrono::duration_cast<cuda::std::chrono::milliseconds>(time).count();
+		auto end = crstd::chrono::high_resolution_clock::now();
+		crstd::chrono::duration time = end - start;
+		times[i] = crstd::chrono::duration_cast<crstd::chrono::milliseconds>(time).count();
 		#endif
 	}
 
@@ -58,6 +58,7 @@ void PerformanceModule::process(Candidate *candidate) const {
 		}
 		calls++;
 	}
+	delete[] times;
 }
 
 string PerformanceModule::getDescription() const {
@@ -125,7 +126,7 @@ void ParticleFilter::process(Candidate* candidate) const {
 	#ifndef __CUDACC__
 	if (ids.find(candidate->current.getId()) == ids.end())
 	#else
-	if (*cuda::std::find(&idsPtr[0], &idsPtr[idsSize-1], candidate->current.getId()) == idsPtr[idsSize-1])
+	if (*crstd::find(&idsPtr[0], &idsPtr[idsSize-1], candidate->current.getId()) == idsPtr[idsSize-1])
 	#endif
 		reject(candidate);
 	else

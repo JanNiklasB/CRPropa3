@@ -45,11 +45,11 @@ struct NuclearMassTable {
 	}
 
 	CUDA_CALLABLE_MEMBER double getMass(std::size_t idx) {
-		return table[idx];
+		return tablePtr[idx];
 	}
 };
 
-CUDA_CALLABLE_MEMBER static NuclearMassTable nuclearMassTable;
+static NuclearMassTable nuclearMassTable;
 
 double particleMass(int id) {
 	if (isNucleus(id))

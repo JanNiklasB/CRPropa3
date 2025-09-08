@@ -28,6 +28,18 @@ CUDA_CALLABLE_MEMBER inline int digit(const int& value, const int& d) {
 	return (value % (d * 10)) / d;
 }
 
+template<typename T>
+CUDA_CALLABLE_MEMBER T* push_back(T* src, int& size, T value){
+	T* tmp = new T[size+1];
+	for (int i=0; i<size; i++)
+		tmp[i] = src[i];
+	tmp[size] = value;
+	delete[] src;
+	src = tmp;
+	size++;
+	return src;
+}
+
 /// Same Behaviour as std::lower_bound, but accepts the array directly and returns the index instead
 template<typename T>
 CUDA_CALLABLE_MEMBER size_t lower_bound(T x, const T *X, int size) {
@@ -125,10 +137,10 @@ CUDA_CALLABLE_MEMBER inline double pow_integer<0>(double base)
 
 /// - input:  function over which to integrate, integration limits A and B
 /// - output: 8-points Gauß-Legendre integral
-static const double X[8] = {.0950125098, .2816035507, .4580167776, .6178762444, .7554044083, .8656312023, .9445750230, .9894009349};
-static const double W[8] = {.1894506104, .1826034150, .1691565193, .1495959888, .1246289712, .0951585116, .0622535239, .0271524594};
 template<typename Integrand>
 CUDA_CALLABLE_MEMBER double gaussInt(Integrand&& integrand, double A, double B) {
+	const double X[8] = {.0950125098, .2816035507, .4580167776, .6178762444, .7554044083, .8656312023, .9445750230, .9894009349};
+	const double W[8] = {.1894506104, .1826034150, .1691565193, .1495959888, .1246289712, .0951585116, .0622535239, .0271524594};
 	const double XM = 0.5 * (B + A);
 	const double XR = 0.5 * (B - A);
 	double SS = 0.;

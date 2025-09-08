@@ -77,8 +77,8 @@ public:
 	void setXScaleHeight(double zs);
 	double getXScaleHeight() const;
 
-	Vector3d getXField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const; // override old X and spiral field
-	Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
+	CUDA_CALLABLE_MEMBER Vector3d getXField(const double& r, const double& z, const double& sinPhi, const double& cosPhi) const; // override old X and spiral field
+	CUDA_CALLABLE_MEMBER Vector3d getDiskField(const double& r, const double& z, const double& phi, const double& sinPhi, const double& cosPhi) const;
 
 /** @brief Disable the transition of the spiral field strength to 0 at the outer boundary such that only the magnetic flux at the 5 kpc ring is redirected.
 	Thus, the spiral field lines are continued to r = 20 kpc as in the initial JF12 field. You can reactivate the outer transition afterwards via setDiskTransitionWidth which sets both transition widths at the inner and outer boundary.
@@ -91,27 +91,27 @@ public:
 	@param r Distance of the current position to the z axis in the usual galactocentric cylindrical coordinates. Should be non-negative.
 	@return The value of the transition polynomial at r if r is inside one of the transition regions. Otherwise, return (5 kpc)/r, i.e. the scaling of the spiral field, if r is inside the region where the spiral field remains unaltered.
 */
-	double getDiskTransitionPolynomial(const double& r) const;
+	CUDA_CALLABLE_MEMBER double getDiskTransitionPolynomial(const double& r) const;
 
 /** @brief Evaluate the derivative of the polynomial which provides the transition of the spiral field strength to zero in the transition regions. The derivative is needed to restore solenoidality in the transition region
 	@param r 	Distance of the current position to the z axis in the usual galactocentric cylindrical coordinates. Should be non-negative.
 	@return The value of the transition polynomial derivative at r if r is inside one of the transition regions. Otherwise, return 0.
 */
-	double getDiskTransitionPolynomialDerivative(const double& r) const;
+	CUDA_CALLABLE_MEMBER double getDiskTransitionPolynomialDerivative(const double& r) const;
 
 /** @brief Evaluate an angular azimuth integral over the piecewise constant spiral field strengths at r_1 = 5 kpc. This integral is needed to restore the solenoidality of the spiral field in the transition regions.
 	@param r 	Distance of the current position to the z axis in the usual galactocentric cylindrical coordinates. Should be non-negative.
 	@param phi	Azimuth angle of the current position in galactocentric cylindrical coordinates. Can be any double.
 	@return The value of the azimuth integral over the spiral field strengths at r_1 = 5 kpc from at fixed phi0 to the current phi which is mapped back to r_1 = 5 kpc along the spiral field line passing through (r,phi).
 */
-	double getHPhiIntegral(const double& r, const double& phi) const;
+	CUDA_CALLABLE_MEMBER double getHPhiIntegral(const double& r, const double& phi) const;
 
 /** @brief Find the correct magnetic spiral arm for the current position and return its field strength at r_1 = 5 kpc
 	@param r 	Distance of the current position to the z axis in the usual galactocentric cylindrical coordinates. Should be non-negative.
 	@param phi	Azimuth angle of the current position in galactocentric cylindrical coordinates. Can be any double.
 	@return The value of the spiral field strength b_j
 */
-	double getSpiralFieldStrengthConstant(const double& r, const double& phi) const;
+	CUDA_CALLABLE_MEMBER double getSpiralFieldStrengthConstant(const double& r, const double& phi) const;
 };
 /** @} */
 

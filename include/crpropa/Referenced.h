@@ -32,11 +32,11 @@ public:
 	/** Default Constructor
 	 * just sets _referenceCount to 0
 	*/
-	CUDA_CALLABLE_MEMBER inline Referenced() :
+	inline Referenced() :
 			_referenceCount(0) {
 	}
 
-	CUDA_CALLABLE_MEMBER inline Referenced(const Referenced&) :
+	inline Referenced(const Referenced&) :
 			_referenceCount(0) {
 	}
 
@@ -101,7 +101,7 @@ public:
 protected:
 
 	/// Destructor
-	CUDA_CALLABLE_MEMBER virtual inline ~Referenced() {
+	virtual inline ~Referenced() {
 		#ifdef DEBUG
 			if (_referenceCount)
 				std::cerr << "WARNING: Deleting Object with references: "

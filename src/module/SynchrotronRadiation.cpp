@@ -179,14 +179,7 @@ void SynchrotronRadiation::process(Candidate *candidate) const {
 				break;			
 		}
 
-		// store energies in array (the following is the same as push_back)
-		double* tmp = new double[energiesSize+1];
-		for (int j=0; j<energiesSize; j++)
-			tmp[j] = energies[j];
-		tmp[energiesSize] = Ephoton;
-		delete[] energies;
-		energies = tmp;
-		energiesSize++;
+		push_back(energies, energiesSize, Ephoton);
 
 		// energy loss
 		dE -= Ephoton;

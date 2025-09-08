@@ -36,7 +36,7 @@ public:
 	ParticleCollector(const std::size_t nBuffer);
 	ParticleCollector(const std::size_t nBuffer, const bool clone);
 	ParticleCollector(const std::size_t nBuffer, const bool clone, const bool recursive);
-	CUDA_CALLABLE_MEMBER ~ParticleCollector();
+	~ParticleCollector();
 
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	CUDA_CALLABLE_MEMBER void process(ref_ptr<Candidate> c) const;

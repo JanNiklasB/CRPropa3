@@ -113,7 +113,7 @@ public:
 		origin(origin), Nx(Nx), Ny(Ny), Nz(Nz), spacing(spacing), reflective(false), ipol(TRILINEAR), clipVolume(false) {
 	}
 	
-	CUDA_CALLABLE_MEMBER virtual ~GridProperties() {
+	virtual ~GridProperties() {
 	}
 	
 	/** If True, the repetition of the grid is refletive instead of periodic. */
@@ -522,7 +522,7 @@ private:
 		fY = r.y - iY0;
 		fZ = r.z - iZ0;
 
-		int nrCubicInterpolations = 4;
+		const int nrCubicInterpolations = 4;
 		double interpolateVaryX[nrCubicInterpolations];
 		double interpolateVaryY[nrCubicInterpolations];
 		double interpolateVaryZ[nrCubicInterpolations];

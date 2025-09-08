@@ -32,17 +32,19 @@ double TabularPhotonField::getPhotonDensity(double Ephoton, double z) const {
 		// fix behaviour for future redshift. See issue #414
 		// with redshift < 0 the photon density is set to 0 in interpolate2d. 
 		// Therefore it is assumed that the photon density does not change from values at z = 0. This is only valid for small changes in redshift.
-		double zMin = this->redshifts[0];
+		double zMin = this->redshiftsPtr[0];
 		if(z < zMin){
+			#ifndef __CUDACC__
 			if(z < -1) {
 				KISS_LOG_WARNING << "Photon Field " << fieldName << " uses FutureRedshift with z < -1. The photon density is set to n(Ephoton, z=0). \n";
 			}
+			#endif
 			return getPhotonDensity(Ephoton, zMin);
 		} else {
-			return interpolate2d(Ephoton, z, this->photonEnergies, this->redshifts, this->photonDensity);
+			return interpolate2d(Ephoton, z, this->photonEnergiesPtr, this->redshiftsPtr, this->photonDensityPtr, this->photonDensitySize);
 		}
 	} else {
-		return interpolate(Ephoton, this->photonEnergies, this->photonDensity);
+		return interpolate(Ephoton, this->photonEnergiesPtr, this->photonDensityPtr, this->photonDensitySize);
 	}
 }
 
@@ -61,11 +63,11 @@ double TabularPhotonField::getRedshiftScaling(double z) const {
 }
 
 double TabularPhotonField::getMinimumPhotonEnergy(double z) const{
-	return photonEnergies[0];
+	return photonEnergiesPtr[0];
 }
 
 double TabularPhotonField::getMaximumPhotonEnergy(double z) const{
-	return photonEnergies[photonEnergies.size() -1];
+	return photonEnergiesPtr[photonEnergiesSize -1];
 }
 
 void TabularPhotonField::readPhotonEnergy(std::string filePath) {
@@ -185,7 +187,7 @@ BlackbodyPhotonField::BlackbodyPhotonField(std::string fieldName, double blackbo
 }
 
 double BlackbodyPhotonField::getPhotonDensity(double Ephoton, double z) const {
-	return 8 * M_PI * pow_integer<3>(Ephoton / (h_planck * c_light)) / std::expm1(Ephoton / (k_boltzmann * this->blackbodyTemperature));
+	return 8 * M_PI * pow_integer<3>(Ephoton / (h_planck * c_light)) / crstd::expm1(Ephoton / (k_boltzmann * this->blackbodyTemperature));
 }
 
 double BlackbodyPhotonField::getMinimumPhotonEnergy(double z) const {
@@ -203,14 +205,16 @@ double BlackbodyPhotonField::getMinimumPhotonEnergy(double z) const {
 		A = 5.417942e-5 * eV / kelvin;
 		break;
 	default:
+		#ifndef __CUDACC__
 		throw std::runtime_error("Quantile not understood. Please use 0.01 (1%), 0.001 (0.1%) or 0.0001 (0.01%) \n");
+		#endif
 		break;
 	}
 	return A * this -> blackbodyTemperature;
 }
 
 double BlackbodyPhotonField::getMaximumPhotonEnergy(double z) const {
-	double factor = std::max(1., blackbodyTemperature / 2.73);
+	double factor = crstd::max(1., blackbodyTemperature / 2.73);
 	return 0.1 * factor * eV; // T dependent scaling, starting at 0.1 eV as suitable for CMB
 }
 
