@@ -44,10 +44,10 @@ public:
 	void run(Candidate* candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
 	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
 	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
-	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
+	void run(SourceInterface* source, std::size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#ifdef __CUDACC__
 	void copySecondaries(ref_ptr<Candidate> candidate);
-	void cudarun(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
+	void cudarun(SourceInterface* source, std::size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 	#endif
 
 	std::string getDescription() const;

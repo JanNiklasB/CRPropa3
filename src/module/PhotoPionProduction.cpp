@@ -140,7 +140,7 @@ double PhotoPionProduction::nucleonMFP(double gamma, double z, bool onProton) co
 	// scale nucleus energy instead of background photon energy
 	gamma *= (1 + z);
 	if (gamma < tabLorentzPtr[0] or (gamma > tabLorentzPtr[tabLorentzSize-1]))
-		return crstd::numeric_limits<double>::max();
+		return std::numeric_limits<double>::max();
 
 	double rate;
 	if (haveRedshiftDependence)
@@ -174,7 +174,7 @@ void PhotoPionProduction::process(Candidate *candidate) const {
 
 		// find interaction with minimum random distance
 		Random &random = Random::instance();
-		double randDistance = crstd::numeric_limits<double>::max();
+		double randDistance = std::numeric_limits<double>::max();
 		double meanFreePath;
 		double totalRate = 0;
 		bool onProton = true; // interacting particle: proton or neutron
@@ -317,7 +317,7 @@ void PhotoPionProduction::performInteraction(Candidate *candidate, bool onProton
 			break;
 		}
 	}
-	double maxEnergy = *crstd::max_element(&pnEnergy[0], &pnEnergy[pnEnergySize-1]);  // criterion for being declared primary
+	double maxEnergy = *std::max_element(&pnEnergy[0], &pnEnergy[pnEnergySize-1]);  // criterion for being declared primary
 	for (int i = 0; i < pnEnergySize; ++i) {
 		if (pnEnergy[i] == maxEnergy) {  // nucleon is primary particle
 			if (A == 1) {
@@ -445,7 +445,7 @@ SophiaEventOutput PhotoPionProduction::sophiaEvent(bool onProton, double Ein, do
 double PhotoPionProduction::sampleEps(bool onProton, double E, double z) const {
 	// sample eps between epsMin ... epsMax
 	double Ein = E / GeV;
-	double epsMin = crstd::max(photonField -> getMinimumPhotonEnergy(z) / eV, epsMinInteraction(onProton, Ein));
+	double epsMin = std::max(photonField -> getMinimumPhotonEnergy(z) / eV, epsMinInteraction(onProton, Ein));
 	double epsMax = photonField -> getMaximumPhotonEnergy(z) / eV;
 	double pEpsMax = probEpsMax(onProton, Ein, z, epsMin, epsMax);
 
@@ -478,7 +478,7 @@ double PhotoPionProduction::probEpsMax(bool onProton, double Ein, double z, doub
 	double step = 0.;
 	if (sampleLog){
 		// sample in logspace with stepsize that is at max Δlog(E/eV) = 0.01 or otherwise dep. on size of energy range with nrSteps+1 steps log. equidis. spaced
-		step = crstd::min(0.01, crstd::log10(epsMax / epsMin) / nrSteps);
+		step = std::min(0.01, std::log10(epsMax / epsMin) / nrSteps);
 	} else
 		step = (epsMax - epsMin) / nrSteps;
 
@@ -566,8 +566,8 @@ double PhotoPionProduction::crossection(double eps, bool onProton) const {
 		// direct channel
 		if ((eps > 0.1) && (eps < 0.6)) {
 			cross_dir1 = 92.7 * Pl(eps, 0.152, 0.25, 2.0)  // single pion production
-					   + 40. * crstd::exp(-(eps - 0.29) * (eps - 0.29) / 0.002)
-					   - 15. * crstd::exp(-(eps - 0.37) * (eps - 0.37) / 0.002);
+					   + 40. * std::exp(-(eps - 0.29) * (eps - 0.29) / 0.002)
+					   - 15. * std::exp(-(eps - 0.37) * (eps - 0.37) / 0.002);
 		} else {
 			cross_dir1 = 92.7 * Pl(eps, 0.152, 0.25, 2.0);  // single pion production
 		}
@@ -576,7 +576,7 @@ double PhotoPionProduction::crossection(double eps, bool onProton) const {
 	}
 	// fragmentation 2:
 	double cross_frag2 = onProton? 80.3 : 60.2;
-	cross_frag2 *= Ef(eps, 0.5, 0.1) * crstd::pow(s, -0.34);
+	cross_frag2 *= Ef(eps, 0.5, 0.1) * std::pow(s, -0.34);
 	// multipion production/fragmentation 1 cross section
 	double cs_multidiff = 0.;
 	double cs_multi = 0.;
@@ -586,17 +586,17 @@ double PhotoPionProduction::crossection(double eps, bool onProton) const {
 	if (eps > 0.85) {
 		double ss1 = (eps - 0.85) / 0.69;
 		double ss2 = onProton? 29.3 : 26.4;
-		ss2 *= crstd::pow(s, -0.34) + 59.3 * crstd::pow(s, 0.095);
-		cs_multidiff = (1. - crstd::exp(-ss1)) * ss2;
+		ss2 *= std::pow(s, -0.34) + 59.3 * std::pow(s, 0.095);
+		cs_multidiff = (1. - std::exp(-ss1)) * ss2;
 		cs_multi = 0.89 * cs_multidiff;
 		// diffractive scattering:
 		cross_diffr1 = 0.099 * cs_multidiff;
 		cross_diffr2 = 0.011 * cs_multidiff;
 		cross_diffr = 0.11 * cs_multidiff;
 		// **************************************
-		ss1 = crstd::pow(eps - 0.85, 0.75) / 0.64;
-		ss2 = 74.1 * crstd::pow(eps, -0.44) + 62. * crstd::pow(s, 0.08);
-		double cs_tmp = 0.96 * (1. - crstd::exp(-ss1)) * ss2;
+		ss1 = std::pow(eps - 0.85, 0.75) / 0.64;
+		ss2 = 74.1 * std::pow(eps, -0.44) + 62. * std::pow(s, 0.08);
+		double cs_tmp = 0.96 * (1. - std::exp(-ss1)) * ss2;
 		cross_diffr1 = 0.14 * cs_tmp;
 		cross_diffr2 = 0.013 * cs_tmp;
 		double cs_delta = cross_frag2 - (cross_diffr1 + cross_diffr2 - cross_diffr);
@@ -618,8 +618,8 @@ double PhotoPionProduction::Pl(double eps, double epsTh, double epsMax, double a
 	if (epsTh > eps)
 		return 0.;
 	const double a = alpha * epsMax / epsTh;
-	const double prod1 = crstd::pow((eps - epsTh) / (epsMax - epsTh), a - alpha);
-	const double prod2 = crstd::pow(eps / epsMax, -a);
+	const double prod1 = std::pow((eps - epsTh) / (epsMax - epsTh), a - alpha);
+	const double prod2 = std::pow(eps / epsMax, -a);
 	return prod1 * prod2;
 }
 

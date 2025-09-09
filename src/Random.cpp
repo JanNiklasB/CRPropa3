@@ -182,7 +182,7 @@ Vector3d Random::randVectorLamberts(const Vector3d &normalVector) {
 	Vector3d vLambertz = randVectorLamberts();
 	// find rotation axis that rotates the z-axis to the normalVector of the surface element
 	Vector3d axis = normalVector.cross(Vector3d(0, 0, 1));
-	if (axis.getR() < crstd::numeric_limits<double>::epsilon()) {
+	if (axis.getR() < std::numeric_limits<double>::epsilon()) {
 		axis = Vector3d(0, 0, 1);
 	}
 	double angle = normalVector.getAngleTo(Vector3d(0, 0, 1));
@@ -202,7 +202,7 @@ double Random::randPowerLaw(double index, double min, double max) {
 	}
 	#endif
 	//check for index -1!
-	if ((crstd::abs(index + 1.0)) < crstd::numeric_limits<double>::epsilon()) {
+	if ((std::abs(index + 1.0)) < std::numeric_limits<double>::epsilon()) {
 		double part1 = log(max);
 		double part2 = log(min);
 		return exp((part1 - part2) * rand() + part2);
@@ -229,7 +229,7 @@ double Random::randBrokenPowerLaw(double index1, double index2,
 	} else {
 		double intPL1;
 		// check if index1 = -1
-		if ((crstd::abs(index1 + 1.0)) < crstd::numeric_limits<double>::epsilon()) {
+		if ((std::abs(index1 + 1.0)) < std::numeric_limits<double>::epsilon()) {
 			intPL1 = log(breakpoint / min);
 		} else {
 			intPL1 = (pow(breakpoint, index1 + 1) - pow(min, index1 + 1))
@@ -237,7 +237,7 @@ double Random::randBrokenPowerLaw(double index1, double index2,
 		}
 		double intPL2;
 		// check if index2 = -1
-		if ((crstd::abs(index2 + 1.0)) < crstd::numeric_limits<double>::epsilon()) {
+		if ((std::abs(index2 + 1.0)) < std::numeric_limits<double>::epsilon()) {
 			intPL2 = log(max / breakpoint) * pow(breakpoint, index1 - index2);
 		} else {
 			intPL2 = (pow(max, index2 + 1) - pow(breakpoint, index2 + 1))
@@ -254,7 +254,7 @@ double Random::randExponential() {
 	double dum;
 	do {
 		dum = rand();
-	} while (dum < crstd::numeric_limits<double>::epsilon());
+	} while (dum < std::numeric_limits<double>::epsilon());
 	return -1.0 * log(dum);
 }
 
@@ -423,13 +423,13 @@ uint32_t Random::hash(time_t t, clock_t c) {
 	uint32_t h1 = 0;
 	unsigned char *p = (unsigned char *) &t;
 	for (size_t i = 0; i < sizeof(t); ++i) {
-		h1 *= crstd::numeric_limits<unsigned char>::max() + 2U;
+		h1 *= std::numeric_limits<unsigned char>::max() + 2U;
 		h1 += p[i];
 	}
 	uint32_t h2 = 0;
 	p = (unsigned char *) &c;
 	for (size_t j = 0; j < sizeof(c); ++j) {
-		h2 *= crstd::numeric_limits<unsigned char>::max() + 2U;
+		h2 *= std::numeric_limits<unsigned char>::max() + 2U;
 		h2 += p[j];
 	}
 	return (h1 + differ++) ^ h2;

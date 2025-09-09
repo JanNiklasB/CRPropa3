@@ -119,7 +119,7 @@ public:
 
 	/// magnitude (2-norm) of the vector
 	CUDA_CALLABLE_MEMBER T getR() const {
-		return crstd::sqrt(x * x + y * y + z * z);
+		return std::sqrt(x * x + y * y + z * z);
 	}
 
 	/// square of magnitude of the vector
@@ -129,16 +129,16 @@ public:
 
 	/// return the azimuth angle
 	CUDA_CALLABLE_MEMBER T getPhi() const {
-		T eps = crstd::numeric_limits < T > ::min();
+		T eps = std::numeric_limits < T > ::min();
 		if ((fabs(x) < eps) && (fabs(y) < eps))
 			return 0.0;
 		else
-			return crstd::atan2(y, x);
+			return std::atan2(y, x);
 	}
 
 	/// return the zenith angle
 	CUDA_CALLABLE_MEMBER T getTheta() const {
-		T eps = crstd::numeric_limits < T > ::min();
+		T eps = std::numeric_limits < T > ::min();
 		if ((fabs(x) < eps) && (fabs(y) < eps) && (fabs(z) < eps))
 			return 0.0;
 		else
@@ -191,7 +191,7 @@ public:
 	/// 0 if the second vector has 0 magnitude
 	CUDA_CALLABLE_MEMBER Vector3<T> getParallelTo(const Vector3<T> &v) const {
 		T vmag = v.getR();
-		if (vmag == crstd::numeric_limits < T > ::min())
+		if (vmag == std::numeric_limits < T > ::min())
 			return Vector3<T>(0.);
 		return v * dot(v) / vmag;
 	}
@@ -199,7 +199,7 @@ public:
 	/// return the component perpendicular to a second vector
 	/// 0 if the second vector has 0 magnitude
 	CUDA_CALLABLE_MEMBER Vector3<T> getPerpendicularTo(const Vector3<T> &v) const {
-		if (v.getR() == crstd::numeric_limits < T > ::min())
+		if (v.getR() == std::numeric_limits < T > ::min())
 			return Vector3<T>(0.);
 		return (*this) - getParallelTo(v);
 	}
@@ -223,40 +223,40 @@ public:
 	/// return vector with values limited to the range [lower, upper]
 	CUDA_CALLABLE_MEMBER Vector3<T> clip(T lower, T upper) const {
 		Vector3<T> out;
-		out.x = crstd::max(lower, crstd::min(x, upper));
-		out.y = crstd::max(lower, crstd::min(y, upper));
-		out.z = crstd::max(lower, crstd::min(z, upper));
+		out.x = std::max(lower, std::min(x, upper));
+		out.y = std::max(lower, std::min(y, upper));
+		out.z = std::max(lower, std::min(z, upper));
 		return out;
 	}
 
 	/// return vector with absolute values
 	CUDA_CALLABLE_MEMBER Vector3<T> abs() const {
-		return Vector3<T>(crstd::abs(x), crstd::abs(y), crstd::abs(z));
+		return Vector3<T>(std::abs(x), std::abs(y), std::abs(z));
 	}
 
 	/// return vector with floored values
 	CUDA_CALLABLE_MEMBER Vector3<T> floor() const {
-		return Vector3<T>(crstd::floor(x), crstd::floor(y), crstd::floor(z));
+		return Vector3<T>(std::floor(x), std::floor(y), std::floor(z));
 	}
 
 	/// return vector with ceiled values
 	CUDA_CALLABLE_MEMBER Vector3<T> ceil() const {
-		return Vector3<T>(crstd::ceil(x), crstd::ceil(y), crstd::ceil(z));
+		return Vector3<T>(std::ceil(x), std::ceil(y), std::ceil(z));
 	}
 
 	/// return vector with round values
 	CUDA_CALLABLE_MEMBER Vector3<T> round() const {
-		return Vector3<T>(crstd::round(x), crstd::round(y), crstd::round(z));
+		return Vector3<T>(std::round(x), std::round(y), std::round(z));
 	}
 
 	/// minimum element
 	CUDA_CALLABLE_MEMBER T min() const {
-		return crstd::min(x, crstd::min(y, z));
+		return std::min(x, std::min(y, z));
 	}
 
 	/// maximum element
 	CUDA_CALLABLE_MEMBER T max() const {
-		return crstd::max(x, crstd::max(y, z));
+		return std::max(x, std::max(y, z));
 	}
 
 	/// dot product

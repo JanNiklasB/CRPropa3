@@ -38,7 +38,7 @@ class SimpleTurbulenceSpectrum : public TurbulenceSpectrum {
 	General energy spectrum for synthetic turbulence models
 	*/
 	double energySpectrum(double k) const {
-		return crstd::pow(k, -getSindex() - 2);
+		return std::pow(k, -getSindex() - 2);
 	}
 
 	/**

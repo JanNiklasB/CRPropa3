@@ -187,7 +187,7 @@ BlackbodyPhotonField::BlackbodyPhotonField(std::string fieldName, double blackbo
 }
 
 double BlackbodyPhotonField::getPhotonDensity(double Ephoton, double z) const {
-	return 8 * M_PI * pow_integer<3>(Ephoton / (h_planck * c_light)) / crstd::expm1(Ephoton / (k_boltzmann * this->blackbodyTemperature));
+	return 8 * M_PI * pow_integer<3>(Ephoton / (h_planck * c_light)) / std::expm1(Ephoton / (k_boltzmann * this->blackbodyTemperature));
 }
 
 double BlackbodyPhotonField::getMinimumPhotonEnergy(double z) const {
@@ -214,7 +214,7 @@ double BlackbodyPhotonField::getMinimumPhotonEnergy(double z) const {
 }
 
 double BlackbodyPhotonField::getMaximumPhotonEnergy(double z) const {
-	double factor = crstd::max(1., blackbodyTemperature / 2.73);
+	double factor = std::max(1., blackbodyTemperature / 2.73);
 	return 0.1 * factor * eV; // T dependent scaling, starting at 0.1 eV as suitable for CMB
 }
 

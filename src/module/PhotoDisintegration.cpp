@@ -309,7 +309,7 @@ void PhotoDisintegration::performInteraction(Candidate *candidate, int channel) 
 	int l = round((lg - lgmin) / (lgmax - lgmin) * (nlg - 1));  // index of closest tabulation point
 	int key = Z*1e6 + (A-Z)*1e4 + (Z+dZ)*1e2 + (A+dA) - (Z+dZ);
 
-	int idx = crstd::find(&pdPhotonkeys[0], &pdPhotonkeys[pdPhotonSize-1], key) - &pdPhotonkeys[0];
+	int idx = std::find(&pdPhotonkeys[0], &pdPhotonkeys[pdPhotonSize-1], key) - &pdPhotonkeys[0];
 
 	for (int i = 0; i < pdPhotonInnerSize[idx]; i++) {
 		// check for random emission

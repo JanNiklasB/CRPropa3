@@ -2,6 +2,7 @@
 #ifndef CRPROPA_H
 #define CRPROPA_H
 
+#include "crpropa/__CudaDefines.h"
 #include "crpropa/Candidate.h"
 #include "crpropa/Common.h"
 #include "crpropa/Cosmology.h"

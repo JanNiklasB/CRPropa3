@@ -65,7 +65,7 @@ public:
  */
 class EmissionMap : public Referenced {
 public:	
-	typedef crstd::pair<int, size_t> key_t;
+	typedef std::pair<int, size_t> key_t;
 	typedef std::map<key_t, ref_ptr<CylindricalProjectionMap> > map_t;
 
 	EmissionMap();

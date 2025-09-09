@@ -350,9 +350,9 @@ Vector3d KST24Field::get_logspiral(const Vector3d pos_kpc, const double B_gauss,
 	double r_scale = 5;
 	double L1_at_r_scale, arc_r_plane, arc_r_z;
 	L1_at_r_scale = r_scale/sin_pitch;
-	arc_r_plane = crstd::max(arc_radius2_kpc, arc_radius2_kpc*(1 + (L1 - L1_at_r_scale)*arc_div_rad));
+	arc_r_plane = std::max(arc_radius2_kpc, arc_radius2_kpc*(1 + (L1 - L1_at_r_scale)*arc_div_rad));
 	// arc_r_plane = arc_radius2_kpc;
-	arc_r_z     = crstd::max(arc_radius1_kpc, arc_radius1_kpc*(1 + (L1 - L1_at_r_scale)*arc_div_rad));
+	arc_r_z     = std::max(arc_radius1_kpc, arc_radius1_kpc*(1 + (L1 - L1_at_r_scale)*arc_div_rad));
 	if (arc_r_plane > 1.2)
 		arc_r_plane = 1.2;
 	if (arc_r_z > 1.2)

@@ -22,7 +22,7 @@ Vector3d CMZField::BPol(const Vector3d& position,const Vector3d& mid, double B1,
     // cylindircal coordinates
     Vector3d pos = position - mid;
     double r = sqrt(pos.x*pos.x + pos.y*pos.y);
-    double phi = crstd::atan2(pos.y, pos.x);
+    double phi = std::atan2(pos.y, pos.x);
 
     double r1 = 1/(1+a*pos.z*pos.z);
     double Bs = B1*exp(-r1*r/L);
@@ -40,7 +40,7 @@ Vector3d CMZField::BAz(const Vector3d& position, const Vector3d& mid, double B1,
     // cylindrical coordinates
     Vector3d pos = position - mid;
     double r = sqrt(pos.x*pos.x + pos.y*pos.y);
-    double phi = crstd::atan2(pos.y,pos.x);
+    double phi = std::atan2(pos.y,pos.x);
 
     Vector3d bVec(0.);
     double Hc = R/sqrt(log(2));
@@ -185,7 +185,7 @@ Vector3d CMZField::getMCField(const Vector3d& pos) const {//Field in molecular c
     double Hc = R/sqrt(log(2));
     double r = sqrt(x*x + y*y);
     double r1 = R/10;
-    double phi= crstd::atan2(y,x);
+    double phi= std::atan2(y,x);
     double Bphi;
 
     if(r>r1){

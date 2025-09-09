@@ -319,8 +319,8 @@ UF23Field::getTwistedHaloField(const double x, const double y, const double z)
   const
 {
   const double r = sqrt(x*x + y*y);
-  const double cosPhi = r > crstd::numeric_limits<double>::min() ? x / r : 1;
-  const double sinPhi = r > crstd::numeric_limits<double>::min() ? y / r : 0;
+  const double cosPhi = r > std::numeric_limits<double>::min() ? x / r : 1;
+  const double sinPhi = r > std::numeric_limits<double>::min() ? y / r : 0;
 
   const Vector3d bXCart = getPoloidalHaloField(x, y, z);
   const double bXCartTmp[3] = {bXCart.x, bXCart.y, bXCart.z};
@@ -341,7 +341,7 @@ UF23Field::getTwistedHaloField(const double x, const double y, const double z)
     // Eq.(43)
     const double fr = 1 - exp(-r/r0);
     // Eq.(44)
-    const double t0 = exp(2*crstd::abs(z)/z0);
+    const double t0 = exp(2*std::abs(z)/z0);
     const double gz = 2 / (1 + t0);
 
     // Eq. (46)
@@ -364,7 +364,7 @@ UF23Field::getToroidalHaloField(const double x, const double y, const double z)
 {
   const double r2 = x*x + y*y;
   const double r = sqrt(r2);
-  const double absZ = crstd::abs(z);
+  const double absZ = std::abs(z);
 
   const double b0 = z >= 0 ? fToroidalBN : fToroidalBS;
   const double rh = fToroidalR;
@@ -377,8 +377,8 @@ UF23Field::getToroidalHaloField(const double x, const double y, const double z)
   const double bPhi = b0 * (1. - sigmoidR) * sigmoidZ * exp(-absZ/z0);
 
   const double bCyl[3] = {0, bPhi, 0};
-  const double cosPhi = r > crstd::numeric_limits<double>::min() ? x / r : 1;
-  const double sinPhi = r > crstd::numeric_limits<double>::min() ? y / r : 0;
+  const double cosPhi = r > std::numeric_limits<double>::min() ? x / r : 1;
+  const double sinPhi = r > std::numeric_limits<double>::min() ? y / r : 0;
   return uf23::CylToCart(bCyl, cosPhi, sinPhi);
 }
 
@@ -392,7 +392,7 @@ UF23Field::getPoloidalHaloField(const double x, const double y, const double z)
   const double c = pow(fPoloidalA/fPoloidalZ, fPoloidalP);
   const double a0p = pow(fPoloidalA, fPoloidalP);
   const double rp = pow(r, fPoloidalP);
-  const double abszp = pow(crstd::abs(z), fPoloidalP);
+  const double abszp = pow(std::abs(z), fPoloidalP);
   const double cabszp = c*abszp;
 
   /*
@@ -407,7 +407,7 @@ UF23Field::getPoloidalHaloField(const double x, const double y, const double z)
 
   double a = 0;
   if (ap < 0) {
-    if (r > crstd::numeric_limits<double>::min()) {
+    if (r > std::numeric_limits<double>::min()) {
       #ifndef __CUDACC__
       // this should never happen
       throw std::runtime_error("ap = " + std::to_string(ap));
@@ -434,12 +434,12 @@ UF23Field::getPoloidalHaloField(const double x, const double y, const double z)
   // Eq.(35) for p=n
   const double signZ = z < 0 ? -1 : 1;
   const double Br =
-    Bzz * c * a / rOverA * signZ * pow(crstd::abs(z), fPoloidalP - 1) / t1;
+    Bzz * c * a / rOverA * signZ * pow(std::abs(z), fPoloidalP - 1) / t1;
 
   // Eq.(36) for p=n
   const double Bz = Bzz * pow(rOverA, fPoloidalP-2) * (ap + a0p) / t1;
 
-  if (r < crstd::numeric_limits<double>::min())
+  if (r < std::numeric_limits<double>::min())
     return Vector3d(0, 0, Bz);
   else {
     const double bCylX[3] = {Br, 0 , Bz};
@@ -459,7 +459,7 @@ UF23Field::getSpurField(const double x, const double y, const double z)
   // cylindrical coordinates
   const double r2 = x*x + y*y;
   const double r = sqrt(r2);
-  if (r < crstd::numeric_limits<double>::min())
+  if (r < std::numeric_limits<double>::min())
     return Vector3d(0, 0, 0);
 
   double phi = atan2(y, x);
@@ -472,8 +472,8 @@ UF23Field::getSpurField(const double x, const double y, const double z)
   for (int i = -1; i <= 1; ++i) {
     const double pphi = phi - phiRef + i*uf23::kTwoPi;
     const double rr = rRef*exp(pphi * fTanPitch);
-    if (bestDist < 0 || crstd::abs(r-rr) < bestDist) {
-      bestDist =  crstd::abs(r-rr);
+    if (bestDist < 0 || std::abs(r-rr) < bestDist) {
+      bestDist =  std::abs(r-rr);
       iBest = i;
     }
   }
@@ -490,10 +490,10 @@ UF23Field::getSpurField(const double x, const double y, const double z)
     const double phiC = fSpurCenter;
     const double deltaPhiC = uf23::DeltaPhi(phiC, phi);
     const double lC = fSpurLength;
-    const double gS = 1 - uf23::Sigmoid(crstd::abs(deltaPhiC), lC, wS);
+    const double gS = 1 - uf23::Sigmoid(std::abs(deltaPhiC), lC, wS);
 
     // Eq. (13)
-    const double hd = 1 - uf23::Sigmoid(crstd::abs(z), fDiskH, fDiskW);
+    const double hd = 1 - uf23::Sigmoid(std::abs(z), fDiskH, fDiskW);
 
     // Eq. (17)
     const double bS = rRef/r * B * hd * gS;
@@ -528,7 +528,7 @@ UF23Field::getSpiralField(const double x, const double y, const double z)
   const double phi = atan2(y, x);
 
   // Eq.(13)
-  const double hdz = 1 - uf23::Sigmoid(crstd::abs(z), fDiskH, fDiskW);
+  const double hdz = 1 - uf23::Sigmoid(std::abs(z), fDiskH, fDiskW);
 
   // Eq.(14) times rRef divided by r
   const double rFacI = uf23::Sigmoid(r, rInner, wInner);

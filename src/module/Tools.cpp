@@ -42,11 +42,11 @@ void PerformanceModule::process(Candidate *candidate) const {
 		double end = Clock::getInstance().getMillisecond();
 		times[i] = end - start;
 		#else
-		auto start = crstd::chrono::high_resolution_clock::now();
+		auto start = std::chrono::high_resolution_clock::now();
 		m.module->process(candidate);
-		auto end = crstd::chrono::high_resolution_clock::now();
-		crstd::chrono::duration time = end - start;
-		times[i] = crstd::chrono::duration_cast<crstd::chrono::milliseconds>(time).count();
+		auto end = std::chrono::high_resolution_clock::now();
+		std::chrono::duration time = end - start;
+		times[i] = std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
 		#endif
 	}
 
@@ -126,7 +126,7 @@ void ParticleFilter::process(Candidate* candidate) const {
 	#ifndef __CUDACC__
 	if (ids.find(candidate->current.getId()) == ids.end())
 	#else
-	if (*crstd::find(&idsPtr[0], &idsPtr[idsSize-1], candidate->current.getId()) == idsPtr[idsSize-1])
+	if (*std::find(&idsPtr[0], &idsPtr[idsSize-1], candidate->current.getId()) == idsPtr[idsSize-1])
 	#endif
 		reject(candidate);
 	else

@@ -199,7 +199,7 @@ class ICSSecondariesEnergyDistribution {
 			double dlx = -log(x0) / Nrer;
 			double binWidth = x0 * (exp(j * dlx) - exp((j-1) * dlx));
 			double Ep = (x0 * exp((j-1) * dlx) + binWidth) * Ee;
-			return crstd::min(Ee, Ep); // prevent Ep > Ee from numerical inaccuracies
+			return std::min(Ee, Ep); // prevent Ep > Ee from numerical inaccuracies
 		}
 };
 

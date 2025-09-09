@@ -102,15 +102,15 @@ namespace crpropa {
 						break;
 					else {
 						newStep = step * 0.95 * pow(r, -0.2);
-						newStep = crstd::max(newStep, 0.1 * step); // limit step size decrease
-						newStep = crstd::max(newStep, minStep); // limit step size to minStep
+						newStep = std::max(newStep, 0.1 * step); // limit step size decrease
+						newStep = std::max(newStep, minStep); // limit step size to minStep
 						step = newStep;
 					}
 				} else {  // small direction error relative to tolerance, try to increase step size
 					if (step != maxStep) {  // only update once if maximum step size yet not reached
 						newStep = step * 0.95 * pow(r, -0.2);
-						newStep = crstd::min(newStep, 5 * step); // limit step size increase
-						newStep = crstd::min(newStep, maxStep); // limit step size to maxStep
+						newStep = std::min(newStep, 5 * step); // limit step size increase
+						newStep = std::min(newStep, maxStep); // limit step size to maxStep
 					}
 					break;
 				}

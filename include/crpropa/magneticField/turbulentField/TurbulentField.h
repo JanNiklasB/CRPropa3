@@ -33,9 +33,9 @@ class TurbulenceSpectrum : public Referenced {
 	Normalization for the below defined Lc
 	*/
 	double spectrumNormalization() const {
-		return crstd::tgamma((sIndex + qIndex) / 2.0) /
-		       (2.0 * crstd::tgamma((sIndex - 1) / 2.0) *
-		        crstd::tgamma((qIndex + 1) / 2.0));
+		return std::tgamma((sIndex + qIndex) / 2.0) /
+		       (2.0 * std::tgamma((sIndex - 1) / 2.0) *
+		        std::tgamma((qIndex + 1) / 2.0));
 	}
 
   public:
@@ -75,8 +75,8 @@ class TurbulenceSpectrum : public Referenced {
 	*/
 	virtual double energySpectrum(double k) const {
 		double kHat = k * lBendover;
-		return crstd::pow(kHat, qIndex) /
-				       crstd::pow(1.0 + kHat * kHat,
+		return std::pow(kHat, qIndex) /
+				       std::pow(1.0 + kHat * kHat,
 			                (sIndex + qIndex) / 2.0 + 1.0);
 	}
 
