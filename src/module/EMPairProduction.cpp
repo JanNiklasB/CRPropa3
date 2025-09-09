@@ -232,7 +232,7 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
 	double s = lo + random.rand() * (hi - lo);
 
 	// sample electron / positron energy
-	static PPSecondariesEnergyDistribution interpolation;
+	PPSecondariesEnergyDistribution interpolation;
 	double Ee = interpolation.sample(E, s);
 	double Ep = E - Ee;
 	double f = Ep / E;

@@ -9,7 +9,7 @@
 
 namespace crpropa {
 
-static const double mec2 = mass_electron * c_squared;
+CUDA_CONSTANT static const double mec2 = mass_electron * c_squared;
 
 EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons, double thinning, double limit) {
 	setPhotonField(photonField);
@@ -219,7 +219,7 @@ void EMInverseComptonScattering::performInteraction(Candidate *candidate) const 
 	double s = s_kin + mec2 * mec2;
 
 	// sample electron energy after scattering
-	static ICSSecondariesEnergyDistribution distribution;
+	ICSSecondariesEnergyDistribution distribution;
 	double Enew = distribution.sample(E, s);
 
 	// add up-scattered photon

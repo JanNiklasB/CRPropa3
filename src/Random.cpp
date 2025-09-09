@@ -518,7 +518,7 @@ std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 }
 
 #else
-static CUDA_CONSTANT Random _random;
+static Random _random;
 Random &Random::instance() {
 	return _random;
 }

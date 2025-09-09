@@ -202,8 +202,8 @@ public:
 	friend std::ostream& operator<<( std::ostream& os, const Random& mtrand );
 	friend std::istream& operator>>( std::istream& is, Random& mtrand );
 
-	CUDA_CALLABLE_MEMBER static Random &instance();
-	CUDA_CALLABLE_MEMBER static void seedThreads(const uint32_t oneSeed);
+	static Random &instance();
+	static void seedThreads(const uint32_t oneSeed);
 	static std::vector< std::vector<uint32_t> > getSeedThreads();
 
 protected:
