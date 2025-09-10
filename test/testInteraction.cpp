@@ -194,7 +194,7 @@ TEST(NuclearDecay, scandium44) {
 	EXPECT_DOUBLE_EQ(gamma, c.current.getLorentzFactor());
 	
 	// expect at least two secondaries: positron + electron neutrino
-	EXPECT_GE(c.secondaries.size(), 2);
+	EXPECT_GE(c.secondariesSize, 2);
 }
 
 TEST(NuclearDecay, lithium4) {
@@ -209,7 +209,7 @@ TEST(NuclearDecay, lithium4) {
 	EXPECT_EQ(nucleusId(3, 2), c.current.getId());
 
 	// expected secondary: proton
-	EXPECT_EQ(1, c.secondaries.size());
+	EXPECT_EQ(1, c.secondariesSize);
 	Candidate c1 = *c.secondaries[0];
 	EXPECT_EQ(nucleusId(1, 1), c1.current.getId());
 	EXPECT_EQ(1 * EeV, c1.current.getEnergy());
@@ -283,7 +283,7 @@ TEST(NuclearDecay, secondaries) {
 	size_t nNeutrinos = 0;
 	size_t nPhotons = 0;
 
-	for(size_t i = 0; i < c.secondaries.size(); ++i) {
+	for(size_t i = 0; i < c.secondariesSize; ++i) {
 		int id = (*c.secondaries[i]).current.getId();
 		if (id == 22) nPhotons++;
 		if (id == 11) nElectrons++;
@@ -364,7 +364,7 @@ TEST(PhotoDisintegration, carbon) {
 
 	EXPECT_TRUE(c.current.getEnergy() < 100 * EeV);
 	// energy loss
-	EXPECT_TRUE(c.secondaries.size() > 0);
+	EXPECT_TRUE(c.secondariesSize > 0);
 	// secondaries produced
 
 	double E = c.current.getEnergy();
@@ -372,7 +372,7 @@ TEST(PhotoDisintegration, carbon) {
 	int A = massNumber(id);
 	int Z = chargeNumber(id);
 
-	for (int i = 0; i < c.secondaries.size(); i++) {
+	for (int i = 0; i < c.secondariesSize; i++) {
 		E += (*c.secondaries[i]).current.getEnergy();
 		id = (*c.secondaries[i]).current.getId();
 		A += massNumber(id);
@@ -402,14 +402,14 @@ TEST(PhotoDisintegration, iron) {
 	EXPECT_TRUE(c.current.getEnergy() < 200 * EeV);
 	
 	// expect secondaries produced
-	EXPECT_TRUE(c.secondaries.size() > 0);
+	EXPECT_TRUE(c.secondariesSize > 0);
 
 	double E = c.current.getEnergy();
 	id = c.current.getId();
 	int A = massNumber(id);
 	int Z = chargeNumber(id);
 
-	for (int i = 0; i < c.secondaries.size(); i++) {
+	for (int i = 0; i < c.secondariesSize; i++) {
 		E += (*c.secondaries[i]).current.getEnergy();
 		id = (*c.secondaries[i]).current.getId();
 		A += massNumber(id);
@@ -530,9 +530,9 @@ TEST(ElasticScattering, secondaries) {
 	c.setCurrentStep(400 * Mpc);
 	scattering.process(&c);
 
-	EXPECT_GT(c.secondaries.size(), 0);
+	EXPECT_GT(c.secondariesSize, 0);
 
-	for (int i = 0; i < c.secondaries.size(); i++) {
+	for (int i = 0; i < c.secondariesSize; i++) {
 		int id = (*c.secondaries[i]).current.getId();
 		EXPECT_EQ(id, 22);
 		double energy = (*c.secondaries[i]).current.getEnergy();
@@ -586,7 +586,7 @@ TEST(PhotoPionProduction, proton) {
 	EXPECT_EQ(1, massNumber(c.current.getId()));
 
 	// expect no (nucleonic) secondaries
-	EXPECT_EQ(0, c.secondaries.size());
+	EXPECT_EQ(0, c.secondariesSize);
 }
 
 TEST(PhotoPionProduction, helium) {
@@ -602,7 +602,7 @@ TEST(PhotoPionProduction, helium) {
 	EXPECT_LT(c.current.getEnergy(), 400. * EeV);
 	int id = c.current.getId();
 	EXPECT_TRUE(massNumber(id) < 4);
-	EXPECT_TRUE(c.secondaries.size() > 0);
+	EXPECT_TRUE(c.secondariesSize > 0);
 }
 
 TEST(PhotoPionProduction, thisIsNotNucleonic) {
@@ -637,7 +637,7 @@ TEST(PhotoPionProduction, secondaries) {
 	c.setCurrentStep(1000 * Mpc);
 	ppp.process(&c);
 	// there should be secondaries
-	EXPECT_GT(c.secondaries.size(), 1);
+	EXPECT_GT(c.secondariesSize, 1);
 }
 
 TEST(PhotoPionProduction, sampling) {
@@ -771,11 +771,11 @@ TEST(EMPairProduction, secondaries) {
 				continue;
 			
 			// expect 2 secondaries
-			EXPECT_EQ(c.secondaries.size(), 2);
+			EXPECT_EQ(c.secondariesSize, 2);
 
 			// expect electron / positron with energies 0 < E < Ephoton
 			double Etot = 0;
-			for (int j = 0; j < c.secondaries.size(); j++) {
+			for (int j = 0; j < c.secondariesSize; j++) {
 				Candidate s = *c.secondaries[j];
 				EXPECT_EQ(abs(s.current.getId()), 11);
 				EXPECT_GT(s.current.getEnergy(), 0);
@@ -877,11 +877,11 @@ TEST(EMDoublePairProduction, secondaries) {
 				continue;
 			
 			// expect 2 secondaries (only one pair is considered)
-			EXPECT_EQ(c.secondaries.size(), 2);
+			EXPECT_EQ(c.secondariesSize, 2);
 
 			// expect electron / positron with energies 0 < E < Ephoton
 			double Etot = 0;
-			for (int j = 0; j < c.secondaries.size(); j++) {
+			for (int j = 0; j < c.secondariesSize; j++) {
 				Candidate s = *c.secondaries[j];
 				EXPECT_EQ(abs(s.current.getId()), 11);
 				EXPECT_GT(s.current.getEnergy(), 0);
@@ -988,7 +988,7 @@ TEST(EMTripletPairProduction, secondaries) {
 			double Etot = c.current.getEnergy();
 
 			// expect electron / positron with energies 0 < E < Ephoton
-			for (int j = 0; j < c.secondaries.size(); j++) {
+			for (int j = 0; j < c.secondariesSize; j++) {
 				Candidate s = *c.secondaries[j];
 				EXPECT_EQ(abs(s.current.getId()), 11);
 				EXPECT_GT(s.current.getEnergy(), 0);
@@ -1100,7 +1100,7 @@ TEST(EMInverseComptonScattering, secondaries) {
 
 
 			double Etot = c.current.getEnergy();
-			for (int j = 0; j < c.secondaries.size(); j++) {
+			for (int j = 0; j < c.secondariesSize; j++) {
 				s = *c.secondaries[j];
 				Etot += s.current.getEnergy();
 			}
@@ -1302,14 +1302,14 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
 
 	sync.process(&c);
-	EXPECT_TRUE(c.secondaries.size() > 0);	// must have secondaries
+	EXPECT_TRUE(c.secondariesSize > 0);	// must have secondaries
 
 	// check avg energy of the secondary photons 
 	double Esec = 0; 
-	for (size_t i = 0; i < c.secondaries.size(); i++) {
+	for (size_t i = 0; i < c.secondariesSize; i++) {
 		Esec += c.secondaries[i] -> current.getEnergy();
 	}
-	Esec /= c.secondaries.size();
+	Esec /= c.secondariesSize;
 
 	EXPECT_NEAR(Esec, Ecrit, Ecrit);
 }

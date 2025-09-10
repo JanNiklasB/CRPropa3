@@ -447,6 +447,14 @@ add_library(crpropa SHARED
 target_link_libraries(crpropa ${CRPROPA_EXTRA_LIBRARIES})
 set_target_properties(crpropa PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+if(ENABLE_CUDA)
+  add_executable(CudaTests CudaTest.cu)
+  target_link_libraries(CudaTests crpropa)
+  set_target_properties(CudaTests PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+else()
+  add_executable(CudaTests CudaTest.cpp)
+  target_link_libraries(CudaTests crpropa)
+endif(ENABLE_CUDA)
 
 #------------------------------------------------------------------
 # Doxygen ; xml data is used for sphinx site and python docstrings
