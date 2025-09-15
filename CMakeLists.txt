@@ -1,9 +1,22 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.18)
 
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
 
-set(CMAKE_CXX_STANDARD 11)
+find_package(CUDAToolkit)
+
+if(CUDAToolkit_FOUND)
+  option(ENABLE_CUDA "Enables the usage of cuda support functions, requires a available CUDA GPU" OFF)
+  if(ENABLE_CUDA)
+    project(CRPropa LANGUAGES Fortran C CXX CUDA)
+    add_definitions(-DHAVE_CUDA)
+  endif(ENABLE_CUDA)
+endif(CUDAToolkit_FOUND)
+
+# Disables warnings during compiling (only errors)
+add_definitions(-w)
+
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 set(CRPROPA_EXTRA_SOURCES)
@@ -198,6 +211,9 @@ if(ENABLE_OPENMP)
   if(OPENMP_FOUND)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    if(ENABLE_CUDA)
+      set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} ${OpenMP_CUDA_FLAGS}")
+    endif(ENABLE_CUDA)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
   endif(OPENMP_FOUND)
 endif(ENABLE_OPENMP)
@@ -341,6 +357,18 @@ file(GLOB_RECURSE CRPROPA_INCLUDES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/
 set(CRPROPA_EXTRA_INCLUDES "${CRPROPA_EXTRA_INCLUDES}" CACHE STRING "The include paths of the extra libraries that are needed." FORCE)
 mark_as_advanced(CRPROPA_EXTRA_INCLUDES)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
+
+if(ENABLE_CUDA)
+  # Sets files that should be compiled with NVCC instead if cuda is enabled
+  file(GLOB_RECURSE CRPROPA_SRCFILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} src/*.cpp)
+  set_source_files_properties(
+    ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
+    ${CRPROPA_SRCFILES}
+    
+    PROPERTIES 
+    LANGUAGE CUDA
+  )
+endif(ENABLE_CUDA)
 
 add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp

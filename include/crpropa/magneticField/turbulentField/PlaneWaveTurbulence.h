@@ -4,6 +4,12 @@
 #include "crpropa/Grid.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 #include <vector>
+#include <memory>
+
+#ifdef __CUDACC__
+#include "cuda_runtime.h"
+#include "thrust/device_vector.h"
+#endif
 
 namespace crpropa {
 /**
@@ -92,13 +98,15 @@ class PlaneWaveTurbulence : public TurbulentField {
   private:
 	int Nm;
 
-	std::vector<Vector3d> xi;
-	std::vector<Vector3d> kappa;
-	std::vector<double> phi;
-	std::vector<double> costheta;
-	std::vector<double> beta;
-	std::vector<double> Ak;
-	std::vector<double> k;
+	#ifndef __CUDACC__
+	std::vector<Vector3d> xi, kappa;
+	std::vector<double> phi, costheta, beta, Ak, k;
+	#else
+	thrust::device_vector<Vector3d> xi, kappa;
+	mutable thrust::device_vector<Vector3d> output;
+	thrust::device_vector<double> phi, costheta, beta, Ak, k;
+	int threadsPerBlock, blocksPerGrid;
+	#endif
 
 	// data for FAST_WAVES
 	int avx_Nm;

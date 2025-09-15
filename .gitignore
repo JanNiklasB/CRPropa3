@@ -5,6 +5,7 @@ data/*
 data-tools/*
 data.tar.gz
 CMakeCache.txt
+.vscode/*
 
 CMakeFiles/
 bin/
@@ -26,3 +27,4 @@ cmake/CMakeFiles/
 *.dat
 *.ipynb_checkpoints
 *.idea
+*.code-workspace

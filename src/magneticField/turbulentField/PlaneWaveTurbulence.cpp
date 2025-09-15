@@ -48,6 +48,11 @@
 
 #include <iostream>
 
+#ifdef __CUDACC__
+#include "thrust/reduce.h"
+#include "thrust/execution_policy.h"
+#endif
+
 #if defined(FAST_WAVES)
 #if defined(__SSE__) && defined(__SSE2__) && defined(__SSE3__) && defined(__SSE4_1__) && defined(__SSE4_2__) && defined(__AVX__)
 #define ENABLE_FAST_WAVES
@@ -76,19 +81,48 @@ double hsum_double_avx(__m256d v) {
 }
 #endif // defined(ENABLE_FAST_WAVES)
 
+#ifdef __CUDACC__
+
+// see answer of talonmies on https://stackoverflow.com/a/14038590/30769038
+inline void gpuAssert(cudaError_t code, char * file, int line, bool Abort=true){
+	if (code != 0) {
+		KISS_LOG_ERROR << "GPUassert: " << *cudaGetErrorString(code) << " " << file << " " << line << std::endl;
+		fprintf(stderr, "GPUassert: %s %s %d\n", cudaGetErrorString(code),file,line);
+		if (Abort) exit(code);
+	}
+}
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+
+__global__ void cudaGetField(Vector3d pos, Vector3d* Output,
+	const Vector3d* kappa, const Vector3d* xi, const double* Ak, 
+	const double* k, const double* beta, int entries){
+	
+	int i = blockDim.x*blockIdx.x + threadIdx.x;
+
+	if (i<entries){
+		double z_ = pos.dot(kappa[i]);
+		Output[i] = xi[i] * Ak[i] * cos(k[i] * z_ + beta[i]);
+	}
+}
+
+#endif
+
 PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
                                          int Nm, int seed)
     : TurbulentField(spectrum), Nm(Nm) {
 
-#ifdef ENABLE_FAST_WAVES
+	#ifdef __CUDACC__
+	KISS_LOG_INFO << "PlaneWaveTurbulence: Using CUDA TD13 implementation"
+				<< std::endl;
+	#else if defined(ENABLE_FAST_WAVES)
 	KISS_LOG_INFO << "PlaneWaveTurbulence: Using SIMD TD13 implementation"
-	              << std::endl;
+				<< std::endl;
 
 	// There used to be a cpuid check here, to see if the cpu running
 	// this code would support SIMD (SSE + AVX). However, the library providing
 	// the relevant function is no longer being used, and doing this manually
 	// might be a bit too much work.
-#endif
+	#endif
 
 	if (Nm <= 1) {
 		throw std::runtime_error(
@@ -177,7 +211,20 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 		Ak[i] = sqrt(2 * Ak[i] / Ak2_sum) * spectrum.getBrms();
 	}
 
-#ifdef ENABLE_FAST_WAVES
+	#ifdef __CUDACC__
+	// now also determine the maximum number of allowed threads per block:
+	output.resize(Nm);
+
+	cudaDeviceProp prop;
+	gpuErrchk( cudaGetDeviceProperties(&prop, 0) );
+	int maxThreadsPerBlock = prop.maxThreadsDim[0];
+
+	threadsPerBlock = maxThreadsPerBlock;
+	blocksPerGrid = (Nm + threadsPerBlock - 1) / threadsPerBlock;
+
+	#endif
+
+	#ifdef ENABLE_FAST_WAVES
 	// * copy data into AVX-compatible arrays *
 	//
 	// AVX requires all data to be aligned to 256 bit, or 32 bytes, which is the
@@ -225,18 +272,32 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 		// of the cosine as well.
 		avx_data[i + align_offset + avx_Nm * ibeta] = beta[i] / M_PI;
 	}
-#endif // ENABLE_FAST_WAVES
+	#endif // ENABLE_FAST_WAVES
 }
 
 Vector3d PlaneWaveTurbulence::getField(const Vector3d &pos) const {
 
-#ifndef ENABLE_FAST_WAVES
+#if !defined(ENABLE_FAST_WAVES) && !defined(__CUDACC__)
 	Vector3d B(0.);
 	for (int i = 0; i < Nm; i++) {
 		double z_ = pos.dot(kappa[i]);
 		B += xi[i] * Ak[i] * cos(k[i] * z_ + beta[i]);
 	}
 	return B;
+
+#elif defined(__CUDACC__)
+	cudaGetField<<<blocksPerGrid, threadsPerBlock>>>(
+		pos,
+		thrust::raw_pointer_cast(output.data()),
+		kappa.data().get(),
+		xi.data().get(),
+		Ak.data().get(),
+		k.data().get(),
+		beta.data().get(),
+		Nm
+	);
+	cudaDeviceSynchronize();
+	return thrust::reduce(thrust::device, output.begin(), output.end(), Vector3d(0.));
 
 #else  // ENABLE_FAST_WAVES
 
