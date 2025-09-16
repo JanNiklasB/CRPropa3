@@ -212,9 +212,24 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 	}
 
 	#ifdef __CUDACC__
-	// now also determine the maximum number of allowed threads per block:
-	output.resize(Nm);
+	
+	// reserve memory on device
+	// output.resize(Nm);
+	cudaMalloc((void**)&output, sizeof(Vector3d)*Nm);
+	cudaMalloc((void**)&kappaPtr, sizeof(Vector3d)*Nm);
+	cudaMalloc((void**)&xiPtr, sizeof(Vector3d)*Nm);
+	cudaMalloc((void**)&AkPtr, sizeof(double)*Nm);
+	cudaMalloc((void**)&kPtr, sizeof(double)*Nm);
+	cudaMalloc((void**)&betaPtr, sizeof(double)*Nm);
 
+	// copy data from vectors to device:
+	cudaMemcpy(kappaPtr, kappa.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice);
+	cudaMemcpy(xiPtr, xi.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice);
+	cudaMemcpy(AkPtr, Ak.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
+	cudaMemcpy(kPtr, k.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
+	cudaMemcpy(betaPtr, beta.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
+	
+	// now also determine the maximum number of allowed threads per block:
 	cudaDeviceProp prop;
 	gpuErrchk( cudaGetDeviceProperties(&prop, 0) );
 	int maxThreadsPerBlock = prop.maxThreadsDim[0];
@@ -275,6 +290,18 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 	#endif // ENABLE_FAST_WAVES
 }
 
+PlaneWaveTurbulence::~PlaneWaveTurbulence(){
+	#ifdef __CUDACC__
+	// free device memory when PlaneWaveTurbulence is deleted
+	cudaFree(output);
+	cudaFree(kappaPtr);
+	cudaFree(xiPtr);
+	cudaFree(AkPtr);
+	cudaFree(kPtr);
+	cudaFree(betaPtr);
+	#endif
+}
+
 Vector3d PlaneWaveTurbulence::getField(const Vector3d &pos) const {
 
 #if !defined(ENABLE_FAST_WAVES) && !defined(__CUDACC__)
@@ -288,16 +315,16 @@ Vector3d PlaneWaveTurbulence::getField(const Vector3d &pos) const {
 #elif defined(__CUDACC__)
 	cudaGetField<<<blocksPerGrid, threadsPerBlock>>>(
 		pos,
-		thrust::raw_pointer_cast(output.data()),
-		kappa.data().get(),
-		xi.data().get(),
-		Ak.data().get(),
-		k.data().get(),
-		beta.data().get(),
+		output,
+		kappaPtr,
+		xiPtr,
+		AkPtr,
+		kPtr,
+		betaPtr,
 		Nm
 	);
 	cudaDeviceSynchronize();
-	return thrust::reduce(thrust::device, output.begin(), output.end(), Vector3d(0.));
+	return thrust::reduce(thrust::device, output, output + Nm, Vector3d(0.));
 
 #else  // ENABLE_FAST_WAVES
 

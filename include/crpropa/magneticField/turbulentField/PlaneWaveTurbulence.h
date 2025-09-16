@@ -98,13 +98,22 @@ class PlaneWaveTurbulence : public TurbulentField {
   private:
 	int Nm;
 
-	#ifndef __CUDACC__
+	// #ifndef __CUDACC__
+	// std::vector<Vector3d> xi, kappa;
+	// std::vector<double> phi, costheta, beta, Ak, k;
+	// #else
+	// thrust::device_vector<Vector3d> xi, kappa;
+	// mutable thrust::device_vector<Vector3d> output;
+	// thrust::device_vector<double> phi, costheta, beta, Ak, k;
+	// int threadsPerBlock, blocksPerGrid;
+	// #endif
+
 	std::vector<Vector3d> xi, kappa;
 	std::vector<double> phi, costheta, beta, Ak, k;
-	#else
-	thrust::device_vector<Vector3d> xi, kappa;
-	mutable thrust::device_vector<Vector3d> output;
-	thrust::device_vector<double> phi, costheta, beta, Ak, k;
+	#ifdef __CUDACC__
+	Vector3d *kappaPtr=NULL, *xiPtr=NULL;
+	mutable Vector3d *output=NULL;
+	double *AkPtr=NULL, *kPtr=NULL, *betaPtr=NULL;
 	int threadsPerBlock, blocksPerGrid;
 	#endif
 
@@ -143,6 +152,8 @@ class PlaneWaveTurbulence : public TurbulentField {
 	PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum, int Nm = 64,
 	                    int seed = 0);
 
+	~PlaneWaveTurbulence();
+	
 	/**
 	   Evaluates the field at the given position.
 
