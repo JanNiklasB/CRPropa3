@@ -98,19 +98,10 @@ class PlaneWaveTurbulence : public TurbulentField {
   private:
 	int Nm;
 
-	// #ifndef __CUDACC__
-	// std::vector<Vector3d> xi, kappa;
-	// std::vector<double> phi, costheta, beta, Ak, k;
-	// #else
-	// thrust::device_vector<Vector3d> xi, kappa;
-	// mutable thrust::device_vector<Vector3d> output;
-	// thrust::device_vector<double> phi, costheta, beta, Ak, k;
-	// int threadsPerBlock, blocksPerGrid;
-	// #endif
-
 	std::vector<Vector3d> xi, kappa;
 	std::vector<double> phi, costheta, beta, Ak, k;
-	#ifdef __CUDACC__
+	// needs to be visible to swig wrapper, so also check for HAVE_CUDA
+	#if defined(HAVE_CUDA) || defined(__CUDACC__)
 	Vector3d *kappaPtr=NULL, *xiPtr=NULL;
 	mutable Vector3d *output=NULL;
 	double *AkPtr=NULL, *kPtr=NULL, *betaPtr=NULL;

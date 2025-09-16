@@ -214,20 +214,19 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 	#ifdef __CUDACC__
 	
 	// reserve memory on device
-	// output.resize(Nm);
-	cudaMalloc((void**)&output, sizeof(Vector3d)*Nm);
-	cudaMalloc((void**)&kappaPtr, sizeof(Vector3d)*Nm);
-	cudaMalloc((void**)&xiPtr, sizeof(Vector3d)*Nm);
-	cudaMalloc((void**)&AkPtr, sizeof(double)*Nm);
-	cudaMalloc((void**)&kPtr, sizeof(double)*Nm);
-	cudaMalloc((void**)&betaPtr, sizeof(double)*Nm);
+	gpuErrchk( cudaMalloc((void**)&output, sizeof(Vector3d)*Nm) );
+	gpuErrchk( cudaMalloc((void**)&kappaPtr, sizeof(Vector3d)*Nm) );
+	gpuErrchk( cudaMalloc((void**)&xiPtr, sizeof(Vector3d)*Nm) );
+	gpuErrchk( cudaMalloc((void**)&AkPtr, sizeof(double)*Nm) );
+	gpuErrchk( cudaMalloc((void**)&kPtr, sizeof(double)*Nm) );
+	gpuErrchk( cudaMalloc((void**)&betaPtr, sizeof(double)*Nm) );
 
 	// copy data from vectors to device:
-	cudaMemcpy(kappaPtr, kappa.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice);
-	cudaMemcpy(xiPtr, xi.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice);
-	cudaMemcpy(AkPtr, Ak.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
-	cudaMemcpy(kPtr, k.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
-	cudaMemcpy(betaPtr, beta.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice);
+	gpuErrchk( cudaMemcpy(kappaPtr, kappa.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice) );
+	gpuErrchk( cudaMemcpy(xiPtr, xi.data(), sizeof(Vector3d)*Nm, cudaMemcpyHostToDevice) );
+	gpuErrchk( cudaMemcpy(AkPtr, Ak.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice) );
+	gpuErrchk( cudaMemcpy(kPtr, k.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice) );
+	gpuErrchk( cudaMemcpy(betaPtr, beta.data(), sizeof(double)*Nm, cudaMemcpyHostToDevice) );
 	
 	// now also determine the maximum number of allowed threads per block:
 	cudaDeviceProp prop;
@@ -293,12 +292,12 @@ PlaneWaveTurbulence::PlaneWaveTurbulence(const TurbulenceSpectrum &spectrum,
 PlaneWaveTurbulence::~PlaneWaveTurbulence(){
 	#ifdef __CUDACC__
 	// free device memory when PlaneWaveTurbulence is deleted
-	cudaFree(output);
-	cudaFree(kappaPtr);
-	cudaFree(xiPtr);
-	cudaFree(AkPtr);
-	cudaFree(kPtr);
-	cudaFree(betaPtr);
+	gpuErrchk( cudaFree(output) );
+	gpuErrchk( cudaFree(kappaPtr) );
+	gpuErrchk( cudaFree(xiPtr) );
+	gpuErrchk( cudaFree(AkPtr) );
+	gpuErrchk( cudaFree(kPtr) );
+	gpuErrchk( cudaFree(betaPtr) );
 	#endif
 }
 
