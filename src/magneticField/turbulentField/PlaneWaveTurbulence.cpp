@@ -322,7 +322,7 @@ Vector3d PlaneWaveTurbulence::getField(const Vector3d &pos) const {
 		betaPtr,
 		Nm
 	);
-	cudaDeviceSynchronize();
+	gpuErrchk( cudaDeviceSynchronize() );
 	return thrust::reduce(thrust::device, output, output + Nm, Vector3d(0.));
 
 #else  // ENABLE_FAST_WAVES
