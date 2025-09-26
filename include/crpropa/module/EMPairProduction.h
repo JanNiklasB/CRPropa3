@@ -27,6 +27,7 @@ namespace crpropa {
  Thinning is available. A thinning of 0 means that all particles are tracked. 
  For the maximum thinning of 1, only a few representative particles are added to the list of secondaries.
  Note that for thinning>0 the output must contain the column "weights", which should be included in the post-processing.
+ The surface is defined to include the nodes of the grid contained within.
  */
 class EMPairProduction: public Module {
 private:
@@ -44,10 +45,10 @@ public:
 	 @param haveElectrons	if true, add secondary electrons as candidates
 	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
 	 @param limit			step size limit as fraction of mean free path
-   @param surface
-   @param (hidden) interactionRates object to store and access to the interaction rates of the process
+   @param surface    suface to enclose the grid nodes to be loaded
+   @param interactionRates(hidden) object to store and access to the interaction rates of the process
 	 */
-	EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons = false, double thinning = 0, double limit = 0.1, Surface* surface = nullptr);
+	EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons = false, double thinning = 0, double limit = 0.1, ref_ptr<Surface> surface = nullptr);
 
 	// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
@@ -67,7 +68,7 @@ public:
 
     /** Apply a surface that confine the position dependent photon field
      * @param surface closed surface to confine the grid to be  uploaded */
-    void setSurface(Surface* surface);
+    void setSurface(ref_ptr<Surface> surface);
     bool hasSurface() const;
     
 	/** set a custom interaction tag to trace back this interaction

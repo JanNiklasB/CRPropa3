@@ -13,7 +13,7 @@ namespace crpropa {
 
 static const double mec2 = mass_electron * c_squared;
 
-EMTripletPairProduction::EMTripletPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, Surface* surface) {
+EMTripletPairProduction::EMTripletPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, ref_ptr<Surface> surface) {
 
   setSurface(surface);
   setPhotonField(photonField);
@@ -58,7 +58,7 @@ void EMTripletPairProduction::setThinning(double thinning) {
 	this->thinning = thinning;
 }
 
-void EMTripletPairProduction::setSurface(Surface* surface) {
+void EMTripletPairProduction::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 

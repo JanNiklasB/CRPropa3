@@ -21,7 +21,7 @@ namespace crpropa {
 
 static const double mec2 = mass_electron * c_squared;
 
-EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons, double thinning, double limit, Surface* surface) {
+EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons, double thinning, double limit, ref_ptr<Surface> surface) {
 
   setSurface(surface);
   setPhotonField(photonField);
@@ -68,7 +68,7 @@ void EMInverseComptonScattering::setThinning(double thinning) {
 	this->thinning = thinning;
 }
 
-void EMInverseComptonScattering::setSurface(Surface* surface) {
+void EMInverseComptonScattering::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 

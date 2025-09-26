@@ -84,11 +84,11 @@ protected:
  This class reads photon field data from files;
  The first file must be a list of photon energies [J], named fieldName_photonEnergy.txt
  The second file must be a list of comoving photon field densities [1/m^3], named fieldName_photonDensity.txt
- Optionally, a third file contains redshifts, named fieldName_redshift.txt
+ Optionally, a third file contains redshifts, named fieldName_redshift.txt.
  */
 class TabularPhotonField: public PhotonField {
 public:
-	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true); // Surface* surface = nullptr
+	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true);
 
 	double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
 	double getRedshiftScaling(double z) const;
@@ -117,10 +117,11 @@ protected:
  The second files must be lists of comoving photon field densities [1/m^3], named fieldName_photonDensity.txt and contained in the subdirectory /photonDensity/;
  The generated files through the CRPropa procedure (https://crpropa.github.io/CRPropa3/pages/example_notebooks/custom_photonfield/custom-photon-field.html) have a different ordering: the energy bins from the larger to the lower.
  No redshift dependence is available.
+ The surface is defined to include the nodes of the grid contained within.
  */
 class TabularSpatialPhotonField: public PhotonField {
 public:
-    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true, Surface* surface = nullptr);
+    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true, ref_ptr<Surface> surface = nullptr);
     
     double getPhotonDensity(double ePhoton = 0., double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
     double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const;
@@ -133,8 +134,8 @@ protected:
     std::string splitFilename(const std::string str) const;
     
     /** Apply a surface that confine the position dependent photon field
-     * @param surface closed surface to confine the grid to be  uploaded */
-    void setSurface(Surface* surface);
+     * @param surface closed surface to confine the nodes of grid to be uploaded */
+    void setSurface(ref_ptr<Surface> surface);
     
     std::vector<double> photonEnergies; // assuming all the nodes in the grid have the same energy binning!
     std::vector<std::vector<double>> photonDensity;
@@ -335,7 +336,7 @@ public:
  */
 class ISRF_Freudenreich98: public TabularSpatialPhotonField {
 public:
-    ISRF_Freudenreich98(Surface* surface) : TabularSpatialPhotonField("ISRF_Freudenreich98", false, true, surface) {}
+    ISRF_Freudenreich98(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Freudenreich98", false, true, surface) {}
 };
 
 /**
@@ -348,7 +349,7 @@ public:
  */
 class ISRF_Robitaille12: public TabularSpatialPhotonField {
 public:
-    ISRF_Robitaille12(Surface* surface) : TabularSpatialPhotonField("ISRF_Robitaille12", false, true, surface) {}
+    ISRF_Robitaille12(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Robitaille12", false, true, surface) {}
 };
 
 /**

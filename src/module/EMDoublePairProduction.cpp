@@ -17,7 +17,7 @@
 
 namespace crpropa {
 
-EMDoublePairProduction::EMDoublePairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, Surface* surface) {
+EMDoublePairProduction::EMDoublePairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, ref_ptr<Surface> surface) {
 
   setSurface(surface);
   setPhotonField(photonField);
@@ -60,7 +60,7 @@ void EMDoublePairProduction::setThinning(double thinning) {
 	this->thinning = thinning;
 }
 
-void EMDoublePairProduction::setSurface(Surface* surface) {
+void EMDoublePairProduction::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 

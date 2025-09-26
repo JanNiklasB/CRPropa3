@@ -21,7 +21,7 @@ namespace crpropa {
 
 static const double mec2 = mass_electron * c_squared;
 
-EMPairProduction::EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, Surface* surface) {
+EMPairProduction::EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons, double thinning, double limit, ref_ptr<Surface> surface) {
 
   setSurface(surface);
   setPhotonField(photonField);
@@ -68,7 +68,7 @@ void EMPairProduction::setThinning(double thinning) {
 	this->thinning = thinning;
 }
 
-void EMPairProduction::setSurface(Surface* surface) {
+void EMPairProduction::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 

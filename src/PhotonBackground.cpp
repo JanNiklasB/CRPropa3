@@ -218,7 +218,7 @@ void TabularPhotonField::checkInputData() const {
 	}
 }
 
-TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent, Surface* surface) {
+TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent, ref_ptr<Surface> surface) {
     this->fieldName = fieldName;
     this->isRedshiftDependent = isRedshiftDependent;
     this->isPositionDependent = isPositionDependent;
@@ -301,7 +301,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
     }
 }
 
-void TabularSpatialPhotonField::setSurface(Surface* surface) {
+void TabularSpatialPhotonField::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 
