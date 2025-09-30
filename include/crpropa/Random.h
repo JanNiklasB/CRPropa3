@@ -107,25 +107,21 @@ public:
 protected:
 	enum {M = 397}; // period parameter
 	uint32_t state[N];// internal state
-	#if __CUDACC__
-	thrust::universal_vector<uint32_t> initial_seed;
-	#else
 	std::vector<uint32_t> initial_seed;
-	#endif
 	uint32_t *pNext;// next value to get from state
 	int left;// number of values left before reload needed
 
 //Methods
 public:
 	/// initialize with a simple uint32_t
-	CUDA_CALLABLE_MEMBER Random( const uint32_t& oneSeed );
+	Random( const uint32_t& oneSeed );
 	// initialize with an array
-	CUDA_CALLABLE_MEMBER Random( uint32_t *const bigSeed, uint32_t const seedLength = N );
+	Random( uint32_t *const bigSeed, uint32_t const seedLength = N );
 	/// auto-initialize with /dev/urandom or time() and clock()
 	/// Do NOT use for CRYPTOGRAPHY without securely hashing several returned
 	/// values together, otherwise the generator state can be learned after
 	/// reading 624 consecutive values.
-	CUDA_CALLABLE_MEMBER Random();
+	Random();
 	// Access to 32-bit random numbers
 	CUDA_CALLABLE_MEMBER double rand();///< real number in [0,1]
 	CUDA_CALLABLE_MEMBER double rand( const double& n );///< real number in [0,n]

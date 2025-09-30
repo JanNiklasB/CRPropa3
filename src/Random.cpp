@@ -507,22 +507,25 @@ std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 {
 	std::vector< std::vector<uint32_t> > seeds;
 	for(size_t i = 0; i < omp_get_num_threads(); ++i)
-		seeds.push_back(_tls[i].r.getSeed() ); 
+		seeds.push_back(_tls[i].r.getSeed() );
 	return seeds;
 }
 
 #else
 static Random _random;
+
 Random &Random::instance() {
 	return _random;
 }
+
 void Random::seedThreads(const uint32_t oneSeed) {
 	_random.seed(oneSeed);
 }
+
 std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 {
 	std::vector< std::vector<uint32_t> > seeds;
-		seeds.push_back(_random.getSeed() ); 
+	seeds.push_back(_random.getSeed() );
 	return seeds;
 }
 #endif
