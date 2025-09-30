@@ -164,9 +164,9 @@ list(APPEND CRPROPA_EXTRA_LIBRARIES HepPID)
 list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include)
 
 # SOPHIA (provided)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
-list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
-list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
+# list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
+# list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 
 # Galactic magnetic lenses
 option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" ON)
@@ -375,7 +375,6 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
@@ -383,39 +382,18 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElasticScattering.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoPionProduction.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationCK.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
@@ -433,8 +411,6 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Cordes.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp

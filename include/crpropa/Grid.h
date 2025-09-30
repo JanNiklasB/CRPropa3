@@ -11,7 +11,7 @@
 #include <vector>
 #include <type_traits>
 #include <string>
-#include <sstream>  
+#include <sstream>
 #if HAVE_SIMD
 #include <immintrin.h>
 #include <smmintrin.h>
