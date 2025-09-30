@@ -65,23 +65,23 @@ void Cosmology::setParameters(double hubbleParameter, double omegaMatter) {
 	update();
 }
 
-double Cosmology::hubbleRate(double z) {
+double Cosmology::hubbleRate(double z) const {
 	return H0 * sqrt(omegaL + omegaM * pow(1 + z, 3));
 }
 
-double Cosmology::getOmegaL() {
+double Cosmology::getOmegaL() const {
 	return omegaL;
 }
 
-double Cosmology::getOmegaM() {
+double Cosmology::getOmegaM() const {
 	return omegaM;
 }
 
-double Cosmology::getH0() {
+double Cosmology::getH0() const {
 	return H0;
 }
 
-double Cosmology::comovingDistance2Redshift(double d) {
+double Cosmology::comovingDistance2Redshift(double d) const {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
@@ -91,7 +91,7 @@ double Cosmology::comovingDistance2Redshift(double d) {
 	return interpolate(d, this->DcPtr, this->ZPtr, this->ZSize);
 }
 
-double Cosmology::redshift2ComovingDistance(double z) {
+double Cosmology::redshift2ComovingDistance(double z) const {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
@@ -101,7 +101,7 @@ double Cosmology::redshift2ComovingDistance(double z) {
 	return interpolate(z, this->ZPtr, this->DcPtr, this->DcSize);
 }
 
-double Cosmology::luminosityDistance2Redshift(double d) {
+double Cosmology::luminosityDistance2Redshift(double d) const {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
@@ -111,7 +111,7 @@ double Cosmology::luminosityDistance2Redshift(double d) {
 	return interpolate(d, this->DlPtr, this->ZPtr, this->ZSize);
 }
 
-double Cosmology::redshift2LuminosityDistance(double z) {
+double Cosmology::redshift2LuminosityDistance(double z) const {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
@@ -121,7 +121,7 @@ double Cosmology::redshift2LuminosityDistance(double z) {
 	return interpolate(z, this->ZPtr, this->DlPtr, this->DlSize);
 }
 
-double Cosmology::lightTravelDistance2Redshift(double d) {
+double Cosmology::lightTravelDistance2Redshift(double d) const {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
@@ -131,7 +131,7 @@ double Cosmology::lightTravelDistance2Redshift(double d) {
 	return interpolate(d, this->DtPtr, this->ZPtr, this->ZSize);
 }
 
-double Cosmology::redshift2LightTravelDistance(double z) {
+double Cosmology::redshift2LightTravelDistance(double z) const {
 	#ifndef __CUDACC__
 	if (z < 0)
 		throw std::runtime_error("Cosmology: z < 0");
@@ -141,7 +141,7 @@ double Cosmology::redshift2LightTravelDistance(double z) {
 	return interpolate(z, this->ZPtr, this->DtPtr, this->DtSize);
 }
 
-double Cosmology::comoving2LightTravelDistance(double d) {
+double Cosmology::comoving2LightTravelDistance(double d) const {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
@@ -151,7 +151,7 @@ double Cosmology::comoving2LightTravelDistance(double d) {
 	return interpolate(d, this->DcPtr, this->DtPtr, this->DtSize);
 }
 
-double Cosmology::lightTravel2ComovingDistance(double d) {
+double Cosmology::lightTravel2ComovingDistance(double d) const {
 	#ifndef __CUDACC__
 	if (d < 0)
 		throw std::runtime_error("Cosmology: d < 0");
@@ -159,64 +159,6 @@ double Cosmology::lightTravel2ComovingDistance(double d) {
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
 	return interpolate(d, this->DtPtr, this->DcPtr, this->DcSize);
-}
-
-static Cosmology cosmology;
-
-ref_ptr<Cosmology> getStaticCosmology(){
-	return ref_ptr<Cosmology>(&cosmology);
-}
-
-void setCosmologyParameters(double hubbleParameter, double omegaMatter){
-	cosmology.setParameters(hubbleParameter, omegaMatter);
-}
-
-double hubbleRate(double redshift){
-	return cosmology.hubbleRate(redshift);
-}
-
-double omegaL(){
-	return cosmology.getOmegaL();
-}
-
-double omegaM(){
-	return cosmology.getOmegaM();
-}
-
-double H0(){
-	return cosmology.getH0();
-}
-
-double comovingDistance2Redshift(double distance){
-	return cosmology.comovingDistance2Redshift(distance);
-}
-
-double redshift2ComovingDistance(double redshift){
-	return cosmology.redshift2ComovingDistance(redshift);
-}
-
-double luminosityDistance2Redshift(double distance){
-	return cosmology.luminosityDistance2Redshift(distance);
-}
-
-double redshift2LuminosityDistance(double redshift){
-	return cosmology.redshift2LuminosityDistance(redshift);
-}
-
-double lightTravelDistance2Redshift(double distance){
-	return cosmology.lightTravelDistance2Redshift(distance);
-}
-
-double redshift2LightTravelDistance(double redshift){
-	return cosmology.redshift2LightTravelDistance(redshift);
-}
-
-double comoving2LightTravelDistance(double distance){
-	return cosmology.comoving2LightTravelDistance(distance);
-}
-
-double lightTravel2ComovingDistance(double distance){
-	return cosmology.lightTravel2ComovingDistance(distance);
 }
 
 } // namespace crpropa

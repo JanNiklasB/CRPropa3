@@ -638,8 +638,8 @@ void SourcePulsarDistribution::setDescription() {
 SourceUniform1D::SourceUniform1D(double minD, double maxD, bool withCosmology) {
 	this->withCosmology = withCosmology;
 	if (withCosmology) {
-		this->minD = comoving2LightTravelDistance(minD);
-		this->maxD = comoving2LightTravelDistance(maxD);
+		this->minD = Cosmo.comoving2LightTravelDistance(minD);
+		this->maxD = Cosmo.comoving2LightTravelDistance(maxD);
 	} else {
 		this->minD = minD;
 		this->maxD = maxD;
@@ -651,7 +651,7 @@ void SourceUniform1D::prepareParticle(ParticleState& particle) const {
 	Random& random = Random::instance();
 	double d = random.rand() * (maxD - minD) + minD;
 	if (withCosmology)
-		d = lightTravel2ComovingDistance(d);
+		d = Cosmo.lightTravel2ComovingDistance(d);
 	particle.setPosition(Vector3d(d, 0, 0));
 }
 
@@ -933,7 +933,7 @@ SourceRedshift1D::SourceRedshift1D() {
 
 void SourceRedshift1D::prepareCandidate(Candidate& candidate) const {
 	double d = candidate.source.getPosition().getR();
-	double z = comovingDistance2Redshift(d);
+	double z = Cosmo.comovingDistance2Redshift(d);
 	candidate.setRedshift(z);
 }
 

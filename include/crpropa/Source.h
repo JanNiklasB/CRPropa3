@@ -6,7 +6,7 @@
 #include "crpropa/Grid.h"
 #include "crpropa/EmissionMap.h"
 #include "crpropa/massDistribution/Density.h"
-
+#include "crpropa/Cosmology.h"
 
 #include <vector>
 
@@ -510,6 +510,7 @@ class SourceUniform1D: public SourceFeature {
 	double minD; // minimum light-travel distance
 	double maxD; // maximum light-travel distance
 	bool withCosmology;	// whether to account for cosmological effects (expansion of the Universe)
+	Cosmology Cosmo; // create default constructed Cosmology here to use later (avoid static Cosmology Instances)
 public:
 	/** Constructor
 	 @param minD			minimum distance; comoving if withCosmology is True
@@ -765,6 +766,8 @@ public:
  computes the redshifts based on the source distance.
  */
 class SourceRedshift1D: public SourceFeature {
+private:
+	Cosmology Cosmo; // create default constructed Cosmology here to use later (avoid static Cosmology Instances)
 public:
 	/** Constructor
 	 */
