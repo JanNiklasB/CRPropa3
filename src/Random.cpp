@@ -110,7 +110,7 @@ double Random::rand53() {
 // mean and variance by Box-Muller method
 double Random::randNorm(const double& mean, const double& variance) {
 	double r = sqrt(-2.0 * log(1.0 - randDblExc())) * variance;
-	double phi = 2.0 * M_PI * randExc();
+	double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
 	return mean + r * cos(phi);
 }
 
@@ -289,12 +289,14 @@ uint32_t Random::randInt(const uint32_t& n) {
 	return i;
 }
 
+
 uint64_t Random::randInt64()
 {
 	int64_t a = randInt();
 	int64_t b = randInt();
 	return (b + a << 32);
 }
+
 
 uint64_t Random::randInt64(const uint64_t &n)
 {
@@ -314,12 +316,10 @@ uint64_t Random::randInt64(const uint64_t &n)
 	return i;
 }
 
-void Random::seed(const uint32_t oneSeed) {
-	if(initial_seed)
-		delete[] initial_seed;
 
-	initial_seed = new uint32_t[1];
-	initial_seedSize = 1;
+
+void Random::seed(const uint32_t oneSeed) {
+	initial_seed.resize(1);
 	initial_seed[0] = oneSeed;
 	initialize(oneSeed);
 	reload();
@@ -327,11 +327,7 @@ void Random::seed(const uint32_t oneSeed) {
 
 void Random::seed(uint32_t * const bigSeed, const uint32_t seedLength) {
 
-	if(initial_seed)
-		delete[] initial_seed;
-	initial_seed = new uint32_t(seedLength);
-	initial_seedSize = seedLength;
-
+	initial_seed.resize(seedLength);
 	for (size_t i =0; i< seedLength; i++)
 	{
 		initial_seed[i] = bigSeed[i];
@@ -372,7 +368,6 @@ void Random::seed(uint32_t * const bigSeed, const uint32_t seedLength) {
 
 void Random::seed() {
 	// First try getting an array from /dev/urandom
-	#ifndef __CUDACC__
 	FILE* urandom = std::fopen("/dev/urandom", "rb");
 	if (urandom) {
 		uint32_t bigSeed[N];
@@ -387,7 +382,6 @@ void Random::seed() {
 			return;
 		}
 	}
-	#endif
 
 	// Was not successful, so use time() and clock() instead
 	seed(hash(time(NULL), clock()));
@@ -446,7 +440,7 @@ void Random::save(uint32_t* saveArray) const {
 
 const std::vector<uint32_t> &Random::getSeed() const
 {
-	return std::vector<uint32_t>(initial_seed, &initial_seed[initial_seedSize-1]);
+	return initial_seed;
 }
 
 void Random::load(uint32_t * const loadArray) {
@@ -535,7 +529,7 @@ std::vector< std::vector<uint32_t> > Random::getSeedThreads()
 
 const std::string Random::getSeed_base64() const
 {
-	return Base64::encode((unsigned char*) &initial_seed[0], sizeof(initial_seed[0]) * initial_seedSize / sizeof(unsigned char));
+	return Base64::encode((unsigned char*) &initial_seed[0], sizeof(initial_seed[0]) * initial_seed.size() / sizeof(unsigned char));
 }
 
 void Random::seed(const std::string &b64Seed)

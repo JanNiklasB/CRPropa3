@@ -375,6 +375,7 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
@@ -382,6 +383,7 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp

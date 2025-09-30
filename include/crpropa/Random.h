@@ -63,6 +63,9 @@
 // Not thread safe (unless auto-initialization is avoided and each thread has
 // its own Random object)
 #include "crpropa/__CudaDefines.h"
+#if __CUDACC__
+#include "thrust/universal_vector.h"
+#endif
 #include "crpropa/Vector3.h"
 #include "Common.h"
 
@@ -79,7 +82,7 @@
 
 //necessary for win32
 #ifndef M_PI
-#define M_PI 3.14159265358979323846264338328
+#define M_PI 3.14159265358979323846
 #endif
 
 namespace crpropa {
@@ -104,8 +107,11 @@ public:
 protected:
 	enum {M = 397}; // period parameter
 	uint32_t state[N];// internal state
-	uint32_t* initial_seed=NULL;
-	int initial_seedSize=0;
+	#if __CUDACC__
+	thrust::universal_vector<uint32_t> initial_seed;
+	#else
+	std::vector<uint32_t> initial_seed;
+	#endif
 	uint32_t *pNext;// next value to get from state
 	int left;// number of values left before reload needed
 
@@ -179,23 +185,23 @@ public:
 	CUDA_CALLABLE_MEMBER double randBrokenPowerLaw(double index1, double index2, double breakpoint, double min, double max );
 
 	/// Seed the generator with a simple uint32_t
-	CUDA_CALLABLE_MEMBER void seed( const uint32_t oneSeed );
+	void seed( const uint32_t oneSeed );
 	/// Seed the generator with an array of uint32_t's
 	/// There are 2^19937-1 possible initial states.  This function allows
 	/// all of those to be accessed by providing at least 19937 bits (with a
 	/// default seed length of N = 624 uint32_t's).  Any bits above the lower 32
 	/// in each element are discarded.
 	/// Just call seed() if you want to get array from /dev/urandom
-	CUDA_CALLABLE_MEMBER void seed( uint32_t *const bigSeed, const uint32_t seedLength = N );
+	void seed( uint32_t *const bigSeed, const uint32_t seedLength = N );
 	// seed via an b64 encoded string
-	CUDA_CALLABLE_MEMBER void seed( const std::string &b64Seed);
+	void seed( const std::string &b64Seed);
 	/// Seed the generator with an array from /dev/urandom if available
 	/// Otherwise use a hash of time() and clock() values
-	CUDA_CALLABLE_MEMBER void seed();
+	void seed();
 
 	// Saving and loading generator state
-	CUDA_CALLABLE_MEMBER void save( uint32_t* saveArray ) const;// to array of size SAVE
-	CUDA_CALLABLE_MEMBER void load( uint32_t *const loadArray );// from such array
+	void save( uint32_t* saveArray ) const;// to array of size SAVE
+	void load( uint32_t *const loadArray );// from such array
 	const std::vector<uint32_t> &getSeed() const; // copy the seed to the array
 	CUDA_CALLABLE_MEMBER const std::string getSeed_base64() const; // get the base 64 encoded seed
 
