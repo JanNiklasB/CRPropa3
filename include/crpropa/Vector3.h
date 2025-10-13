@@ -6,11 +6,13 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-#include <Python.h>
-#include <numpy/arrayobject.h>
 #include <unistd.h>
 
+#ifdef Python_FOUND
+#include <Python.h>
+#include <numpy/arrayobject.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
+#endif
 
 namespace crpropa {
 
@@ -416,6 +418,8 @@ public:
 		return *this;
 	}
 
+
+	#ifdef Python_FOUND
 	// ----------------------------
 	// 	Python numpy interface 
 	// ----------------------------
@@ -492,6 +496,7 @@ public:
 		// free the reference to the numpy array
 		Py_DECREF(array);
 	}
+	#endif
 	
 };
 
