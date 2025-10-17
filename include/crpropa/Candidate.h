@@ -114,7 +114,7 @@ public:
 	 Sets the tagOrigin of the candidate. Can be used to trace back the interactions
 	 */
 	CUDA_CALLABLE_MEMBER void setTagOrigin(std::string tagOrigin);
-	CUDA_CALLABLE_MEMBER std::string getTagOrigin() const;
+	std::string getTagOrigin() const;
 
 	/**
 	 Sets the time of the candidate.

@@ -401,14 +401,14 @@ ModuleListRunner::ModuleListRunner(ModuleList *mlist) : mlist(mlist) {
 }
 
 void ModuleListRunner::process(Candidate *candidate) const {
-	if (mlist.valid())
+	if (mlist)
 		mlist->run(candidate);
 }
 
 std::string ModuleListRunner::getDescription() const {
 	std::stringstream ss;
 	ss << "ModuleListRunner\n";
-	if (mlist.valid())
+	if (mlist)
 		ss << mlist->getDescription();
 	return ss.str();
 };

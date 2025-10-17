@@ -45,19 +45,20 @@ public:
  @brief General particle observer
  */
 class Observer: public Module {
-	std::string flagKey;
-	std::string flagValue;
 private:
-	std::vector<ref_ptr<ObserverFeature> > features;
-	ref_ptr<ObserverFeature>* featuresPtr=NULL;
-	int featuresSize=0;
-	ref_ptr<Module> detectionAction;
+	char *flagKey, *flagValue;
+	int flagKeySize, flagValueSize;
+	// std::vector<ref_ptr<ObserverFeature> > features;
+	ObserverFeature** features;
+	int featuresSize;
+	Module* detectionAction;
 	bool clone;
 	bool makeInactive;
 public:
 	/** Default observer constructor
 	 */
 	Observer();
+	~Observer();
 	/** Add a feature to the observer
 	 @param feature		observer feature to be added to the Observer object
 	 */
@@ -294,9 +295,6 @@ public:
 	 The so created detList can then be modified via addTime, addTimeRange and setTimes.
 	 */
 	ObserverTimeEvolution(const std::vector<double> &detList);
-	/** Destructor
-	 */
-	~ObserverTimeEvolution(){}
 
 	/** Function
 	 Generates the detList if it is empty when for example the 

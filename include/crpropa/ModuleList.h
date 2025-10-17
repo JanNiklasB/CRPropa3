@@ -111,9 +111,8 @@ void ModuleList::add(Type *module) {
  */
 class ModuleListRunner: public Module {
 private:
-	ref_ptr<ModuleList> mlist;
+	ModuleList* mlist;
 public:
-
 	ModuleListRunner(ModuleList *mlist);
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
 	std::string getDescription() const;

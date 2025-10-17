@@ -25,15 +25,15 @@ class PerformanceModule: public Module {
 private:
 	struct _module_info {
 		double time;
-		ref_ptr<Module> module;
+		Module* module;
 	};
 
-	mutable std::vector<_module_info> modules;
-	mutable _module_info* modulesPtr=NULL;
-	mutable int modulesSize=0;
+	mutable _module_info* modules;
+	mutable int modulesSize;
 	mutable size_t calls;
 
 public:
+	CUDA_CALLABLE_MEMBER PerformanceModule(){}
 	~PerformanceModule();
 	void add(Module* module);
 	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;

@@ -20,10 +20,9 @@ namespace crpropa {
 */
 class ParticleCollector: public Module {
 protected:
-	typedef std::vector<ref_ptr<Candidate> > tContainer;
+	typedef Candidate** tContainer;
 	mutable tContainer container;
-	mutable ref_ptr<Candidate>* containerPtr=NULL;
-	mutable int containerSize=0;
+	mutable int containerSize;
 	std::size_t nBuffer;
 	bool clone;
 	bool recursive;
@@ -32,7 +31,7 @@ private:
 	void checkVector() const;
 
 public:
-	ParticleCollector();
+	CUDA_CALLABLE_MEMBER ParticleCollector();
 	ParticleCollector(const std::size_t nBuffer);
 	ParticleCollector(const std::size_t nBuffer, const bool clone);
 	ParticleCollector(const std::size_t nBuffer, const bool clone, const bool recursive);
@@ -52,14 +51,6 @@ public:
 	std::vector<ref_ptr<Candidate> >& getContainer() const;
 	void setClone(bool b);
 	bool getClone() const;
-
-	/** iterator goodies */
-	typedef tContainer::iterator iterator;
-	typedef tContainer::const_iterator const_iterator;
-	iterator begin();
-	const_iterator begin() const;
-	iterator end();
-	const_iterator end() const;
 
 	/**
 	 Retrieves the trajectory of a detected particle

@@ -52,12 +52,13 @@ public:
 	};
 
 private:
-	ref_ptr<MagneticField> field;
+	MagneticField* field;
 	double tolerance; /*< target relative error of the numerical integration */
 	double minStep; /*< minimum step size of the propagation */
 	double maxStep; /*< maximum step size of the propagation */
 
 public:
+	CUDA_CALLABLE_MEMBER PropagationCK();
 	/** Constructor for the adaptive Kash Carp.
 	 * @param field
 	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep

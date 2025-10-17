@@ -54,12 +54,14 @@ public:
 	};
 
 private:
-	ref_ptr<MagneticField> field;
+	MagneticField* field;
 	double tolerance; /** target relative error of the numerical integration */
 	double minStep; /** minimum step size of the propagation */
 	double maxStep; /** maximum step size of the propagation */
 
 public:
+	CUDA_CALLABLE_MEMBER PropagationBP();
+
 	/** Default constructor for the Boris push. It is constructed with a fixed step size.
 	 * @param field
 	 * @param fixedStep 

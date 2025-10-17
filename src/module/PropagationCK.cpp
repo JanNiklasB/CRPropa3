@@ -59,6 +59,13 @@ PropagationCK::Y PropagationCK::dYdt(const Y &y, ParticleState &p, double z) con
 	return Y(velocity, dudt);
 }
 
+PropagationCK::PropagationCK(){
+	field = NULL;
+	tolerance = 1.e-4;
+	minStep = 0.1*kpc;
+	maxStep = 1*Gpc;
+}
+
 PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
 		double minStep, double maxStep) :
 		minStep(0) {
@@ -143,14 +150,14 @@ Vector3d PropagationCK::getFieldAtPosition(Vector3d pos, double z) const {
 	try {
 		// check if field is valid and use the field vector at the
 		// position pos with the redshift z
-		if (field.valid())
+		if (field)
 			B = field->getField(pos, z);
 	} catch (std::exception &e) {
 		KISS_LOG_ERROR 	<< "PropagationCK: Exception in PropagationCK::getFieldAtPosition.\n"
 				<< e.what();
 	}
 	#else
-	if (field.valid())
+	if (field)
 		B = field->getField(pos, z);
 	#endif
 	return B;

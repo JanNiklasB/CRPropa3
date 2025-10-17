@@ -18,10 +18,11 @@ class Candidate;
  @brief Abstract base class for modules
  */
 class Module: public Referenced {
-	std::string description;
+	char* description;
+	int descriptionSize;
 public:
 	Module();
-	virtual ~Module(){}
+	virtual ~Module();
 
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);
@@ -42,10 +43,12 @@ public:
  */
 class AbstractCondition: public Module {
 protected:
-	ref_ptr<Module> rejectAction, acceptAction;
+	Module *rejectAction, *acceptAction;
 	bool makeRejectedInactive, makeAcceptedInactive;
-	std::string rejectFlagKey, rejectFlagValue;
-	std::string acceptFlagKey, acceptFlagValue;
+	char *rejectFlagKey, *rejectFlagValue;
+	int rejectFlagKeySize, rejectFlagValueSize;
+	char *acceptFlagKey, *acceptFlagValue;
+	int acceptFlagKeySize, acceptFlagValueSize;
 
 	CUDA_CALLABLE_MEMBER void reject(Candidate *candidate) const;
 	CUDA_CALLABLE_MEMBER inline void reject(ref_ptr<Candidate> candidate) const {
@@ -59,6 +62,7 @@ protected:
 
 public:
 	AbstractCondition();
+	virtual ~AbstractCondition();
 	CUDA_CALLABLE_MEMBER void onReject(Module *rejectAction);
 	CUDA_CALLABLE_MEMBER void onAccept(Module *acceptAction);
 	CUDA_CALLABLE_MEMBER void setMakeRejectedInactive(bool makeInactive);

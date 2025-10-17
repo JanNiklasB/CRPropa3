@@ -15,10 +15,14 @@ Observer::Observer() :
 		makeInactive(true), clone(false) {
 }
 
+Observer::~Observer(){
+	delete[] flagKey;
+	delete[] flagValue;
+	Module::~Module();
+}
+
 void Observer::add(ObserverFeature *feature) {
-	features.push_back(feature);
-	featuresPtr = features.data();
-	featuresSize = features.size();
+	push_back(features, featuresSize, feature);
 }
 
 void Observer::onDetection(Module *action, bool clone_) {
@@ -30,7 +34,7 @@ void Observer::process(Candidate *candidate) const {
 	// loop over all features and have them check the particle
 	DetectionState state = NOTHING;
 	for (int i = 0; i < featuresSize; i++) {
-		DetectionState s = featuresPtr[i]->checkDetection(candidate);
+		DetectionState s = features[i]->checkDetection(candidate);
 		if (s == VETO)
 			state = VETO;
 		else if ((s == DETECTED) && (state != VETO))
@@ -39,17 +43,17 @@ void Observer::process(Candidate *candidate) const {
 
 	if (state == DETECTED) {
 		for (int i = 0; i < featuresSize; i++) {
-			featuresPtr[i]->onDetection(candidate);
+			features[i]->onDetection(candidate);
 		}
 
-		if (detectionAction.valid()) {
+		if (detectionAction) {
 			if (clone)
 				detectionAction->process(candidate->clone(false));
 			else
 				detectionAction->process(candidate);
 		}
 
-		if (!flagKey.empty())
+		if (flagKeySize)
 			candidate->setProperty(flagKey, flagValue);
 
 		if (makeInactive)
@@ -58,18 +62,26 @@ void Observer::process(Candidate *candidate) const {
 }
 
 void Observer::setFlag(std::string key, std::string value) {
-	flagKey = key;
-	flagValue = value;
+	delete[] flagKey;
+	delete[] flagValue;
+
+	flagKeySize = key.size();
+	flagValueSize = value.size();
+
+	flagKey = new char[flagKeySize];
+	flagValue = new char[flagValueSize];
+	key.copy(flagKey, flagKeySize);
+	value.copy(flagValue, flagValueSize);
 }
 
 std::string Observer::getDescription() const {
 	std::stringstream ss;
 	ss << "Observer";
-	for (int i = 0; i < features.size(); i++)
+	for (int i = 0; i < featuresSize; i++)
 		ss << "\n    " << features[i]->getDescription() << "\n";
 	ss << "    Flag: '" << flagKey << "' -> '" << flagValue << "'\n";
 	ss << "    MakeInactive: " << (makeInactive ? "yes\n" : "no\n");
-	if (detectionAction.valid())
+	if (detectionAction)
 		ss << "    Action: " << detectionAction->getDescription() << ", clone: " << (clone ? "yes" : "no");
 
 	return ss.str();

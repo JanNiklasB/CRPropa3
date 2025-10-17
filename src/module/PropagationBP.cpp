@@ -38,6 +38,12 @@ namespace crpropa {
 		return Y(pos, dir);
 	}
 
+	PropagationBP::PropagationBP(){
+		field = NULL;
+		tolerance = 0.42;
+		minStep = 1.*kpc;
+		maxStep = 1.*kpc;
+	}
 
 	// with a fixed step size
 	PropagationBP::PropagationBP(ref_ptr<MagneticField> field, double fixedStep) :
@@ -140,14 +146,14 @@ namespace crpropa {
 		try {
 			// check if field is valid and use the field vector at the
 			// position pos with the redshift z
-			if (field.valid())
+			if (field)
 				B = field->getField(pos, z);
 		} catch (std::exception &e) {
 			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
 					<< e.what();
 		}
 		#else
-		if (field.valid())
+		if (field)
 			B = field->getField(pos, z);
 		#endif
 

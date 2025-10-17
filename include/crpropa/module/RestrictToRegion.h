@@ -20,9 +20,10 @@ namespace crpropa {
  */
 class RestrictToRegion: public Module {
 private:
-	ref_ptr<Surface> surface;
-	ref_ptr<Module> module;
+	Surface* surface;
+	Module* module;
 public:
+	RestrictToRegion(){};
 	RestrictToRegion(Module* _module, Surface* _surface);
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;

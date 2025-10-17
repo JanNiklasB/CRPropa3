@@ -10,12 +10,12 @@ namespace crpropa {
 
 PerformanceModule::~PerformanceModule() {
 	double total = 0;
-	for (size_t i = 0; i < modules.size(); i++) {
+	for (size_t i = 0; i < modulesSize; i++) {
 		_module_info &m = modules[i];
 		total += m.time;
 	}
 	printf("Performance for %d calls:\n", calls);
-	for (size_t i = 0; i < modules.size(); i++) {
+	for (size_t i = 0; i < modulesSize; i++) {
 		_module_info &m = modules[i];
 		printf(
 			" - %d % -> %s: %d\n", 
@@ -24,39 +24,39 @@ PerformanceModule::~PerformanceModule() {
 			(m.time / calls)
 		);
 	}
+	delete[] modules;
+	Module::~Module();
 }
 
 void PerformanceModule::add(Module *module) {
 	_module_info info;
 	info.module = module;
 	info.time = 0;
-	modules.push_back(info);
-	modulesPtr = modules.data();
-	modulesSize = modules.size();
+	push_back(modules, modulesSize, info);
 }
 
 void PerformanceModule::process(Candidate *candidate) const {
 	double* times = new double[modulesSize];
 	for (size_t i = 0; i < modulesSize; i++) {
-		_module_info &m = modulesPtr[i];
+		_module_info &m = modules[i];
 		#ifndef __CUDACC__
 		double start = Clock::getInstance().getMillisecond();
 		m.module->process(candidate);
 		double end = Clock::getInstance().getMillisecond();
 		times[i] = end - start;
 		#else
-		auto start = std::chrono::high_resolution_clock::now();
+		auto start = cuda::std::chrono::high_resolution_clock::now();
 		m.module->process(candidate);
-		auto end = std::chrono::high_resolution_clock::now();
-		std::chrono::duration time = end - start;
-		times[i] = std::chrono::duration_cast<std::chrono::milliseconds>(time).count();
+		auto end = cuda::std::chrono::high_resolution_clock::now();
+		cuda::std::chrono::duration time = end - start;
+		times[i] = cuda::std::chrono::duration_cast<cuda::std::chrono::milliseconds>(time).count();
 		#endif
 	}
 
 	#pragma omp critical(PerformanceModule)
 	{
 		for (size_t i = 0; i < modulesSize; i++) {
-			_module_info &m = modulesPtr[i];
+			_module_info &m = modules[i];
 			m.time += times[i];
 		}
 		calls++;
@@ -67,7 +67,7 @@ void PerformanceModule::process(Candidate *candidate) const {
 string PerformanceModule::getDescription() const {
 	stringstream sstr;
 	sstr << "PerformanceModule (";
-	for (size_t i = 0; i < modules.size(); i++) {
+	for (size_t i = 0; i < modulesSize; i++) {
 		_module_info &m = modules[i];
 		if (i > 0)
 			sstr << ", ";

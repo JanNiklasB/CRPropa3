@@ -9,30 +9,42 @@ Module::Module() {
 	setDescription(info.name());
 }
 
+Module::~Module() {
+	delete[] description;
+}
+
 std::string Module::getDescription() const {
-	return description;
+	return std::string(description, descriptionSize);
 }
 
 void Module::setDescription(const std::string &d) {
-	description = d;
+	delete[] description;
+	descriptionSize = d.size();
+	description = new char[descriptionSize];
+	d.copy(description, descriptionSize);
 }
 
 AbstractCondition::AbstractCondition() :
-		makeRejectedInactive(true), makeAcceptedInactive(false), rejectFlagKey(
-				"Rejected"), rejectFlagValue( typeid(*this).name() ) {
+		makeRejectedInactive(true), makeAcceptedInactive(false) {
+	setRejectFlag("Rejected", typeid(*this).name());
+}
+
+AbstractCondition::~AbstractCondition(){
+	delete[] rejectFlagKey;
+	delete[] rejectFlagValue;
+	delete[] acceptFlagKey;
+	delete[] acceptFlagValue;
 }
 
 void AbstractCondition::reject(Candidate *candidate) const {
 	if (!candidate)
 		return;
 
-	if (rejectAction.valid())
+	if (rejectAction)
 		rejectAction->process(candidate);
 
-	#ifndef __CUDACC__
-	if (!rejectFlagKey.empty())
+	if (rejectFlagKeySize)
 		candidate->setProperty(rejectFlagKey, rejectFlagValue);
-	#endif
 
 	if (makeRejectedInactive)
 		candidate->setActive(false);
@@ -42,13 +54,11 @@ void AbstractCondition::accept(Candidate *candidate) const {
 	if (!candidate)
 		return;
 
-	if (acceptAction.valid())
+	if (acceptAction)
 		acceptAction->process(candidate);
 
-	#ifndef __CUDACC__
-	if (!acceptFlagKey.empty())
+	if (acceptFlagKeySize)
 		candidate->setProperty(acceptFlagKey, acceptFlagValue);
-	#endif
 
 	if (makeAcceptedInactive)
 		candidate->setActive(false);
@@ -71,22 +81,40 @@ void AbstractCondition::onAccept(Module *action) {
 }
 
 void AbstractCondition::setRejectFlag(std::string key, std::string value) {
-	rejectFlagKey = key;
-	rejectFlagValue = value;
+	delete[] rejectFlagKey;
+	delete[] rejectFlagValue;
+
+	rejectFlagKeySize = key.size();
+	rejectFlagValueSize = value.size();
+
+	rejectFlagKey = new char[rejectFlagKeySize];
+	rejectFlagValue = new char[rejectFlagValueSize];
+	key.copy(rejectFlagKey, rejectFlagKeySize);
+	value.copy(rejectFlagValue, rejectFlagValueSize);
 }
 
 void AbstractCondition::setAcceptFlag(std::string key, std::string value) {
-	acceptFlagKey = key;
-	acceptFlagValue = value;
+	delete[] acceptFlagKey;
+	delete[] acceptFlagValue;
+
+	acceptFlagKeySize = key.size();
+	acceptFlagValueSize = value.size();
+
+	acceptFlagKey = new char[acceptFlagKeySize];
+	acceptFlagValue = new char[acceptFlagValueSize];
+	key.copy(acceptFlagKey, acceptFlagKeySize);
+	value.copy(acceptFlagValue, acceptFlagValueSize);
 }
 
 std::string AbstractCondition::getRejectFlag() {
-	std::string out = rejectFlagKey + "&" + rejectFlagValue; 
+	std::string out = std::string(rejectFlagKey, rejectFlagKeySize)
+		+ "&" + std::string(rejectFlagValue, rejectFlagKeySize);
 	return out;
 }
 
 std::string AbstractCondition::getAcceptFlag() {
-	std::string out = acceptFlagKey + "&" + acceptFlagValue;
+	std::string out = std::string(acceptFlagKey, acceptFlagKeySize)
+		+ "&" + std::string(acceptFlagValue, acceptFlagValueSize);
 	return out;
 }
 
