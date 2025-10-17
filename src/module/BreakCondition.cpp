@@ -6,8 +6,17 @@
 
 namespace crpropa {
 
+MaximumTrajectoryLength::MaximumTrajectoryLength(){
+	maxLength = 0;
+}
+
 MaximumTrajectoryLength::MaximumTrajectoryLength(double maxLength) :
 		maxLength(maxLength) {
+}
+
+MaximumTrajectoryLength::~MaximumTrajectoryLength(){
+	delete[] observerPositions;
+	AbstractCondition::~AbstractCondition();
 }
 
 void MaximumTrajectoryLength::setMaximumTrajectoryLength(double length) {
@@ -19,13 +28,11 @@ double MaximumTrajectoryLength::getMaximumTrajectoryLength() const {
 }
 
 void MaximumTrajectoryLength::addObserverPosition(const Vector3d& position) {
-	observerPositions.push_back(position);
-	observerPositionsPtr = observerPositions.data();
-	observerPositionsSize = observerPositions.size();
+	push_back(observerPositions, observerPositionsSize, position);
 }
 
 const std::vector<Vector3d>& MaximumTrajectoryLength::getObserverPositions() const {
-	return observerPositions;
+	return std::vector<Vector3d>(observerPositions, observerPositions+observerPositionsSize);
 }
 
 std::string MaximumTrajectoryLength::getDescription() const {
@@ -33,10 +40,10 @@ std::string MaximumTrajectoryLength::getDescription() const {
 	s << "Maximum trajectory length: " << maxLength / Mpc << " Mpc, ";
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	s << "\n  Observer positions: \n";
-	for (size_t i = 0; i < observerPositions.size(); i++)
+	for (size_t i = 0; i < observerPositionsSize; i++)
 		s << "    - " << observerPositions[i] / Mpc << " Mpc\n";
 	return s.str();
 }
@@ -48,7 +55,7 @@ void MaximumTrajectoryLength::process(Candidate *c) const {
 	if(observerPositionsSize) {
 		bool inRange = false;
 		for (size_t i = 0; i < observerPositionsSize; i++) {
-			double distance = position.getDistanceTo(observerPositionsPtr[i]);
+			double distance = position.getDistanceTo(observerPositions[i]);
 			if (distance + length < maxLength)
 				inRange = true;
 		}
@@ -66,6 +73,10 @@ void MaximumTrajectoryLength::process(Candidate *c) const {
 }
 
 //*****************************************************************************
+MinimumEnergy::MinimumEnergy() : minEnergy(0){
+
+}
+
 MinimumEnergy::MinimumEnergy(double minEnergy) :
 		minEnergy(minEnergy) {
 }
@@ -90,12 +101,16 @@ std::string MinimumEnergy::getDescription() const {
 	s << "Minimum energy: " << minEnergy / EeV << " EeV, ";
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }
 
 //*****************************************************************************
+MinimumRigidity::MinimumRigidity() : minRigidity(0){
+
+}
+
 MinimumRigidity::MinimumRigidity(double minRigidity) :
 		minRigidity(minRigidity) {
 }
@@ -118,12 +133,16 @@ std::string MinimumRigidity::getDescription() const {
 	s << "Minimum rigidity: " << minRigidity / EeV << " EeV, ";
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }
 
 //*****************************************************************************
+MinimumRedshift::MinimumRedshift() : zmin(0){
+
+}
+
 MinimumRedshift::MinimumRedshift(double zmin) :
 		zmin(zmin) {
 }
@@ -148,12 +167,16 @@ std::string MinimumRedshift::getDescription() const {
 	s << "Minimum redshift: " << zmin << ", ";
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }
 
 //*****************************************************************************
+MinimumChargeNumber::MinimumChargeNumber() : minChargeNumber(0){
+
+}
+
 MinimumChargeNumber::MinimumChargeNumber(int minChargeNumber) :
 		minChargeNumber(minChargeNumber) {
 }
@@ -178,23 +201,29 @@ std::string MinimumChargeNumber::getDescription() const {
 	s << "Minimum charge number: " << minChargeNumber;
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }
 
 //*****************************************************************************
+MinimumEnergyPerParticleId::MinimumEnergyPerParticleId() : minEnergyOthers(0){
+
+}
+
 MinimumEnergyPerParticleId::MinimumEnergyPerParticleId(double minEnergyOthers) {
 	setMinimumEnergyOthers(minEnergyOthers);
 }
 
+MinimumEnergyPerParticleId::~MinimumEnergyPerParticleId(){
+	delete[] particleIds;
+	delete[] minEnergies;
+	AbstractCondition::~AbstractCondition();
+}
+
 void MinimumEnergyPerParticleId::add(int id, double energy) {
-	particleIds.push_back(id);
-	particleIdsPtr = particleIds.data();
-	particleIdsSize = particleIds.size();
-	minEnergies.push_back(energy);
-	minEnergiesPtr = minEnergies.data();
-	minEnergiesSize = minEnergies.size();
+	push_back(particleIds, particleIdsSize, id);
+	push_back(minEnergies, minEnergiesSize, energy);
 }
 
 void MinimumEnergyPerParticleId::setMinimumEnergyOthers(double energy) {
@@ -207,8 +236,8 @@ double MinimumEnergyPerParticleId::getMinimumEnergyOthers() const {
 
 void MinimumEnergyPerParticleId::process(Candidate *c) const {
 	for (int i = 0; i < particleIdsSize; i++) {
-		if (c->current.getId() == particleIdsPtr[i]) {
-			if (c->current.getEnergy() < minEnergiesPtr[i])
+		if (c->current.getId() == particleIds[i]) {
+			if (c->current.getEnergy() < minEnergies[i])
 				reject(c);
 			else
 				return;
@@ -224,17 +253,21 @@ void MinimumEnergyPerParticleId::process(Candidate *c) const {
 std::string MinimumEnergyPerParticleId::getDescription() const {
 	std::stringstream s;
 	s << "Minimum energy for non-specified particles: " << minEnergyOthers / eV << " eV";
-	for (int i = 0; i < minEnergies.size(); i++) {
+	for (int i = 0; i < minEnergiesSize; i++) {
 		s << "  for particle " << particleIds[i] << " : " << minEnergies[i] / eV << " eV";
 	}
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }
 
 //*****************************************************************************
+DetectionLength::DetectionLength() : detLength(0) {
+
+}
+
 DetectionLength::DetectionLength(double detLength) :
 		detLength(detLength) {
 }
@@ -247,13 +280,12 @@ double DetectionLength::getDetectionLength() const {
 	return detLength;
 }
 
-
 std::string DetectionLength::getDescription() const {
 	std::stringstream s;
 	s << "Detection length: " << detLength / kpc << " kpc, ";
 	s << "Flag: '" << rejectFlagKey << "' -> '" << rejectFlagValue << "', ";
 	s << "MakeInactive: " << (makeRejectedInactive ? "yes" : "no");
-	if (rejectAction.valid())
+	if (rejectAction)
 		s << ", Action: " << rejectAction->getDescription();
 	return s.str();
 }

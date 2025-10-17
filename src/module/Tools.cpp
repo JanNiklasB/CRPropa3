@@ -79,58 +79,35 @@ string PerformanceModule::getDescription() const {
 
 // ----------------------------------------------------------------------------
 
-ParticleFilter::ParticleFilter() {
-}
-
-ParticleFilter::ParticleFilter(const std::set<int> &ids) : ids(ids) {
-	#ifdef __CUDACC__
-	updatePtr();
-	#endif
-}
-
-ParticleFilter::~ParticleFilter(){
-	#ifdef __CUDACC__
-	delete[] idsPtr;
-	#endif
-}
-
-#ifdef __CUDACC__
-void ParticleFilter::updatePtr(){
+ParticleFilter::ParticleFilter(const std::set<int> &ids) {
 	idsSize = ids.size();
-	delete[] idsPtr;
-	idsPtr = new int[idsSize];
-	int counter = 0;
-	for (auto i=ids.begin(); i!=ids.end(); i++){
-		idsPtr[counter] = *i;
+	this->ids = new int[idsSize];
+	int counter=0;
+	for(auto id=ids.begin(); id!=ids.end(); id++){
+		this->ids[counter] = *id;
 		counter++;
 	}
 }
-#endif
+
+ParticleFilter::~ParticleFilter(){
+	delete[] ids;
+	AbstractCondition::~AbstractCondition();
+}
 
 void ParticleFilter::addId(int id) {
-	ids.insert(id);
-	#ifdef __CUDACC__
-	updatePtr();
-	#endif
+	insert(ids, idsSize, id, lower_bound(id, ids, idsSize));
 }
 
 void ParticleFilter::removeId(int id) {
-	ids.erase(id);
-	#ifdef __CUDACC__
-	updatePtr();
-	#endif
+	erase(ids, idsSize, findSorted(id, ids, idsSize));
 }
 
-std::set<int> &ParticleFilter::getIds() {
-	return ids;
+std::set<int> ParticleFilter::getIds() {
+	return std::set<int>(ids, ids+idsSize);
 }
 
 void ParticleFilter::process(Candidate* candidate) const {
-	#ifndef __CUDACC__
-	if (ids.find(candidate->current.getId()) == ids.end())
-	#else
-	if (*std::find(&idsPtr[0], &idsPtr[idsSize-1], candidate->current.getId()) == idsPtr[idsSize-1])
-	#endif
+	if (findSorted(candidate->current.getId(), ids, idsSize) == (idsSize-1))
 		reject(candidate);
 	else
 		accept(candidate);
@@ -139,8 +116,8 @@ void ParticleFilter::process(Candidate* candidate) const {
 string ParticleFilter::getDescription() const {
 	stringstream sstr;
 	sstr << "ParticleFilter: ";
-	for (std::set<int>::const_iterator i = ids.begin(); i != ids.end(); i++) {
-		sstr << *i << ", ";
+	for (int i=0; i<idsSize; i++){
+		sstr << ids[i] << ", ";
 	}
 	sstr << ")";
 	return sstr.str();

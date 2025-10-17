@@ -45,20 +45,16 @@ public:
   @brief Reject Particles not listed in filter.
 */
 class ParticleFilter: public AbstractCondition {
-	std::set<int> ids;
-	#ifdef __CUDACC__
-	int* idsPtr=NULL, idsSize=0;
-	void updatePtr();
-	#endif
+	int* ids, idsSize;
 
 public:
-	ParticleFilter();
+	CUDA_CALLABLE_MEMBER ParticleFilter(){};
 	ParticleFilter(const std::set<int> &ids);
 	~ParticleFilter();
 
 	void addId(int id);
 	void removeId(int remove);
-	std::set<int> &getIds();
+	std::set<int> getIds();
 
 	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;
 	std::string getDescription() const;
@@ -70,8 +66,9 @@ public:
   @brief Fill EmissionMap with source particle state
 */
 class EmissionMapFiller: public Module {
-	ref_ptr<EmissionMap> emissionMap;
+	EmissionMap* emissionMap;
 public:
+	CUDA_CALLABLE_MEMBER EmissionMapFiller(){};
 	EmissionMapFiller(EmissionMap *emissionMap);
 	void setEmissionMap(EmissionMap *emissionMap);
 	CUDA_CALLABLE_MEMBER void process(Candidate* candidate) const;

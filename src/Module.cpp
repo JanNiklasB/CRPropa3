@@ -34,6 +34,7 @@ AbstractCondition::~AbstractCondition(){
 	delete[] rejectFlagValue;
 	delete[] acceptFlagKey;
 	delete[] acceptFlagValue;
+	Module::~Module();
 }
 
 void AbstractCondition::reject(Candidate *candidate) const {

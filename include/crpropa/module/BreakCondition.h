@@ -20,11 +20,12 @@ namespace crpropa {
  */
 class MaximumTrajectoryLength: public AbstractCondition {
 	double maxLength;
-	std::vector<Vector3d> observerPositions;
-	Vector3d* observerPositionsPtr=NULL;
-	int observerPositionsSize=0;
+	Vector3d* observerPositions;
+	int observerPositionsSize;
 public:
-	MaximumTrajectoryLength(double length = 0);
+	CUDA_CALLABLE_MEMBER MaximumTrajectoryLength();
+	MaximumTrajectoryLength(double length);
+	~MaximumTrajectoryLength();
 	void setMaximumTrajectoryLength(double length);
 	double getMaximumTrajectoryLength() const;
 	void addObserverPosition(const Vector3d &position);
@@ -43,7 +44,8 @@ public:
 class MinimumEnergy: public AbstractCondition {
 	double minEnergy;
 public:
-	MinimumEnergy(double minEnergy = 0);
+	CUDA_CALLABLE_MEMBER MinimumEnergy();
+	MinimumEnergy(double minEnergy);
 	void setMinimumEnergy(double energy);
 	double getMinimumEnergy() const;
 	std::string getDescription() const;
@@ -61,7 +63,8 @@ public:
 class MinimumRigidity: public AbstractCondition {
 	double minRigidity;
 public:
-	MinimumRigidity(double minRigidity = 0);
+	CUDA_CALLABLE_MEMBER MinimumRigidity();
+	MinimumRigidity(double minRigidity);
 	void setMinimumRigidity(double minRigidity);
 	double getMinimumRigidity() const;
 	std::string getDescription() const;
@@ -78,7 +81,8 @@ public:
 class MinimumRedshift: public AbstractCondition {
 	double zmin;
 public:
-	MinimumRedshift(double zmin = 0);
+	CUDA_CALLABLE_MEMBER MinimumRedshift();
+	MinimumRedshift(double zmin);
 	void setMinimumRedshift(double z);
 	double getMinimumRedshift();
 	std::string getDescription() const;
@@ -97,6 +101,7 @@ public:
 class MinimumChargeNumber: public AbstractCondition {
 	int minChargeNumber;
 public:
+	CUDA_CALLABLE_MEMBER MinimumChargeNumber();
 	MinimumChargeNumber(int minChargeNumber = 0);
 	void setMinimumChargeNumber(int chargeNumber);
 	int getMinimumChargeNumber() const;
@@ -113,15 +118,15 @@ public:
  All particles whose minimum energy is not specified follow the more general minEnergyOthers condition.
  */
 class MinimumEnergyPerParticleId: public AbstractCondition {
-	std::vector<double> minEnergies;
-	double* minEnergiesPtr=NULL;
-	int minEnergiesSize=0;
-	std::vector<int> particleIds;
-	int* particleIdsPtr=NULL;
-	int particleIdsSize=0;
+	double* minEnergies;
+	int minEnergiesSize;
+	int* particleIds;
+	int particleIdsSize;
 	double minEnergyOthers;
 public:
-	MinimumEnergyPerParticleId(double minEnergyOthers = 0);
+	CUDA_CALLABLE_MEMBER MinimumEnergyPerParticleId();
+	MinimumEnergyPerParticleId(double minEnergyOthers);
+	~MinimumEnergyPerParticleId();
 	void setMinimumEnergyOthers(double energy);
 	double getMinimumEnergyOthers() const;
 	void add(int id, double energy);
@@ -139,7 +144,8 @@ public:
 class DetectionLength: public AbstractCondition {
 	double detLength;
 public:
-	DetectionLength(double length = 0);
+	CUDA_CALLABLE_MEMBER DetectionLength();
+	DetectionLength(double length);
 	void setDetectionLength(double length);
 	double getDetectionLength() const;
 	std::string getDescription() const;

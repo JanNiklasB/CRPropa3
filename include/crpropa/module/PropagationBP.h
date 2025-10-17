@@ -66,7 +66,7 @@ public:
 	 * @param field
 	 * @param fixedStep 
 	 */
-	PropagationBP(ref_ptr<MagneticField> field = NULL, double fixedStep = 1. * kpc);
+	PropagationBP(ref_ptr<MagneticField> field, double fixedStep = 1. * kpc);
 
 	/** Constructor for the adaptive Boris push.
 	 * @param field

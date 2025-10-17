@@ -65,7 +65,7 @@ public:
 	 * @param minStep	   minStep/c_light is the minimum integration time step
 	 * @param maxStep	   maxStep/c_light is the maximum integration time step. 
 	 */
-    PropagationCK(ref_ptr<MagneticField> field = NULL, double tolerance = 1e-4,
+    PropagationCK(ref_ptr<MagneticField> field, double tolerance = 1e-4,
 			double minStep = (0.1 * kpc), double maxStep = (1 * Gpc));
 
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;

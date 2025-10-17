@@ -57,7 +57,7 @@ private:
 public:
 	/** Default observer constructor
 	 */
-	Observer();
+	CUDA_CALLABLE_MEMBER Observer();
 	~Observer();
 	/** Add a feature to the observer
 	 @param feature		observer feature to be added to the Observer object

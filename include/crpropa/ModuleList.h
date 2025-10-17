@@ -113,6 +113,7 @@ class ModuleListRunner: public Module {
 private:
 	ModuleList* mlist;
 public:
+	CUDA_CALLABLE_MEMBER ModuleListRunner(){};
 	ModuleListRunner(ModuleList *mlist);
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
 	std::string getDescription() const;
