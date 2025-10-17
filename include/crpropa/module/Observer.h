@@ -29,9 +29,11 @@ enum DetectionState {
  @brief Abstract base class for features of observers
  */
 class ObserverFeature: public Referenced {
-protected:
-	std::string description;
+private:
+	char* description;
+	int descriptionSize;
 public:
+	virtual ~ObserverFeature(){delete[] description;}
 	CUDA_CALLABLE_MEMBER virtual DetectionState checkDetection(Candidate *candidate) const;
 	CUDA_CALLABLE_MEMBER virtual void onDetection(Candidate *candidate) const;
 	virtual std::string getDescription() const;

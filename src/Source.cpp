@@ -67,7 +67,14 @@ void SourceFeature::prepareCandidate(Candidate& candidate) const {
 }
 
 std::string SourceFeature::getDescription() const {
-	return description;
+	return std::string(description, descriptionSize);;
+}
+
+void SourceFeature::setDescription(const std::string &d){
+	delete[] description;
+	descriptionSize = d.size();
+	description = new char[descriptionSize];
+	d.copy(description, descriptionSize);
 }
 
 // ----------------------------------------------------------------------------
@@ -83,7 +90,8 @@ void SourceParticleType::prepareParticle(ParticleState& particle) const {
 void SourceParticleType::setDescription() {
 	std::stringstream ss;
 	ss << "SourceParticleType: " << id << "\n";
-	description = ss.str();
+
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -111,7 +119,7 @@ void SourceMultipleParticleTypes::setDescription() {
 	ss << "SourceMultipleParticleTypes: Random particle type\n";
 	for (int i = 0; i < particleTypes.size(); i++)
 		ss << "      ID = " << particleTypes[i] << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -127,7 +135,7 @@ void SourceEnergy::prepareParticle(ParticleState& p) const {
 void SourceEnergy::setDescription() {
 	std::stringstream ss;
 	ss << "SourceEnergy: " << E / EeV << " EeV\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -148,7 +156,7 @@ void SourcePowerLawSpectrum::setDescription() {
 	ss << "SourcePowerLawSpectrum: Random energy ";
 	ss << "E = " << Emin / EeV << " - " << Emax / EeV << " EeV, ";
 	ss << "dN/dE ~ E^" << index  << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -203,7 +211,7 @@ void SourceComposition::setDescription() {
 	ss << "dN/dE ~ E^" << index << "\n";
 	for (int i = 0; i < nuclei.size(); i++)
 		ss << "      ID = " << nuclei[i] << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -224,7 +232,7 @@ void SourcePosition::prepareParticle(ParticleState& particle) const {
 void SourcePosition::setDescription() {
 	std::stringstream ss;
 	ss << "SourcePosition: " << position / Mpc << " Mpc\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -251,7 +259,7 @@ void SourceMultiplePositions::setDescription() {
 	ss << "SourceMultiplePositions: Random position from list\n";
 	for (int i = 0; i < positions.size(); i++)
 		ss << "  " << positions[i] / Mpc << " Mpc\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -271,7 +279,7 @@ void SourceUniformSphere::setDescription() {
 	ss << "SourceUniformSphere: Random position within a sphere at ";
 	ss << center / Mpc << " Mpc with";
 	ss  << radius / Mpc << " Mpc radius\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -296,7 +304,7 @@ void SourceUniformHollowSphere::setDescription() {
 	ss << center / Mpc << " Mpc with";
 	ss << radius_inner / Mpc << " Mpc inner radius\n";
 	ss << radius_outer / Mpc << " Mpc outer radius\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -315,7 +323,7 @@ void SourceUniformShell::setDescription() {
 	ss << "SourceUniformShell: Random position on a spherical shell at ";
 	ss << center / Mpc << " Mpc with ";
 	ss << radius / Mpc << " Mpc radius\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -335,7 +343,7 @@ void SourceUniformBox::setDescription() {
 	ss << "SourceUniformBox: Random uniform position in box with ";
 	ss << "origin = " << origin / Mpc << " Mpc and ";
 	ss << "size = " << size / Mpc << " Mpc\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ---------------------------------------------------------------------------
@@ -357,7 +365,7 @@ void SourceUniformCylinder::setDescription() {
 	ss << "origin = " << origin / Mpc << " Mpc and ";
 	ss << "radius = " << radius / Mpc << " Mpc and";
 	ss << "height = " << height / Mpc << " Mpc\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ---------------------------------------------------------------------------
@@ -477,7 +485,7 @@ void SourceSNRDistribution::setDescription() {
 	ss << "rEarth = " << rEarth / kpc << " kpc and ";
 	ss << "zg = " << zg / kpc << " kpc and";
 	ss << "beta = " << beta << " \n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ---------------------------------------------------------------------------
@@ -631,7 +639,7 @@ void SourcePulsarDistribution::setDescription() {
 	ss << "beta = " << beta << " and ";
 	ss << "r_blur = " << rBlur << " and ";
 	ss << "theta blur = " << thetaBlur << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -662,7 +670,7 @@ void SourceUniform1D::setDescription() {
 	if (withCosmology)
 		ss << " (including cosmology)";
 	ss << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -697,7 +705,7 @@ void SourceDensityGrid::prepareParticle(ParticleState& particle) const {
 }
 
 void SourceDensityGrid::setDescription() {
-	description = "SourceDensityGrid: 3D source distribution according to density grid\n";
+	SourceFeature::setDescription("SourceDensityGrid: 3D source distribution according to density grid\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -731,7 +739,7 @@ void SourceDensityGrid1D::prepareParticle(ParticleState& particle) const {
 }
 
 void SourceDensityGrid1D::setDescription() {
-	description = "SourceDensityGrid1D: 1D source distribution according to density grid\n";
+	SourceFeature::setDescription("SourceDensityGrid1D: 1D source distribution according to density grid\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -745,7 +753,7 @@ void SourceIsotropicEmission::prepareParticle(ParticleState& particle) const {
 }
 
 void SourceIsotropicEmission::setDescription() {
-	description = "SourceIsotropicEmission: Random isotropic direction\n";
+	SourceFeature::setDescription("SourceIsotropicEmission: Random isotropic direction\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -778,7 +786,7 @@ void SourceDirectedEmission::setDescription() {
 	ss << "SourceDirectedEmission: Random directed emission following the von-Mises-Fisher distribution with mean direction ";
 	ss << mu << " and concentration parameter kappa = ";
 	ss << kappa << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -801,7 +809,7 @@ void SourceLambertDistributionOnSphere::setDescription() {
 	ss << "SourceLambertDistributionOnSphere: Random position and direction on a Sphere with center ";
 	ss << center / kpc << " kpc and ";
 	ss << radius / kpc << " kpc radius\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -817,7 +825,7 @@ void SourceDirection::prepareParticle(ParticleState& particle) const {
 void SourceDirection::setDescription() {
 	std::stringstream ss;
 	ss <<  "SourceDirection: Emission direction = " << direction << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -833,7 +841,7 @@ void SourceEmissionMap::prepareCandidate(Candidate &candidate) const {
 }
 
 void SourceEmissionMap::setDescription() {
-	description = "SourceEmissionMap: accept only directions from emission map\n";
+	SourceFeature::setDescription("SourceEmissionMap: accept only directions from emission map\n");
 }
 
 void SourceEmissionMap::setEmissionMap(EmissionMap *emissionMap) {
@@ -866,7 +874,7 @@ void SourceEmissionCone::setDescription() {
 	ss << "SourceEmissionCone: Jetted emission in ";
 	ss << "direction = " << direction << " with ";
 	ss << "half-opening angle = " << aperture << " rad\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -882,7 +890,7 @@ void SourceRedshift::prepareCandidate(Candidate& candidate) const {
 void SourceRedshift::setDescription() {
 	std::stringstream ss;
 	ss << "SourceRedshift: Redshift z = " << z << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -900,7 +908,7 @@ void SourceUniformRedshift::setDescription() {
 	std::stringstream ss;
 	ss << "SourceUniformRedshift: Uniform redshift in z = ";
 	ss << zmin << " - " << zmax << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 // ----------------------------------------------------------------------------
@@ -908,7 +916,7 @@ SourceRedshiftEvolution::SourceRedshiftEvolution(double m, double zmin, double z
 	std::stringstream ss;
 	ss << "SourceRedshiftEvolution: (1+z)^m, m = " << m;
 	ss << ", z = " << zmin << " - " << zmax << "\n";
-	description = ss.str();
+	SourceFeature::setDescription(ss.str());
 }
 
 void SourceRedshiftEvolution::prepareCandidate(Candidate& candidate) const {
@@ -938,7 +946,7 @@ void SourceRedshift1D::prepareCandidate(Candidate& candidate) const {
 }
 
 void SourceRedshift1D::setDescription() {
-	description = "SourceRedshift1D: Redshift according to source distance\n";
+	SourceFeature::setDescription("SourceRedshift1D: Redshift according to source distance\n");
 }
 
 // ----------------------------------------------------------------------------
@@ -1032,7 +1040,7 @@ void SourceGenericComposition::prepareParticle(ParticleState& particle) const {
 }
 
 void SourceGenericComposition::setDescription() {
-	description = "Generice source composition" + expression;
+	SourceFeature::setDescription("Generice source composition" + expression);
 }
 
 #endif
@@ -1048,7 +1056,7 @@ void SourceTag::prepareCandidate(Candidate &cand) const {
 }
 
 void SourceTag::setDescription() {
-	description = "SourceTag: " + sourceTag;
+	SourceFeature::setDescription("SourceTag: " + sourceTag);
 }
 
 void SourceTag::setTag(std::string tag) {

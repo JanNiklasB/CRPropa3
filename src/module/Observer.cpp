@@ -88,7 +88,7 @@ void ObserverFeature::onDetection(Candidate *candidate) const {
 }
 
 std::string ObserverFeature::getDescription() const {
-	return description;
+	return std::string(description, descriptionSize);
 }
 
 // ObserverDetectAll ----------------------------------------------------------
@@ -97,7 +97,7 @@ DetectionState ObserverDetectAll::checkDetection(Candidate *candidate) const {
 }
 
 std::string ObserverDetectAll::getDescription() const {
-	return description;
+	return ObserverFeature::getDescription();
 }
 
 // ObserverTracking --------------------------------------------------------

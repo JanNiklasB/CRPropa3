@@ -21,12 +21,15 @@ namespace crpropa {
  @brief Abstract base class for specific source features
  */
 class SourceFeature: public Referenced {
-protected:
-	std::string description;
+private:
+	char* description;
+	int descriptionSize;
 public:
+	virtual ~SourceFeature(){delete[] description;}
 	virtual void prepareParticle(ParticleState& particle) const {};
 	virtual void prepareCandidate(Candidate& candidate) const;
 	std::string getDescription() const;
+	void setDescription(const std::string &description);
 };
 
 
