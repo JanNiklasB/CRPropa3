@@ -55,7 +55,7 @@ public:
 		data[2] = v.z;
 	}
 
-	CUDA_CALLABLE_MEMBER ~Vector3()
+	~Vector3()
 	{
 	}
 

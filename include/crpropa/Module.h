@@ -5,6 +5,7 @@
 #include "crpropa/Candidate.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Common.h"
+#include "cuda.h"
 
 #include <string>
 
@@ -20,13 +21,17 @@ class Module: public Referenced {
 	std::string description;
 public:
 	Module();
-	virtual ~Module() {
-	}
+	virtual ~Module(){}
+
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);
-	CUDA_CALLABLE_MEMBER virtual void process(Candidate *candidate) const = 0;
+	CUDA_CALLABLE_MEMBER virtual void process(Candidate *candidate) const {};
 	CUDA_CALLABLE_MEMBER inline void process(ref_ptr<Candidate> candidate) const {
 		process(candidate.get());
+	}
+	// this function needs to be created manually on device since it is virtual!
+	CUDA_CALLABLE_MEMBER virtual void test() const{
+		printf("Module::test(pointer)\n");
 	}
 };
 

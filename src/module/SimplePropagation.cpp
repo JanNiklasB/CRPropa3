@@ -6,12 +6,14 @@
 namespace crpropa {
 
 SimplePropagation::SimplePropagation(double minStep, double maxStep) :
-		minStep(minStep), maxStep(maxStep) {
+	minStep(minStep), maxStep(maxStep) {
+
 	if (minStep > maxStep)
 		throw std::runtime_error("SimplePropagation: minStep > maxStep");
 }
 
 void SimplePropagation::process(Candidate *c) const {
+	printf("TestSimplePropagation\n");
 	c->previous = c->current;
 
 	double step = clip(c->getNextStep(), minStep, maxStep);

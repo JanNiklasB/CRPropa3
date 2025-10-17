@@ -14,12 +14,15 @@ PerformanceModule::~PerformanceModule() {
 		_module_info &m = modules[i];
 		total += m.time;
 	}
-	cout << "Performance for " << calls << " calls:" << endl;
+	printf("Performance for %d calls:\n", calls);
 	for (size_t i = 0; i < modules.size(); i++) {
 		_module_info &m = modules[i];
-		cout << " - " << floor((1000 * m.time / total) + 0.5) / 10 << "% -> "
-				<< m.module->getDescription() << ": " << (m.time / calls)
-				<< endl;
+		printf(
+			" - %d % -> %s: %d\n", 
+			floor((1000 * m.time / total) + 0.5)/10, 
+			m.module->getDescription(), 
+			(m.time / calls)
+		);
 	}
 }
 

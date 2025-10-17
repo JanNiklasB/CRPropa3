@@ -24,8 +24,13 @@ private:
 	double minStep, maxStep;
 
 public:
+	CUDA_CALLABLE_MEMBER SimplePropagation(){}
 	SimplePropagation(double minStep = (0.1 * kpc), double maxStep = (1 * Gpc));
+
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
+	CUDA_CALLABLE_MEMBER void test() const{
+		printf("SimplePropagation::test()\n");
+	}
 	void setMinimumStep(double minStep);
 	void setMaximumStep(double maxStep);
 	double getMinimumStep() const;

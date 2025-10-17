@@ -32,11 +32,11 @@ public:
 	/** Default Constructor
 	 * just sets _referenceCount to 0
 	*/
-	inline Referenced() :
+	CUDA_CALLABLE_MEMBER inline Referenced() :
 			_referenceCount(0) {
 	}
 
-	inline Referenced(const Referenced&) :
+	CUDA_CALLABLE_MEMBER inline Referenced(const Referenced&) :
 			_referenceCount(0) {
 	}
 
@@ -100,7 +100,8 @@ public:
 
 protected:
 
-	/// Destructor
+	#ifdef __CUDACC__
+	/// Destructor, only defined if not called from cuda:
 	virtual inline ~Referenced() {
 		#ifdef DEBUG
 			if (_referenceCount)
@@ -108,6 +109,7 @@ protected:
 						<< typeid(*this).name() << std::endl;
 		#endif
 	}
+	#endif
 
 	mutable size_t _referenceCount;
 };
@@ -166,7 +168,7 @@ public:
 	 * calls _ptr->removeReference() which deletes referenced object if it sets ref counter to 0
 	 * and then sets _ptr to NULL
 	 */
-	CUDA_CALLABLE_MEMBER ~ref_ptr() {
+	~ref_ptr() {
 		if (_ptr)
 			_ptr->removeReference();
 		_ptr = 0;
@@ -217,6 +219,7 @@ public:
 	}
 	/// Getter function for the stored pointer
 	CUDA_CALLABLE_MEMBER T* get() const {
+		printf("TestINRefPtr::get\n");
 		return _ptr;
 	}
 
@@ -244,26 +247,6 @@ public:
 		_ptr = rp._ptr;
 		rp._ptr = tmp;
 	}
-
-	// // not so trivial like this, classes do not exist in cuda, only functions, base types, structs etc.
-	// // probably keep standard Referenced.h and implement cuda HostToDevice and cuda DeviceToHost for each class
-	// #ifdef __CUDACC__
-	// CUDA_CALLABLE_MEMBER void hostToDevice(){
-	// 	T* tmp = NULL;  // create temporary pointer
-	// 	cudaMalloc((void**)&tmp, sizeof(T));  // reserve device memory
-	// 	cudaMemcpy(tmp, _ptr, sizeof(T), cudaMemcpyHostToDevice); // copy data from _ptr to tmp
-	// 	_ptr->removeReference();  // remove reference since now on device
-	// 	_ptr = tmp;  // set _ptr to tmp
-	// }
-
-	// CUDA_CALLABLE_MEMBER void deviceToHost(){
-	// 	T* tmp = NULL;  // assign host memory, do not need malloc since only one object expected
-	// 	cudaMemcpy(tmp, _ptr, sizeof(T), cudaMemcpyDeviceToHost);
-	// 	cudaFree(_ptr);  // free memory befor freeing _ptr
-	// 	_ptr->removeReferenceNoDelete();  // remove reference since now on device but do not delete
-	// 	_ptr = tmp;  // set _ptr to tmp
-	// }
-	// #endif
 
 private:
 
