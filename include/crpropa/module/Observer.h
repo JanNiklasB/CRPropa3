@@ -33,7 +33,7 @@ private:
 	char* description;
 	int descriptionSize;
 public:
-	virtual ~ObserverFeature(){delete[] description;}
+	virtual ~ObserverFeature();
 	CUDA_CALLABLE_MEMBER virtual DetectionState checkDetection(Candidate *candidate) const;
 	CUDA_CALLABLE_MEMBER virtual void onDetection(Candidate *candidate) const;
 	virtual std::string getDescription() const;
@@ -84,6 +84,7 @@ public:
  */
 class ObserverDetectAll: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverDetectAll(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -95,8 +96,9 @@ public:
  */
 class ObserverSurface: public ObserverFeature {
 private:
-	ref_ptr<Surface> surface;
+	Surface* surface;
 public:
+	CUDA_CALLABLE_MEMBER ObserverSurface(){}
 	/** Constructor
 	 @param surface		object with some specific geometric (see Geometry.h)
 	*/
@@ -116,6 +118,7 @@ private:
 	double radius;
     double stepSize;
 public:
+	CUDA_CALLABLE_MEMBER ObserverTracking();
 	/** Constructor
 	 @param center		vector containing the coordinates of the center of the sphere
 	 @param radius		radius of the sphere
@@ -135,6 +138,7 @@ public:
  */
 class Observer1D: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER Observer1D(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -156,11 +160,12 @@ class ObserverRedshiftWindow: public ObserverFeature {
 private:
 	double zmin, zmax;
 public:
+	CUDA_CALLABLE_MEMBER ObserverRedshiftWindow();
 	/** Constructor
 	 @param zmin	lower bound of redshift interval
 	 @param zmax	upper bound of redshift interval
 	 */
-	ObserverRedshiftWindow(double zmin = 0, double zmax = 0.1);
+	ObserverRedshiftWindow(double zmin, double zmax = 0.1);
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -172,6 +177,7 @@ public:
  */
 class ObserverInactiveVeto: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverInactiveVeto(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -183,6 +189,7 @@ public:
  */
 class ObserverNucleusVeto: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverNucleusVeto(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -194,6 +201,7 @@ public:
  */
 class ObserverNeutrinoVeto: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverNeutrinoVeto(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -205,6 +213,7 @@ public:
  */
 class ObserverPhotonVeto: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverPhotonVeto(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -216,6 +225,7 @@ public:
  */
 class ObserverElectronVeto: public ObserverFeature {
 public:
+	CUDA_CALLABLE_MEMBER ObserverElectronVeto(){}
 	CUDA_CALLABLE_MEMBER DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };
@@ -231,6 +241,7 @@ class ObserverParticleIdVeto: public ObserverFeature {
 private:
 	int vetoParticleId;
 public:
+	CUDA_CALLABLE_MEMBER ObserverParticleIdVeto(){}
 	/** Constructor
 	 @param id		id of the particle following the PDG numbering scheme
 	 */
@@ -257,19 +268,13 @@ protected:
 	 If it is not empty, the vector will be used instead of the getTime function.
 	 (leave empty if you want to rather use functions)
 	*/
-	std::vector<double> detList;
-	double* detListPtr=NULL;
-	int detListSize=0;
-	/**
-	 A temporary storage for detList, this enables the return of a List in getTimes
-	 without risking to modify detList
-	 */
-	mutable std::vector<double> tempDetList;
+	double* detList;
+	int detListSize;
 	
 public:
 	/** Default constructor
 	 */
-	ObserverTimeEvolution();
+	CUDA_CALLABLE_MEMBER ObserverTimeEvolution();
 	/** Constructor
 	 @param min		minimum time
 	 @param dist	time interval for detection
@@ -295,6 +300,7 @@ public:
 	 The so created detList can then be modified via addTime, addTimeRange and setTimes.
 	 */
 	ObserverTimeEvolution(const std::vector<double> &detList);
+	~ObserverTimeEvolution();
 
 	/** Function
 	 Generates the detList if it is empty when for example the 
@@ -320,7 +326,7 @@ public:
 	/** Function
 	 Checks if detList is empty
 	 */
-	bool empty(){return detList.empty();}
+	bool empty(){return detListSize==0;}
 
 	// setter functions:
 	/** Function
@@ -365,7 +371,7 @@ public:
 	 This function does not return detList directly, it rather appends a new vector with
 	 getTime numb times.
 	 */
-	const std::vector<double>& getTimes() const;
+	std::vector<double> getTimes() const;
 	/** Function
 	 Returns a string containing a representation of all times.
 	 This function does not create a detList.

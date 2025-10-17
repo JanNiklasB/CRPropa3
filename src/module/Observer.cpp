@@ -92,6 +92,10 @@ void Observer::setDeactivateOnDetection(bool deactivate) {
 }
 
 // ObserverFeature ------------------------------------------------------------
+ObserverFeature::~ObserverFeature(){
+	delete[] description;
+}
+
 DetectionState ObserverFeature::checkDetection(Candidate *candidate) const {
 	return NOTHING;
 }
@@ -113,6 +117,8 @@ std::string ObserverDetectAll::getDescription() const {
 }
 
 // ObserverTracking --------------------------------------------------------
+ObserverTracking::ObserverTracking(){}
+
 ObserverTracking::ObserverTracking(Vector3d center, double radius, double stepSize) :
 		center(center), radius(radius), stepSize(stepSize) {
 	if (stepSize == 0) {
@@ -164,8 +170,12 @@ std::string Observer1D::getDescription() const {
 }
 
 // ObserverRedshiftWindow -----------------------------------------------------
+ObserverRedshiftWindow::ObserverRedshiftWindow() :
+	zmin(0), zmax(0.1) {
+}
+
 ObserverRedshiftWindow::ObserverRedshiftWindow(double zmin, double zmax) :
-		zmin(zmin), zmax(zmax) {
+	zmin(zmin), zmax(zmax) {
 }
 
 DetectionState ObserverRedshiftWindow::checkDetection(
@@ -257,7 +267,7 @@ std::string ObserverParticleIdVeto::getDescription() const {
 
 
 // ObserverTimeEvolution --------------------------------------------------------
-ObserverTimeEvolution::ObserverTimeEvolution() {}
+ObserverTimeEvolution::ObserverTimeEvolution(){}
 
 ObserverTimeEvolution::ObserverTimeEvolution(double min, double dist, double numb) {
 	setIsLogarithmicScaling(false);
@@ -275,6 +285,11 @@ ObserverTimeEvolution::ObserverTimeEvolution(double min, double max, double numb
 
 ObserverTimeEvolution::ObserverTimeEvolution(const std::vector<double> &detList){
 	setTimes(detList);
+}
+
+ObserverTimeEvolution::~ObserverTimeEvolution(){
+	delete[] detList;
+	ObserverFeature::~ObserverFeature();
 }
 
 DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
@@ -321,32 +336,30 @@ DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 
 void ObserverTimeEvolution::clear(){
 	doDetListConstruction = false;
-	detList.clear();
-	detList.resize(0);
-	setNIntervals(0);
-	detListPtr = NULL;
+	delete[] detList;
+	detList = NULL;
 	detListSize = 0;
+	setNIntervals(0);
 }
 
 void ObserverTimeEvolution::constructDetListIfEmpty(){
-	if (detList.empty() && doDetListConstruction) {
+	if (empty() && doDetListConstruction) {
 		std::vector<double> detListTemp;  // needed since getTime otherwise calls detList
 		size_t counter = 0;
 		while (getTime(counter)<=maximum) {
 			detListTemp.push_back(getTime(counter));
 			counter++;
 		}
-		detList.assign(detListTemp.begin(), detListTemp.end());
-		detListPtr = detList.data();
-		detListSize = detList.size();
+		detListSize = detListTemp.size();
+		detList = new double[detListSize];
+		for(int i=0; i<detListSize; i++)
+			detList[i] = detListTemp[i];
 	}
 }
 
 void ObserverTimeEvolution::addTime(const double &time){
 	constructDetListIfEmpty();
-	detList.push_back(time);
-	detListPtr = detList.data();
-	detListSize = detList.size();
+	push_back(detList, detListSize, time);
 	setNIntervals(nIntervals + 1);  // increase number of entries by one
 }
 
@@ -363,14 +376,18 @@ void ObserverTimeEvolution::addTimeRange(double min, double max, double numb, bo
 		}
 	}
 	// allready corrected by addTime, just here to be safe
-	setNIntervals(detList.size());
+	setNIntervals(detListSize);
 }
 
 void ObserverTimeEvolution::setTimes(const std::vector<double> &detList){
-	this->detList.assign(detList.begin(), detList.end());
-	detListPtr = this->detList.data();
-	detListSize = this->detList.size();
-	setNIntervals(detList.size());
+	delete[] this->detList;
+
+	detListSize = detList.size();
+	this->detList = new double[detListSize];
+	for(int i=0; i<detListSize; i++)
+		this->detList[i] = detList[i];
+
+	setNIntervals(detListSize);
 	setMinimum(detList.front());
 	setMaximum(detList.back());
 	doDetListConstruction = false;
@@ -386,7 +403,7 @@ void ObserverTimeEvolution::setMinimum(double min){
 
 double ObserverTimeEvolution::getTime(size_t index) const {
 	if (detListSize>0) {
-		return detListPtr[index];
+		return detList[index];
 	} else if (isLogarithmicScaling) {
 		return minimum * pow(maximum / minimum, index / (nIntervals - 1.0));
 	} else {
@@ -394,8 +411,8 @@ double ObserverTimeEvolution::getTime(size_t index) const {
 	}
 }
 
-const std::vector<double>& ObserverTimeEvolution::getTimes() const {
-	tempDetList.resize(nIntervals);
+std::vector<double> ObserverTimeEvolution::getTimes() const {
+	std::vector<double> tempDetList(nIntervals);
 	for (size_t i = 0; i < nIntervals; i++){
 		tempDetList[i] = getTime(i);
 	}
