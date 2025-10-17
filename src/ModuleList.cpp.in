@@ -21,6 +21,9 @@ void g_cancel_signal_callback(int sig) {
 	g_cancel_signal_flag = sig;
 }
 
+ModuleList::ModuleList() : showProgress(false){
+}
+
 ModuleList::~ModuleList(){
 	#ifdef __CUDACC__
 	for(Module** ptr : dmodules)
@@ -79,6 +82,11 @@ void ModuleList::process(ref_ptr<Candidate> candidate) const {
 }
 
 void ModuleList::run(Candidate* candidate, bool recursive, bool secondariesFirst) {
+	// check if Nuclear Mass Table was initialized:
+	if(!candidate->getNuclearMassTable()){
+		candidate->setNuclearMassTable(&nuclearMassTable);
+	}
+
 	// propagate primary candidate until finished
 	while (candidate->isActive() && (g_cancel_signal_flag == 0)) {
 		process(candidate);
@@ -113,6 +121,13 @@ void ModuleList::run(ref_ptr<Candidate> candidate, bool recursive, bool secondar
 
 void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool secondariesFirst) {
 	size_t count = candidates->size();
+
+	// check if Nuclear Mass Table was initialized:
+	for (auto cand : *candidates){
+		if(!cand->getNuclearMassTable()){
+			cand->setNuclearMassTable(&nuclearMassTable);
+		}
+	}
 
 	#if _OPENMP
 	std::cout << "crpropa::ModuleList: Number of Threads: " << omp_get_max_threads() << std::endl;
@@ -197,11 +212,15 @@ void ModuleList::run(SourceInterface* source, size_t count, bool recursive, bool
 
 		try {
 			candidate = source->getCandidate();
+			if(!candidate->getNuclearMassTable()){
+				candidate->setNuclearMassTable(&nuclearMassTable);
+			}
+
 		} catch (std::exception &e) {
 			std::cerr << "Exception in crpropa::ModuleList::run: source->getCandidate" << std::endl;
 			std::cerr << e.what() << std::endl;
-		#pragma omp critical(g_cancel_signal_flag)
-			g_cancel_signal_flag = -1;
+			#pragma omp critical(g_cancel_signal_flag)
+				g_cancel_signal_flag = -1;
 		}
 
 		if (candidate.valid()) {
@@ -324,6 +343,10 @@ void ModuleList::cudarun(SourceInterface* source, size_t count, bool recursive, 
 		ref_ptr<Candidate> candidate;
 		candidate = source->getCandidate();
 
+		if(!candidate->getNuclearMassTable()){
+			candidate->setNuclearMassTable(&nuclearMassTable);
+		}
+
 		if (candidate.valid()) {
 			candidates.push_back(candidate);
 		}
@@ -397,20 +420,20 @@ void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
 	}
 }
 
-ModuleListRunner::ModuleListRunner(ModuleList *mlist) : mlist(mlist) {
-}
+// ModuleListRunner::ModuleListRunner(ModuleList *mlist) : mlist(mlist) {
+// }
 
-void ModuleListRunner::process(Candidate *candidate) const {
-	if (mlist)
-		mlist->run(candidate);
-}
+// void ModuleListRunner::process(Candidate *candidate) const {
+// 	if (mlist)
+// 		mlist->run(candidate);
+// }
 
-std::string ModuleListRunner::getDescription() const {
-	std::stringstream ss;
-	ss << "ModuleListRunner\n";
-	if (mlist)
-		ss << mlist->getDescription();
-	return ss.str();
-};
+// std::string ModuleListRunner::getDescription() const {
+// 	std::stringstream ss;
+// 	ss << "ModuleListRunner\n";
+// 	if (mlist)
+// 		ss << mlist->getDescription();
+// 	return ss.str();
+// };
 
 } // namespace crpropa

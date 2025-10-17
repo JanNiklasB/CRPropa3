@@ -37,7 +37,7 @@ public:
 	__shared__ int maxThreadsPerBlock;
 	#endif
 
-	CUDA_CALLABLE_MEMBER ModuleList() : showProgress(false){}
+	ModuleList();
 	virtual ~ModuleList();
 	void setShowProgress(bool show = true); ///< activate a progress bar
 
@@ -85,6 +85,7 @@ private:
 	Output* interruptAction;
 	bool haveInterruptAction = false;
 	std::vector<int> notFinished; // list with not finished numbers of candidates
+	NuclearMassTable nuclearMassTable;
 };
 
 template<class Type>
@@ -105,19 +106,19 @@ void ModuleList::add(Type *module) {
 	#endif
 }
 
-/**
- @class ModuleListRunner
- @brief Run the provided ModuleList when process is called.
- */
-class ModuleListRunner: public Module {
-private:
-	ModuleList* mlist;
-public:
-	CUDA_CALLABLE_MEMBER ModuleListRunner(){};
-	ModuleListRunner(ModuleList *mlist);
-	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
-	std::string getDescription() const;
-};
+// /**
+//  @class ModuleListRunner
+//  @brief Run the provided ModuleList when process is called.
+//  */
+// class ModuleListRunner: public Module {
+// private:
+// 	ModuleList* mlist;
+// public:
+// 	CUDA_CALLABLE_MEMBER ModuleListRunner(){};
+// 	ModuleListRunner(ModuleList *mlist);
+// 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
+// 	std::string getDescription() const;
+// };
 
 #ifdef __CUDACC__
 __global__ void _cudarun(

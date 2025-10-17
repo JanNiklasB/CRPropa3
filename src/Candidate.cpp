@@ -9,9 +9,52 @@ namespace crpropa {
 
 CUDA_CALLABLE_MEMBER uint64_t nextSerialNumberGlobal = 0;
 
+Candidate::Candidate() :
+redshift(0), trajectoryLength(0), weight(1.), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin("PRIM"), time(0), NuclearMassPtr(NULL) {
+	ParticleState state;
+	source = state;
+	created = state;
+	previous = state;
+	current = state;
+
+	nextSerialNumber = &nextSerialNumberGlobal;
+
+	#if defined(OPENMP_3_1)
+		#pragma omp atomic capture
+		{serialNumber = (*nextSerialNumber)++;}
+	#elif defined(__GNUC__)
+		{serialNumber = __sync_add_and_fetch(nextSerialNumber, 1);}
+	#else
+		#pragma omp critical(serialNumber)
+		{serialNumber = (*nextSerialNumber)++;}
+	#endif
+}
+
 Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
 redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0) {
-	ParticleState state(id, E, pos, dir);
+	NuclearMassPtr = NULL;
+	ParticleState state(NuclearMassPtr, id, E, pos, dir);
+	source = state;
+	created = state;
+	previous = state;
+	current = state;
+
+	nextSerialNumber = &nextSerialNumberGlobal;
+
+	#if defined(OPENMP_3_1)
+		#pragma omp atomic capture
+		{serialNumber = (*nextSerialNumber)++;}
+	#elif defined(__GNUC__)
+		{serialNumber = __sync_add_and_fetch(nextSerialNumber, 1);}
+	#else
+		#pragma omp critical(serialNumber)
+		{serialNumber = (*nextSerialNumber)++;}
+	#endif
+}
+
+Candidate::Candidate(NuclearMassTable* NuclearMassTablePtr, int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
+redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0), NuclearMassPtr(NuclearMassTablePtr) {
+	ParticleState state(NuclearMassTablePtr, id, E, pos, dir);
 	source = state;
 	created = state;
 	previous = state;
@@ -31,8 +74,9 @@ redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), a
 }
 
 Candidate::Candidate(const ParticleState &state) :
-		source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin ("PRIM"), time(0) {
+	source(state), created(state), current(state), previous(state), redshift(0), trajectoryLength(0), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin ("PRIM"), time(0) {
 	
+	NuclearMassPtr = state.getNuclearMassTable();
 	nextSerialNumber = &nextSerialNumberGlobal;
 
 	#if defined(OPENMP_3_1)
@@ -44,6 +88,10 @@ Candidate::Candidate(const ParticleState &state) :
 		#pragma omp critical(serialNumber)
 		{serialNumber = (*nextSerialNumber)++;}
 	#endif
+}
+
+Candidate::~Candidate(){
+	delete[] secondaries;
 }
 
 bool Candidate::isActive() const {
@@ -109,7 +157,11 @@ void Candidate::setNextStep(double step) {
 }
 
 void Candidate::limitNextStep(double step) {
+	#ifdef __CUDACC__
+	nextStep = cuda::std::min(nextStep, step);
+	#else
 	nextStep = std::min(nextStep, step);
+	#endif
 }
 
 void Candidate::setProperty(const std::string &name, const Variant &value) {
@@ -155,7 +207,7 @@ bool Candidate::hasProperty(const std::string &name) const {
 }
 
 void Candidate::addSecondary(Candidate *c) {
-	push_back<ref_ptr<Candidate>>(secondaries, secondariesSize, c);
+	push_back(secondaries, secondariesSize, c);
 }
 
 void Candidate::addSecondary(int id, double energy, double w, std::string tagOrigin) {
@@ -165,6 +217,7 @@ void Candidate::addSecondary(int id, double energy, double w, std::string tagOri
 	secondary->setTime(time);
 	secondary->setWeight(weight * w);
 	secondary->setTagOrigin(tagOrigin);
+	secondary->setNuclearMassTable(NuclearMassPtr);
 	for (PropertyMap::const_iterator it = properties.begin(); it != properties.end(); ++it) {
 		secondary->setProperty(it->first, it->second);		
 	}
@@ -185,6 +238,7 @@ void Candidate::addSecondary(int id, double energy, Vector3d position, double w,
 	secondary->setTime(time - (current.getPosition() - position).getR() / getVelocity());
 	secondary->setWeight(weight * w);
 	secondary->setTagOrigin(tagOrigin);
+	secondary->setNuclearMassTable(NuclearMassPtr);
 	for (PropertyMap::const_iterator it = properties.begin(); it != properties.end(); ++it) {
 		secondary->setProperty(it->first, it->second);		
 	}
@@ -229,9 +283,10 @@ void Candidate::copy(const Candidate* C){
 	currentStep = C->currentStep;
 	nextStep = C->nextStep;
 	parent = C->parent;
+	NuclearMassPtr = C->NuclearMassPtr;
 }
 
-ref_ptr<Candidate> Candidate::clone(bool recursive) const {
+Candidate* Candidate::clone(bool recursive) const {
 	ref_ptr<Candidate> cloned = new Candidate;
 	cloned->copy(this);
 	if (recursive) {
@@ -277,6 +332,18 @@ void Candidate::setNextSerialNumber(uint64_t snr) {
 
 uint64_t Candidate::getNextSerialNumber() {
 	return nextSerialNumberGlobal;
+}
+
+void Candidate::setNuclearMassTable(NuclearMassTable* NuclearMassTablePtr) {
+	NuclearMassPtr = NuclearMassTablePtr;
+	source.setNuclearMassTable(NuclearMassPtr);
+	created.setNuclearMassTable(NuclearMassPtr);
+	previous.setNuclearMassTable(NuclearMassPtr);
+	current.setNuclearMassTable(NuclearMassPtr);
+}
+
+NuclearMassTable* Candidate::getNuclearMassTable() const {
+	return NuclearMassPtr;
 }
 
 void Candidate::restart() {

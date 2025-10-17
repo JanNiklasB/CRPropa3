@@ -10,13 +10,28 @@
 
 namespace crpropa {
 
-ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.)
-{
+ParticleState::ParticleState()
+	: id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.), nuclearMassTable(NULL){
+	setId(id);
+	setEnergy(0);
+	setPosition(Vector3d(0,0,0));
+	setDirection(Vector3d(-1,0,0));
+}
+
+ParticleState::ParticleState(NuclearMassTable* nuclearMassTable, int id, double E, Vector3d pos, Vector3d dir)
+	: id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.), nuclearMassTable(nuclearMassTable){
 	setId(id);
 	setEnergy(E);
 	setPosition(pos);
 	setDirection(dir);
-	nuclearMassTable = new NuclearMassTable;
+}
+
+ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir)
+	: id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.), nuclearMassTable(NULL){
+	setId(id);
+	setEnergy(E);
+	setPosition(pos);
+	setDirection(dir);
 }
 
 void ParticleState::setPosition(const Vector3d &pos) {
@@ -49,7 +64,10 @@ double ParticleState::getRigidity() const {
 
 void ParticleState::setId(int newId) {
 	id = newId;
-	pmass = nuclearMassTable->particleMass(id);
+	if(nuclearMassTable)
+		pmass = nuclearMassTable->particleMass(id);
+	else
+		pmass = 0;
 	if (isNucleus(id)) {
 		charge = chargeNumber(id) * eplus;
 		if (id < 0)
@@ -65,6 +83,14 @@ int ParticleState::getId() const {
 
 double ParticleState::getMass() const {
 	return pmass;
+}
+
+void ParticleState::setNuclearMassTable(NuclearMassTable* nuclearMassTable){
+	this->nuclearMassTable = nuclearMassTable;
+}
+
+NuclearMassTable* ParticleState::getNuclearMassTable() const{
+	return nuclearMassTable;
 }
 
 double ParticleState::getCharge() const {

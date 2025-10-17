@@ -23,7 +23,7 @@ namespace crpropa {
  */
 class ParticleState {
 private:
-	ref_ptr<NuclearMassTable> nuclearMassTable;
+	NuclearMassTable* nuclearMassTable;
 	int id; ///< particle ID (Particle Data Group numbering scheme)
 	double energy; ///< total energy
 	Vector3d position; ///< position vector in comoving coordinates
@@ -32,15 +32,33 @@ private:
 	double charge; ///< particle charge
 
 public:
+	CUDA_CALLABLE_MEMBER ParticleState();
+
+	/** Constructor for a particle state, lets you hand over your own instance of NuclearMassTable.
+	 @param nuclearMassTable Instance of NuclearMassTable
+	 @param id			id of the particle following the PDG numbering scheme
+	 @param energy		energy of the particle [in Joules]
+	 @param position	vector containing the coordinates of the particle [in meters]
+	 @param direction	vector containing the direction of motion of the particle
+	 */
+	CUDA_CALLABLE_MEMBER ParticleState(
+		NuclearMassTable* nuclearMassTable,
+		int id = 0, double energy = 0,
+		Vector3d position = Vector3d(0, 0, 0),
+		Vector3d direction = Vector3d(-1, 0, 0)
+	);
+
 	/** Constructor for a particle state.
 	 @param id			id of the particle following the PDG numbering scheme
 	 @param energy		energy of the particle [in Joules]
 	 @param position	vector containing the coordinates of the particle [in meters]
 	 @param direction	vector containing the direction of motion of the particle
 	 */
-	CUDA_CALLABLE_MEMBER ParticleState(int id = 0, double energy = 0,
-			Vector3d position = Vector3d(0, 0, 0),
-			Vector3d direction = Vector3d(-1, 0, 0));
+	ParticleState(
+		int id, double energy = 0,
+		Vector3d position = Vector3d(0, 0, 0),
+		Vector3d direction = Vector3d(-1, 0, 0)
+	);
 
 	/** Set particle position.
 	 In simulations including cosmological effects, the position is given in comoving coordinates.
@@ -97,6 +115,10 @@ public:
 	 @returns Mass of the particle [kg]
 	 */
 	CUDA_CALLABLE_MEMBER double getMass() const;
+
+	CUDA_CALLABLE_MEMBER void setNuclearMassTable(NuclearMassTable* nuclearMassTable);
+
+	CUDA_CALLABLE_MEMBER NuclearMassTable* getNuclearMassTable() const;
 
 	/** Set Lorentz factor and modify the particle's energy accordingly.
 	 @param gamma		Lorentz factor

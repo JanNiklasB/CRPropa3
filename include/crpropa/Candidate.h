@@ -35,16 +35,16 @@ public:
 	ParticleState created; /**< Particle state of parent particle at the time of creation */
 	ParticleState current; /**< Current particle state */
 	ParticleState previous; /**< Particle state at the end of the previous step */
+	NuclearMassTable* NuclearMassPtr;  ///< initialized in ModuleList.h to save storage and enable GPU support
 
-	ref_ptr<Candidate>* secondaries=NULL; /**< Secondary particles from interactions */
-	int secondariesSize=0;
+	Candidate** secondaries; /**< Secondary particles from interactions */
+	int secondariesSize;
 
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
 	PropertyMap properties; /**< Map of property names and their values. */
 
 	/** Parent candidate. 0 if no parent (initial particle). Must not be a ref_ptr to prevent circular referencing. */
-	Candidate *parent=NULL;
-
+	Candidate *parent=NULL;	
 private:
 	bool active; /**< Active status */
 	double weight; /**< Weight of the candidate */
@@ -59,7 +59,39 @@ private:
 	uint64_t serialNumber;
 
 public:
+	CUDA_CALLABLE_MEMBER Candidate();
+
+	/** Creates a candidate
+	 * \param id  Particle ID
+	 * \param energy Particle Energy
+	 * \param position Initial position
+	 * \param direction Initial direction
+	 * \param z Current simulation time-point in terms of redshift z
+	 * \param weight Weight of candidate
+	 * \param tagOrigin Name of interaction/source process which created this candidate
+	 */
+	Candidate(
+		int id,
+		double energy = 0,
+		Vector3d position = Vector3d(0, 0, 0),
+		Vector3d direction = Vector3d(-1, 0, 0),
+		double z = 0,
+		double weight = 1., 
+		std::string tagOrigin = "PRIM"
+	);
+
+	/** Creates a candidate with predefined NuclearMassTable
+	 * \param NuclearMassTable Ptr to an instance of NuclearMassTable
+	 * \param id  Particle ID
+	 * \param energy Particle Energy
+	 * \param position Initial position
+	 * \param direction Initial direction
+	 * \param z Current simulation time-point in terms of redshift z
+	 * \param weight Weight of candidate
+	 * \param tagOrigin Name of interaction/source process which created this candidate
+	 */
 	CUDA_CALLABLE_MEMBER Candidate(
+		NuclearMassTable* NuclearMassTable,
 		int id = 0,
 		double energy = 0,
 		Vector3d position = Vector3d(0, 0, 0),
@@ -74,6 +106,8 @@ public:
 	 Candidate::previous and Candidate::current state with the argument.
 	 */
 	CUDA_CALLABLE_MEMBER Candidate(const ParticleState &state);
+
+	CUDA_CALLABLE_MEMBER ~Candidate();
 
 	CUDA_CALLABLE_MEMBER bool isActive() const;
 	CUDA_CALLABLE_MEMBER void setActive(bool b);
@@ -180,13 +214,19 @@ public:
 	/** Get the next serial number that will be assigned */
 	CUDA_CALLABLE_MEMBER static uint64_t getNextSerialNumber();
 
+	/// Set NuclearMassTablePtr
+	CUDA_CALLABLE_MEMBER void setNuclearMassTable(NuclearMassTable* NuclearMassTablePtr);
+
+	/// Get NuclearMassTablePtr
+	CUDA_CALLABLE_MEMBER NuclearMassTable* getNuclearMassTable() const;
+
 	CUDA_CALLABLE_MEMBER void copy(const Candidate* Secondary);
 
 	/**
 	 Create an exact clone of candidate
 	 @param recursive	recursively clone and add the secondaries
 	 */
-	CUDA_CALLABLE_MEMBER ref_ptr<Candidate> clone(bool recursive = false) const;
+	CUDA_CALLABLE_MEMBER Candidate* clone(bool recursive = false) const;
 
 	/**
 	 Copy the source particle state to the current state
