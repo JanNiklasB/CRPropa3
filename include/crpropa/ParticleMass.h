@@ -14,13 +14,13 @@ namespace crpropa {
 class NuclearMassTable : public Referenced {
 	private:
 
-	std::vector<double> table;
-	double* tablePtr = NULL;
-	int tableSize = 0;
+	double* table;
+	int tableSize;
 
 	public:
 
 	NuclearMassTable();
+	~NuclearMassTable();
 	void init();
 
 	CUDA_CALLABLE_MEMBER double getMass(std::size_t idx);

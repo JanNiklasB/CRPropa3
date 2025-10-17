@@ -17,6 +17,10 @@ NuclearMassTable::NuclearMassTable() {
 	init();
 }
 
+NuclearMassTable::~NuclearMassTable(){
+	delete[] table;
+}
+
 void NuclearMassTable::init() {
 	std::string filename = getDataPath("nuclear_mass.txt");
 	std::ifstream infile(filename.c_str());
@@ -29,9 +33,7 @@ void NuclearMassTable::init() {
 	while (infile.good()) {
 		if (infile.peek() != '#') {
 			infile >> Z >> N >> mass;
-			table.push_back(mass);
-			tablePtr = table.data();
-			tableSize = table.size();
+			push_back(table, tableSize, mass);
 		}
 		infile.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	}
@@ -40,7 +42,7 @@ void NuclearMassTable::init() {
 }
 
 double NuclearMassTable::getMass(std::size_t idx) {
-	return tablePtr[idx];
+	return table[idx];
 }
 
 double NuclearMassTable::particleMass(int id) {
