@@ -27,10 +27,8 @@ void SimpleCudaSim(){
 
 	ref_ptr<Source> source = new Source();
 	source->add( new SourceUniform1D(1 * Mpc, 1000 * Mpc) );
-	source->add( new SourceRedshift1D() );
 	SIM.setShowProgress(true);
-	
-	printf("ModuleList would probably run\n");
+
 	SIM.run(source.get(), numCandidates);
 
 	printf("test\n");
