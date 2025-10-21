@@ -305,17 +305,17 @@ __global__ void _cudarun(Candidate** candidates, int candidatesSize, const Modul
 }
 
 // this might need to copy stuff in more detail, otherwise we will lose data
-__global__ void copySecondary(ref_ptr<Candidate>* dst, const ref_ptr<Candidate>* src, int size){
+__global__ void copySecondary(Candidate** dst, const Candidate** src, int size){
 	int i = blockDim.x*blockIdx.x + threadIdx.x;
 	if (i<size){
-		dst[i]->copy(src[i].get());
+		dst[i]->copy(src[i]);
 	}
 }
 
-void ModuleList::copySecondaries(ref_ptr<Candidate> candidate){
+void ModuleList::copySecondaries(Candidate* candidate){
 	int size = candidate->getSecondarySize();
 	if (size>0) {
-		ref_ptr<Candidate>* tmp = new ref_ptr<Candidate>[size];
+		Candidate** tmp = new Candidate*[size];
 
 		int threadsPerBlock = maxThreadsPerBlock;
 		int blocksPerGrid   = (size + threadsPerBlock - 1) / threadsPerBlock;

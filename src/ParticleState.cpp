@@ -102,7 +102,11 @@ double ParticleState::getLorentzFactor() const {
 }
 
 void ParticleState::setLorentzFactor(double lf) {
+	#ifdef __CUDACC__
+	lf = cuda::std::max(0., lf);  // prevent negative Lorentz factors
+	#else
 	lf = std::max(0., lf); // prevent negative Lorentz factors
+	#endif
 	energy = lf * pmass * c_squared;
 }
 
