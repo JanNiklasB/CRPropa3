@@ -15,7 +15,7 @@ class NuclearMassTable : public Referenced {
 	private:
 
 	double* table;
-	int tableSize;
+	size_t tableSize;
 
 	public:
 

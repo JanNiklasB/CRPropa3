@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <sstream>
+#ifdef __CUDACC__
+#include <cuda/std/chrono>
+#endif
 
 using namespace std;
 

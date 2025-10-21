@@ -67,14 +67,11 @@ void SourceFeature::prepareCandidate(Candidate& candidate) const {
 }
 
 std::string SourceFeature::getDescription() const {
-	return std::string(description, descriptionSize);;
+	return std::string(description);;
 }
 
 void SourceFeature::setDescription(const std::string &d){
-	delete[] description;
-	descriptionSize = d.size();
-	description = new char[descriptionSize];
-	d.copy(description, descriptionSize);
+	description = d.c_str();
 }
 
 // ----------------------------------------------------------------------------

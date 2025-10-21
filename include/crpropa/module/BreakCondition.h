@@ -21,7 +21,7 @@ namespace crpropa {
 class MaximumTrajectoryLength: public AbstractCondition {
 	double maxLength;
 	Vector3d* observerPositions;
-	int observerPositionsSize;
+	size_t observerPositionsSize;
 public:
 	CUDA_CALLABLE_MEMBER MaximumTrajectoryLength();
 	MaximumTrajectoryLength(double length);
@@ -119,9 +119,9 @@ public:
  */
 class MinimumEnergyPerParticleId: public AbstractCondition {
 	double* minEnergies;
-	int minEnergiesSize;
+	size_t minEnergiesSize;
 	int* particleIds;
-	int particleIdsSize;
+	size_t particleIdsSize;
 	double minEnergyOthers;
 public:
 	CUDA_CALLABLE_MEMBER MinimumEnergyPerParticleId();

@@ -9,19 +9,14 @@ Module::Module() {
 	setDescription(info.name());
 }
 
-Module::~Module() {
-	delete[] description;
-}
+Module::~Module() {}
 
 std::string Module::getDescription() const {
-	return std::string(description, descriptionSize);
+	return std::string(description);
 }
 
 void Module::setDescription(const std::string &d) {
-	delete[] description;
-	descriptionSize = d.size();
-	description = new char[descriptionSize];
-	d.copy(description, descriptionSize);
+	description = d.c_str();
 }
 
 AbstractCondition::AbstractCondition() :

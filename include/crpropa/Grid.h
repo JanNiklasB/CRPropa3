@@ -82,6 +82,8 @@ public:
 	interpolationType ipol;	// Interpolation type used between grid points
 	bool clipVolume;	// Set grid values to 0 outside the volume if true
 
+	CUDA_CALLABLE_MEMBER GridProperties(){}
+
 	/** Constructor for cubic grid
 	 @param	origin	Position of the lower left front corner of the volume
 	 @param	N		Number of grid points in one direction
@@ -170,6 +172,8 @@ class Grid: public Referenced {
 	interpolationType ipolType; /**< Type of interpolation between the grid points */
 
 public:
+	CUDA_CALLABLE_MEMBER Grid(){}
+
 	/** Constructor for cubic grid
 	 @param	origin	Position of the lower left front corner of the volume
 	 @param	N		Number of grid points in one direction

@@ -179,6 +179,10 @@ void Candidate::setTagOrigin (const char* tagOrigin) {
 	this->tagOrigin = tagOrigin;
 }
 
+void Candidate::setTagOrigin (const std::string& tagOrigin) {
+	this->tagOrigin = tagOrigin.c_str();
+}
+
 const char* Candidate::getTagOrigin () const {
 	return tagOrigin;
 }
@@ -251,7 +255,7 @@ void Candidate::addSecondary(Candidate *c) {
 	push_back(secondaries, secondariesSize, c);
 }
 
-void Candidate::addSecondary(int id, double energy, double w, std::string tagOrigin) {
+void Candidate::addSecondary(int id, double energy, double w, const char* tagOrigin) {
 	ref_ptr<Candidate> secondary = new Candidate;
 	secondary->setRedshift(redshift);
 	secondary->setTrajectoryLength(trajectoryLength);
@@ -276,7 +280,7 @@ void Candidate::addSecondary(int id, double energy, double w, std::string tagOri
 	addSecondary(secondary);
 }
 
-void Candidate::addSecondary(int id, double energy, Vector3d position, double w, std::string tagOrigin) {
+void Candidate::addSecondary(int id, double energy, Vector3d position, double w, const char* tagOrigin) {
 	ref_ptr<Candidate> secondary = new Candidate;
 	secondary->setRedshift(redshift);
 	secondary->setTrajectoryLength(trajectoryLength - (current.getPosition() - position).getR());

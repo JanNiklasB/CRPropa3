@@ -18,8 +18,7 @@ class Candidate;
  @brief Abstract base class for modules
  */
 class Module: public Referenced {
-	char* description;
-	int descriptionSize;
+	const char* description="";
 public:
 	Module();
 	virtual ~Module();

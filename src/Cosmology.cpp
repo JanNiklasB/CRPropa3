@@ -10,7 +10,7 @@ namespace crpropa {
 void Cosmology::update() {
 	double dH = c_light / H0; // Hubble distance
 
-	std::vector<double> E(n);
+	double E[n];
 	E[0] = 1;
 
 	// Relation between comoving distance r and redshift z (cf. J.A. Peacock, Cosmological physics, p. 89 eq. 3.76)
@@ -35,27 +35,29 @@ Cosmology::Cosmology() {
 	omegaM = 0.315;
 	omegaL = 1 - omegaM;
 
-	Z.resize(n);
-	Dc.resize(n);
-	Dl.resize(n);
-	Dt.resize(n);
+	 Z = new double[n];
+	Dc = new double[n];
+	Dl = new double[n];
+	Dt = new double[n];
 
 	Z[0] = 0;
 	Dc[0] = 0;
 	Dl[0] = 0;
 	Dt[0] = 0;
 
-	ZPtr = Z.data();
-	DcPtr = Dc.data();
-	DlPtr = Dl.data();
-	DtPtr = Dt.data();
-
-	ZSize = Z.size();
-	DcSize = Dc.size();
-	DlSize = Dl.size();
-	DtSize = Dt.size();
+	ZSize = n;
+	DcSize = n;
+	DlSize = n;
+	DtSize = n;
 
 	update();
+}
+
+Cosmology::~Cosmology(){
+	delete[] Z ;
+	delete[] Dc;
+	delete[] Dl;
+	delete[] Dt;
 }
 
 void Cosmology::setParameters(double hubbleParameter, double omegaMatter) {
@@ -88,7 +90,7 @@ double Cosmology::comovingDistance2Redshift(double d) const {
 	if (d > this->DcPtr[this->DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, this->DcPtr, this->ZPtr, this->ZSize);
+	return interpolate(d, this->Dc, this->Z, this->ZSize);
 }
 
 double Cosmology::redshift2ComovingDistance(double z) const {
@@ -98,7 +100,7 @@ double Cosmology::redshift2ComovingDistance(double z) const {
 	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, this->ZPtr, this->DcPtr, this->DcSize);
+	return interpolate(z, this->Z, this->Dc, this->DcSize);
 }
 
 double Cosmology::luminosityDistance2Redshift(double d) const {
@@ -108,7 +110,7 @@ double Cosmology::luminosityDistance2Redshift(double d) const {
 	if (d > this->DlPtr[this->DlSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, this->DlPtr, this->ZPtr, this->ZSize);
+	return interpolate(d, this->Dl, this->Z, this->ZSize);
 }
 
 double Cosmology::redshift2LuminosityDistance(double z) const {
@@ -118,7 +120,7 @@ double Cosmology::redshift2LuminosityDistance(double z) const {
 	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, this->ZPtr, this->DlPtr, this->DlSize);
+	return interpolate(z, this->Z, this->Dl, this->DlSize);
 }
 
 double Cosmology::lightTravelDistance2Redshift(double d) const {
@@ -128,7 +130,7 @@ double Cosmology::lightTravelDistance2Redshift(double d) const {
 	if (d > this->DtPtr[this->DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, this->DtPtr, this->ZPtr, this->ZSize);
+	return interpolate(d, this->Dt, this->Z, this->ZSize);
 }
 
 double Cosmology::redshift2LightTravelDistance(double z) const {
@@ -138,7 +140,7 @@ double Cosmology::redshift2LightTravelDistance(double z) const {
 	if (z > this->zmax)
 		throw std::runtime_error("Cosmology: z > zmax");
 	#endif
-	return interpolate(z, this->ZPtr, this->DtPtr, this->DtSize);
+	return interpolate(z, this->Z, this->Dt, this->DtSize);
 }
 
 double Cosmology::comoving2LightTravelDistance(double d) const {
@@ -148,7 +150,7 @@ double Cosmology::comoving2LightTravelDistance(double d) const {
 	if (d > this->DcPtr[this->DcSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, this->DcPtr, this->DtPtr, this->DtSize);
+	return interpolate(d, this->Dc, this->Dt, this->DtSize);
 }
 
 double Cosmology::lightTravel2ComovingDistance(double d) const {
@@ -158,7 +160,7 @@ double Cosmology::lightTravel2ComovingDistance(double d) const {
 	if (d > this->DtPtr[this->DtSize-1])
 		throw std::runtime_error("Cosmology: d > dmax");
 	#endif
-	return interpolate(d, this->DtPtr, this->DcPtr, this->DcSize);
+	return interpolate(d, this->Dt, this->Dc, this->DcSize);
 }
 
 } // namespace crpropa

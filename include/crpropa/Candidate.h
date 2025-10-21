@@ -152,6 +152,7 @@ public:
 	 Sets the tagOrigin of the candidate. Can be used to trace back the interactions
 	 */
 	CUDA_CALLABLE_MEMBER void setTagOrigin(const char* tagOrigin);
+	void setTagOrigin (const std::string& tagOrigin);
 	CUDA_CALLABLE_MEMBER const char* getTagOrigin() const;
 
 	/**
@@ -193,7 +194,7 @@ public:
 	 @param w			weight of the secondary
 	 @param tagOrigin 	tag of the secondary
 	 */
-	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, double w = 1., std::string tagOrigin = "SEC");
+	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, double w = 1., const char* tagOrigin = "SEC");
 	/**
 	 Add a new candidate to the list of secondaries.
 	 @param id			particle ID of the secondary
@@ -202,7 +203,7 @@ public:
 	 @param w			weight of the secondary
 	 @param tagOrigin 	tag of the secondary
 	 */
-	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, Vector3d position, double w = 1., std::string tagOrigin = "SEC");
+	CUDA_CALLABLE_MEMBER void addSecondary(int id, double energy, Vector3d position, double w = 1., const char* tagOrigin = "SEC");
 	CUDA_CALLABLE_MEMBER void clearSecondaries();
 
 	std::string getDescription() const;

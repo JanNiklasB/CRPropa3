@@ -50,7 +50,7 @@ private:
 	int flagKeySize, flagValueSize;
 	// std::vector<ref_ptr<ObserverFeature> > features;
 	ObserverFeature** features;
-	int featuresSize;
+	size_t featuresSize;
 	Module* detectionAction;
 	bool clone;
 	bool makeInactive;
@@ -269,7 +269,7 @@ protected:
 	 (leave empty if you want to rather use functions)
 	*/
 	double* detList;
-	int detListSize;
+	size_t detListSize;
 	
 public:
 	/** Default constructor

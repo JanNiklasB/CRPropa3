@@ -55,9 +55,7 @@ public:
 		data[2] = v.z;
 	}
 
-	~Vector3()
-	{
-	}
+	CUDA_CALLABLE_MEMBER ~Vector3(){}
 
 	CUDA_CALLABLE_MEMBER explicit Vector3(const double *v) {
 		data[0] = v[0];

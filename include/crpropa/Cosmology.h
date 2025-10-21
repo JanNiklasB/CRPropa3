@@ -22,23 +22,23 @@ struct Cosmology : public Referenced {
 	double omegaM; // matter density parameter
 	double omegaL; // vacuum energy parameter
 
-	const int n = 1000;
+	const size_t n = 1000;
 	const double zmin = 0.0001;
 	const double zmax = 100;
 
-	std::vector<double> Z;  // redshift
-	std::vector<double> Dc; // comoving distance [m]
-	std::vector<double> Dl; // luminosity distance [m]
-	std::vector<double> Dt; // light travel distance [m]
+	double* Z =NULL;  // redshift
+	double* Dc=NULL; // comoving distance [m]
+	double* Dl=NULL; // luminosity distance [m]
+	double* Dt=NULL; // light travel distance [m]
 
-	double *ZPtr=NULL, *DcPtr=NULL, *DlPtr=NULL, *DtPtr=NULL;
-	int ZSize=0, DcSize=0, DlSize=0, DtSize=0;
+	size_t ZSize=0, DcSize=0, DlSize=0, DtSize=0;
 
 	public:
 
-	Cosmology();
+	CUDA_CALLABLE_MEMBER Cosmology();
+	CUDA_CALLABLE_MEMBER ~Cosmology();
 
-	void update();
+	CUDA_CALLABLE_MEMBER void update();
 
 	/**
 	 Set the cosmological parameters for a flat universe. To ensure flatness omegaL is set to 1 - omegaMatter

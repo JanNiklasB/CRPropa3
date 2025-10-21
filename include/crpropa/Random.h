@@ -107,7 +107,8 @@ public:
 protected:
 	enum {M = 397}; // period parameter
 	uint32_t state[N];// internal state
-	std::vector<uint32_t> initial_seed;
+	uint32_t* initial_seed=NULL;
+	size_t initial_seedSize=0;
 	uint32_t *pNext;// next value to get from state
 	int left;// number of values left before reload needed
 
@@ -122,6 +123,8 @@ public:
 	/// values together, otherwise the generator state can be learned after
 	/// reading 624 consecutive values.
 	Random();
+	~Random();
+
 	// Access to 32-bit random numbers
 	CUDA_CALLABLE_MEMBER double rand();///< real number in [0,1]
 	CUDA_CALLABLE_MEMBER double rand( const double& n );///< real number in [0,n]

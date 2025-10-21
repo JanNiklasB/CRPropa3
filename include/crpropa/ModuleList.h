@@ -77,7 +77,7 @@ private:
 	#ifdef __CUDACC__
 	std::vector<Module**> dmodules;
 	Module*** dmodulesPtr=NULL;
-	int dmodulesSize=0;
+	size_t dmodulesSize=0;
 	bool isInKernel = false;
 	#endif
 

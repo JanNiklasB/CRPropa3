@@ -45,6 +45,7 @@ class Plane: public Surface {
 private:
 	Vector3d x0, n;
 public:
+	CUDA_CALLABLE_MEMBER Plane(){}
 	Plane(const Vector3d& x0, const Vector3d& v1,const Vector3d& v2);
 	Plane(const Vector3d& x0, const Vector3d& n);
 	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &x) const;
@@ -62,6 +63,7 @@ private:
 	Vector3d center;
 	double radius;
 public:
+	CUDA_CALLABLE_MEMBER Sphere(){}
 	Sphere(const Vector3d& center, double radius);
 	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &point) const;
 	virtual Vector3d normal(const Vector3d& point) const;
@@ -77,6 +79,7 @@ class ParaxialBox: public Surface {
 private:
 	Vector3d corner, size;
 public:
+	CUDA_CALLABLE_MEMBER ParaxialBox(){}
 	ParaxialBox(const Vector3d& corner, const Vector3d& size);
 	CUDA_CALLABLE_MEMBER virtual double distance(const Vector3d &point) const;
 	virtual Vector3d normal(const Vector3d& point) const;

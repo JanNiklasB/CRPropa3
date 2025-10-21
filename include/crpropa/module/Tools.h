@@ -29,7 +29,7 @@ private:
 	};
 
 	mutable _module_info* modules;
-	mutable int modulesSize;
+	mutable size_t modulesSize;
 	mutable size_t calls;
 
 public:
@@ -45,7 +45,8 @@ public:
   @brief Reject Particles not listed in filter.
 */
 class ParticleFilter: public AbstractCondition {
-	int* ids, idsSize;
+	int* ids;
+	size_t idsSize;
 
 public:
 	CUDA_CALLABLE_MEMBER ParticleFilter(){};

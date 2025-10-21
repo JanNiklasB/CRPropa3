@@ -40,7 +40,11 @@ public:
  */
 class ShellPropertyOutput: public Module {
 public:
+	#ifdef __CUDACC__
+	typedef AssocVector<std::string, Variant> PropertyMap;
+	#else
 	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
+	#endif
 	CUDA_CALLABLE_MEMBER ShellPropertyOutput(){}
 	CUDA_CALLABLE_MEMBER void process(Candidate *candidate) const;
 	std::string getDescription() const;

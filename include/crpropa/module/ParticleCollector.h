@@ -21,14 +21,11 @@ namespace crpropa {
 class ParticleCollector: public Module {
 protected:
 	typedef Candidate** tContainer;
-	mutable tContainer container;
-	mutable int containerSize;
+	mutable tContainer container=NULL;
+	mutable size_t containerSize=0;
 	std::size_t nBuffer;
 	bool clone;
 	bool recursive;
-
-private:
-	void checkVector() const;
 
 public:
 	CUDA_CALLABLE_MEMBER ParticleCollector();
@@ -48,7 +45,7 @@ public:
 	void clearContainer();
 
 	std::string getDescription() const;
-	std::vector<ref_ptr<Candidate> >& getContainer() const;
+	std::vector<Candidate* > getContainer();
 	void setClone(bool b);
 	bool getClone() const;
 

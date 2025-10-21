@@ -22,10 +22,9 @@ namespace crpropa {
  */
 class SourceFeature: public Referenced {
 private:
-	char* description;
-	int descriptionSize;
+	const char* description;
 public:
-	virtual ~SourceFeature(){delete[] description;}
+	virtual ~SourceFeature(){}
 	virtual void prepareParticle(ParticleState& particle) const {};
 	virtual void prepareCandidate(Candidate& candidate) const;
 	std::string getDescription() const;
