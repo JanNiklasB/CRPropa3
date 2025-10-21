@@ -100,7 +100,7 @@ public:
 
 protected:
 
-	#ifdef __CUDACC__
+	#ifndef __CUDACC__
 	/// Destructor, only defined if not called from cuda:
 	virtual inline ~Referenced() {
 		#ifdef DEBUG

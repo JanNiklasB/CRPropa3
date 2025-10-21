@@ -10,7 +10,7 @@ namespace crpropa {
 void Cosmology::update() {
 	double dH = c_light / H0; // Hubble distance
 
-	double E[n];
+	double* E = new double[n];
 	E[0] = 1;
 
 	// Relation between comoving distance r and redshift z (cf. J.A. Peacock, Cosmological physics, p. 89 eq. 3.76)
@@ -27,6 +27,7 @@ void Cosmology::update() {
 						* (1 / ((1 + Z[i]) * E[i])
 								+ 1 / ((1 + Z[i - 1]) * E[i - 1])) / 2;
 	}
+	delete[] E;
 }
 
 Cosmology::Cosmology() {

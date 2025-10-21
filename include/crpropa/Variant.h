@@ -23,68 +23,68 @@
 
 // defines copy constructor X(const X&), isX(), asX(), fromX(), toX(), op(), op=, op==, op!=
 #define VARIANT_ADD_TYPE_DECL_POD(NAME, TYPE, VALUE, FIELD) \
-	CUDA_CALLABLE_MEMBER Variant(const VALUE& v) { \
+	Variant(const VALUE& v) { \
 		data._t_##FIELD = v; \
 		type = TYPE;  \
 	} \
-	CUDA_CALLABLE_MEMBER bool is##NAME() const { \
+	bool is##NAME() const { \
 		return type == TYPE; \
 	} \
-	CUDA_CALLABLE_MEMBER VALUE& as##NAME() { \
+	VALUE& as##NAME() { \
 		check(TYPE); \
 		return data._t_##FIELD; \
 	} \
-	CUDA_CALLABLE_MEMBER const VALUE& as##NAME() const { \
+	const VALUE& as##NAME() const { \
 		check(TYPE); \
 		return data._t_##FIELD; \
 	} \
-	CUDA_CALLABLE_MEMBER static Variant from##NAME(const VALUE& v) { \
+	static Variant from##NAME(const VALUE& v) { \
 		return Variant(v); \
 	} \
-	CUDA_CALLABLE_MEMBER VALUE to##NAME() const; \
+	VALUE to##NAME() const; \
 	operator VALUE() const { \
 		return to##NAME(); \
 	} \
-	CUDA_CALLABLE_MEMBER Variant& operator=(const VALUE& v) { \
+	Variant& operator=(const VALUE& v) { \
 		clear(); \
 		type = TYPE; \
 		data._t_##FIELD = v; \
 		return *this; \
 	} \
-	CUDA_CALLABLE_MEMBER bool operator==(const VALUE& v) const { \
+	bool operator==(const VALUE& v) const { \
 		check(TYPE); \
 		return data._t_##FIELD == v; \
 	} \
-	CUDA_CALLABLE_MEMBER bool operator!=(const VALUE& v) const { \
+	bool operator!=(const VALUE& v) const { \
 		check(TYPE); \
 		return data._t_##FIELD != v; \
 	} \
 
 // defines isX(), asX(), fromX()
 #define VARIANT_ADD_TYPE_DECL_PTR_BASE(NAME, TYPE, VALUE, FIELD) \
-	CUDA_CALLABLE_MEMBER bool is##NAME() const { \
+	bool is##NAME() const { \
 		return type == TYPE; \
 	} \
-	CUDA_CALLABLE_MEMBER VALUE& as##NAME() { \
+	VALUE& as##NAME() { \
 		check(TYPE); \
 		return *data._t_##FIELD; \
 	} \
-	CUDA_CALLABLE_MEMBER const VALUE& as##NAME() const { \
+	const VALUE& as##NAME() const { \
 		check(TYPE); \
 		return *data._t_##FIELD; \
 	} \
-	CUDA_CALLABLE_MEMBER static Variant from##NAME(const VALUE& v) { \
+	static Variant from##NAME(const VALUE& v) { \
 		return Variant(v); \
 	} \
 
 // defines isX(), asX(), fromX(), and copy constructor X(const X&), op=, op==, op!=
 #define VARIANT_ADD_TYPE_DECL_PTR(NAME, TYPE, VALUE, FIELD) \
 	VARIANT_ADD_TYPE_DECL_PTR_BASE(NAME, TYPE, VALUE, FIELD) \
-	CUDA_CALLABLE_MEMBER Variant(const VALUE& v) { \
+	Variant(const VALUE& v) { \
 		data._t_##FIELD = new VALUE(v); \
 		type = TYPE; \
 	} \
-	CUDA_CALLABLE_MEMBER Variant& operator=(const VALUE& v) { \
+	Variant& operator=(const VALUE& v) { \
 		if (type != TYPE) { \
 			clear(); \
 			data._t_##FIELD = new VALUE();\
@@ -93,30 +93,30 @@
 		(*data._t_##FIELD) = v; \
 		return *this; \
 	} \
-	CUDA_CALLABLE_MEMBER bool operator==(const VALUE& v) const { \
+	bool operator==(const VALUE& v) const { \
 		check(TYPE); \
 		return *data._t_##FIELD == v; \
 	} \
-	CUDA_CALLABLE_MEMBER bool operator!=(const VALUE& v) const { \
+	bool operator!=(const VALUE& v) const { \
 		return !(*this == v); \
 	} \
 
 #define VARIANT_ADD_ITER_DECL_PTR(NAME, TYPE, FIELD) \
 	typedef FIELD##_t::iterator FIELD##_iterator; \
 	typedef FIELD##_t::const_iterator FIELD##_const_iterator; \
-	CUDA_CALLABLE_MEMBER inline FIELD##_iterator begin##NAME() { \
+	inline FIELD##_iterator begin##NAME() { \
 		check(TYPE); \
 		return data._t_##FIELD->begin(); \
 	} \
-	CUDA_CALLABLE_MEMBER inline FIELD##_iterator end##NAME() { \
+	inline FIELD##_iterator end##NAME() { \
 		check(TYPE); \
 		return data._t_##FIELD->end(); \
 	} \
-	CUDA_CALLABLE_MEMBER inline FIELD##_const_iterator begin##NAME() const { \
+	inline FIELD##_const_iterator begin##NAME() const { \
 		check(TYPE); \
 		return data._t_##FIELD->begin(); \
 	} \
-	CUDA_CALLABLE_MEMBER inline FIELD##_const_iterator end##NAME() const { \
+	inline FIELD##_const_iterator end##NAME() const { \
 		check(TYPE); \
 		return data._t_##FIELD->end(); \
 	}                                                                                
@@ -210,46 +210,46 @@ protected:
 
 
 public:
-	CUDA_CALLABLE_MEMBER Variant();
-	CUDA_CALLABLE_MEMBER Variant(Type t);
-	CUDA_CALLABLE_MEMBER Variant(const Variant& v);
-	CUDA_CALLABLE_MEMBER Variant(const char* s);
-	CUDA_CALLABLE_MEMBER ~Variant();
-	CUDA_CALLABLE_MEMBER inline Type getType() const {
+	Variant();
+	Variant(Type t);
+	Variant(const Variant& v);
+	Variant(const char* s);
+	~Variant();
+	inline Type getType() const {
 		return type;
 	}
-	CUDA_CALLABLE_MEMBER const char* getTypeName() const;
-	CUDA_CALLABLE_MEMBER static const char* getTypeName(Type t);
+	const char* getTypeName() const;
+	static const char* getTypeName(Type t);
 	const std::type_info& getTypeInfo() const;
-	CUDA_CALLABLE_MEMBER static Type toType(const std::string& name);		
+	static Type toType(const std::string& name);		
 	std::string toString(const std::string& delimiter = "\t") const;
 	std::complex<float> toComplexFloat() const;
 	std::complex<double> toComplexDouble() const;
-	CUDA_CALLABLE_MEMBER Vector3f toVector3f() const;
-	CUDA_CALLABLE_MEMBER Vector3d toVector3d() const;
-	CUDA_CALLABLE_MEMBER Vector3c toVector3c() const;
-	CUDA_CALLABLE_MEMBER vector_t toVector() const;
-	CUDA_CALLABLE_MEMBER static Variant fromString(const std::string& str, Type type);
+	Vector3f toVector3f() const;
+	Vector3d toVector3d() const;
+	Vector3c toVector3c() const;
+	vector_t toVector() const;
+	static Variant fromString(const std::string& str, Type type);
 	void clear(Type t = TYPE_NONE);
-	CUDA_CALLABLE_MEMBER bool isValid() const;
-	CUDA_CALLABLE_MEMBER size_t size() const;
-	CUDA_CALLABLE_MEMBER size_t getSizeOf() const;
-	CUDA_CALLABLE_MEMBER size_t getSize() const;
+	bool isValid() const;
+	size_t size() const;
+	size_t getSizeOf() const;
+	size_t getSize() const;
 	void resize(size_t i);
-	CUDA_CALLABLE_MEMBER size_t copyToBuffer(void* buffer);
+	size_t copyToBuffer(void* buffer);
 	operator std::string() const {
 		return toString();
 	}
-	CUDA_CALLABLE_MEMBER Variant& operator=(const Variant& v);
-	CUDA_CALLABLE_MEMBER bool operator==(const Variant& v) const;
-	CUDA_CALLABLE_MEMBER bool operator!=(const Variant& v) const;
-	CUDA_CALLABLE_MEMBER bool operator!=(const char* a) const;
-	CUDA_CALLABLE_MEMBER Variant& operator[](size_t i);
-	CUDA_CALLABLE_MEMBER inline Variant& operator[](int i) {
+	Variant& operator=(const Variant& v);
+	bool operator==(const Variant& v) const;
+	bool operator!=(const Variant& v) const;
+	bool operator!=(const char* a) const;
+	Variant& operator[](size_t i);
+	inline Variant& operator[](int i) {
 		return operator[]((size_t) i);
 	}
-	CUDA_CALLABLE_MEMBER const Variant& operator[](size_t i) const;
-	CUDA_CALLABLE_MEMBER const Variant& operator[](int i) const {
+	const Variant& operator[](size_t i) const;
+	const Variant& operator[](int i) const {
 		return operator[]((size_t) i);
 	}
 	operator vector_t&();
@@ -257,7 +257,7 @@ public:
 
 
 	template<class T>
-	CUDA_CALLABLE_MEMBER T to() const {
+	T to() const {
 		throw bad_conversion(type, TYPE_NONE);
 	}
 
@@ -285,8 +285,8 @@ public:
 		
 private:
 	void copy(const Variant& v);
-	CUDA_CALLABLE_MEMBER void check(const Type t) const;
-	CUDA_CALLABLE_MEMBER void check(const Type t);
+	void check(const Type t) const;
+	void check(const Type t);
 };
 
 #define VARIANT_TO_DECL(NAME, VALUE) \

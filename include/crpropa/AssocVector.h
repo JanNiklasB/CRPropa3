@@ -40,6 +40,7 @@
 #include <thrust/universal_vector.h>
 #include <cuda/std/array>
 #include "crpropa/Variant.h"
+#include "crpropa/Common.h"
 
 namespace crpropa
 {
@@ -68,7 +69,7 @@ namespace crpropa
 		    }
 
             CUDA_CALLABLE_MEMBER void erase(std::size_t i){
-                erase(data, dataSize, i);
+                crpropa::erase(data, dataSize, i);
             }
 
             CUDA_CALLABLE_MEMBER void copy(const AssocVector& other){
@@ -82,8 +83,8 @@ namespace crpropa
             /// Finds first instance of i
             CUDA_CALLABLE_MEMBER std::size_t find(A i) const{
                 std::size_t counter = 0;
-                for(DATA entry : data){
-                    if(entry.first == i) break;
+                for(size_t j=0; j<dataSize; j++){
+                    if(data[j].first == i) break;
                     counter++;
                 }
                 return counter;
@@ -92,8 +93,8 @@ namespace crpropa
             /// Finds first instance of i
             CUDA_CALLABLE_MEMBER std::size_t find(B i) const{
                 std::size_t counter = 0;
-                for(DATA entry : data){
-                    if(entry.second == i) break;
+                for(size_t j=0; j<dataSize; j++){
+                    if(data[j].second == i) break;
                     counter++;
                 }
                 return counter;
@@ -111,9 +112,8 @@ namespace crpropa
                 return data[find(i)].first;
             }
 
-            CUDA_CALLABLE_MEMBER bool empty() const{ return data.empty(); }
-            CUDA_CALLABLE_MEMBER std::size_t size() const{ return data.size();}
-            CUDA_CALLABLE_MEMBER std::size_t max_size() const{ return data.max_size(); }
+            CUDA_CALLABLE_MEMBER bool empty() const{ return dataSize==0; }
+            CUDA_CALLABLE_MEMBER std::size_t size() const{ return dataSize;}
     };
 
 }

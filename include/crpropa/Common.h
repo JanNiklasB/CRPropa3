@@ -62,21 +62,20 @@ CUDA_CALLABLE_MEMBER T* insert(T* src, std::size_t& size, T value, std::size_t i
 
 template<typename T>
 CUDA_CALLABLE_MEMBER T* erase(T* src, std::size_t& size, std::size_t idx){
-	T* tmp = new T[size+1];
+	T* tmp = new T[size-1];
 
-	bool inserted=false;
-	for (std::size_t i=0; i<size+1; i++){
+	bool removed=false;
+	for (std::size_t i=0; i<size; i++){
 		if(i==idx){
-			tmp[i] = value;
-			inserted = true;
+			removed = true;
 			continue;
 		}
-		if(inserted) tmp[i] = src[i-1];
+		if(removed) tmp[i-1] = src[i];
 		else tmp[i] = src[i];
 	}
 	delete[] src;
 	src = tmp;
-	size++;
+	size--;
 	return src;
 }
 
