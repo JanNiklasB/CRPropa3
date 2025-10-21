@@ -29,9 +29,9 @@ CUDA_CALLABLE_MEMBER inline int digit(const int& value, const int& d) {
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER T* push_back(T* src, int& size, T value){
+CUDA_CALLABLE_MEMBER T* push_back(T* src, std::size_t& size, T value){
 	T* tmp = new T[size+1];
-	for (int i=0; i<size; i++)
+	for (std::size_t i=0; i<size; i++)
 		tmp[i] = src[i];
 	tmp[size] = value;
 	delete[] src;
@@ -41,11 +41,11 @@ CUDA_CALLABLE_MEMBER T* push_back(T* src, int& size, T value){
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER T* insert(T* src, int& size, T value, int idx){
+CUDA_CALLABLE_MEMBER T* insert(T* src, std::size_t& size, T value, std::size_t idx){
 	T* tmp = new T[size+1];
 
 	bool inserted=false;
-	for (int i=0; i<size+1; i++){
+	for (std::size_t i=0; i<size+1; i++){
 		if(i==idx){
 			tmp[i] = value;
 			inserted = true;
@@ -61,11 +61,11 @@ CUDA_CALLABLE_MEMBER T* insert(T* src, int& size, T value, int idx){
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER T* erase(T* src, int& size, int idx){
+CUDA_CALLABLE_MEMBER T* erase(T* src, std::size_t& size, std::size_t idx){
 	T* tmp = new T[size+1];
 
 	bool inserted=false;
-	for (int i=0; i<size+1; i++){
+	for (std::size_t i=0; i<size+1; i++){
 		if(i==idx){
 			tmp[i] = value;
 			inserted = true;
@@ -82,8 +82,8 @@ CUDA_CALLABLE_MEMBER T* erase(T* src, int& size, int idx){
 
 /// Same Behaviour as std::lower_bound, but accepts the array directly and returns the index instead
 template<typename T>
-CUDA_CALLABLE_MEMBER size_t lower_bound(T x, const T *X, int size) {
-	int count=size-1, step;
+CUDA_CALLABLE_MEMBER size_t lower_bound(T x, const T *X, std::size_t size) {
+	std::size_t count=size-1, step;
 	T it;
 	size_t i1 = 0;
 	while (count>0) {
@@ -100,8 +100,8 @@ CUDA_CALLABLE_MEMBER size_t lower_bound(T x, const T *X, int size) {
 
 /// Same Behaviour as std::upper_bound, but accepts the array directly and returns the index instead
 template<typename T>
-CUDA_CALLABLE_MEMBER size_t upper_bound(T x, const T *X, int size) {
-	int count=size-1, step;
+CUDA_CALLABLE_MEMBER size_t upper_bound(T x, const T *X, std::size_t size) {
+	std::size_t count=size-1, step;
 	T it;
 	size_t i1 = 0;
 	while (count>0) {
@@ -117,7 +117,7 @@ CUDA_CALLABLE_MEMBER size_t upper_bound(T x, const T *X, int size) {
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER size_t _quickfind(T x, const T *arr, int left, int right) {
+CUDA_CALLABLE_MEMBER size_t _quickfind(T x, const T *arr, std::size_t left, std::size_t right) {
 	if(x==arr[right-1]) return right-1;
 	if(x==arr[left]) return left;
 	int middle = left + (right-left)/2;
@@ -128,21 +128,21 @@ CUDA_CALLABLE_MEMBER size_t _quickfind(T x, const T *arr, int left, int right) {
 
 /// Find index of a sorted array (sort with quicksort)
 template<typename T>
-CUDA_CALLABLE_MEMBER size_t findSorted(T x, const T *arr, int size) {
+CUDA_CALLABLE_MEMBER size_t findSorted(T x, const T *arr, std::size_t size) {
 	return _quickfind(x, arr, 0, size);
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER void _swap(T *arr, int index1, int index2){
+CUDA_CALLABLE_MEMBER void _swap(T *arr, std::size_t index1, std::size_t index2){
 	T tmp = arr[index2];
 	arr[index2] = arr[index1];
 	arr[index1] = tmp;
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER int _divide(T *arr, int left, int right){
-	int i = left;
-	int j = right-1;
+CUDA_CALLABLE_MEMBER int _divide(T *arr, std::size_t left, std::size_t right){
+	std::size_t i = left;
+	std::size_t j = right-1;
 	T pivot = arr[right];
 
 	while(i<j){
@@ -156,16 +156,16 @@ CUDA_CALLABLE_MEMBER int _divide(T *arr, int left, int right){
 	return i;
 }
 template<typename T>
-CUDA_CALLABLE_MEMBER void _quicksort(T *arr, int left, int right){
+CUDA_CALLABLE_MEMBER void _quicksort(T *arr, std::size_t left, std::size_t right){
 	if(left < right){
-		int divider = _divide(arr, left, right);
+		std::size_t divider = _divide(arr, left, right);
 		_quicksort(arr, left, divider-1);
 		_quicksort(arr, divider+1, right);
 	}
 }
 
 template<typename T>
-CUDA_CALLABLE_MEMBER void sort(T *arr, int size){
+CUDA_CALLABLE_MEMBER void sort(T *arr, std::size_t size){
 	quicksort(arr, 0, size);
 }
 
