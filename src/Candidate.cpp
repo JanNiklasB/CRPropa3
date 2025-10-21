@@ -30,7 +30,7 @@ redshift(0), trajectoryLength(0), weight(1.), currentStep(0), nextStep(0), activ
 	#endif
 }
 
-Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
+Candidate::Candidate(int id, double E, Vector3d pos, Vector3d dir, double z, double weight, const char* tagOrigin) :
 redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0) {
 	NuclearMassPtr = NULL;
 	ParticleState state(NuclearMassPtr, id, E, pos, dir);
@@ -52,7 +52,7 @@ redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), a
 	#endif
 }
 
-Candidate::Candidate(NuclearMassTable* NuclearMassTablePtr, int id, double E, Vector3d pos, Vector3d dir, double z, double weight, std::string tagOrigin) :
+Candidate::Candidate(NuclearMassTable* NuclearMassTablePtr, int id, double E, Vector3d pos, Vector3d dir, double z, double weight, const char* tagOrigin) :
 redshift(z), trajectoryLength(0), weight(weight), currentStep(0), nextStep(0), active(true), parent(0), tagOrigin(tagOrigin), time(0), NuclearMassPtr(NuclearMassTablePtr) {
 	ParticleState state(NuclearMassTablePtr, id, E, pos, dir);
 	source = state;
@@ -165,14 +165,21 @@ void Candidate::limitNextStep(double step) {
 }
 
 void Candidate::setProperty(const std::string &name, const Variant &value) {
-	properties[name] = value;
+	setProperty(name.c_str(), value);	
 }
 
-void Candidate::setTagOrigin (std::string tagOrigin) {
+void Candidate::setProperty(const char* name, const Variant &value) {
+	if(hasProperty(name))
+		properties[name] = value;
+	else
+		properties.insert(name, value);	
+}
+
+void Candidate::setTagOrigin (const char* tagOrigin) {
 	this->tagOrigin = tagOrigin;
 }
 
-std::string Candidate::getTagOrigin () const {
+const char* Candidate::getTagOrigin () const {
 	return tagOrigin;
 }
 
@@ -185,25 +192,59 @@ double Candidate::getTime() const {
 }
 
 const Variant &Candidate::getProperty(const std::string &name) const {
+	return getProperty(name.c_str());
+}
+
+const Variant &Candidate::getProperty(const char* name) const {
+	#ifdef __CUDACC__
+	std::size_t index = properties.find(name);
+	if(index==properties.size())
+		printf("Property %s could'nt be found! Expect segfault!", name);
+	return properties[index].second;
+	#else
 	PropertyMap::const_iterator i = properties.find(name);
 	if (i == properties.end())
 		throw std::runtime_error("Unknown candidate property: " + name);
 	return i->second;
+	#endif
 }
 
 bool Candidate::removeProperty(const std::string& name) {
-	PropertyMap::iterator i = properties.find(name);
+	#ifdef __CUDACC__
+	std::size_t index = properties.find(name.c_str());
+	if(index==properties.size())
+		return false;
+	properties.erase(index);
+	return true;
+
+	#else
+
+	PropertyMap::iterator i = properties.find(name.c_str());
 	if (i == properties.end())
 		return false;
 	properties.erase(i);
 	return true;
+	#endif
 }
 
 bool Candidate::hasProperty(const std::string &name) const {
-	PropertyMap::const_iterator i = properties.find(name);
+	return hasProperty(name.c_str());
+}
+
+bool Candidate::hasProperty(const char* name) const {
+	#ifdef __CUDACC__
+	std::size_t index = properties.find(name);
+	if(index==properties.size())
+		return false;
+	return true;
+
+	#else
+
+	PropertyMap::iterator i = properties.find(name);
 	if (i == properties.end())
 		return false;
 	return true;
+	#endif
 }
 
 void Candidate::addSecondary(Candidate *c) {
@@ -218,9 +259,13 @@ void Candidate::addSecondary(int id, double energy, double w, std::string tagOri
 	secondary->setWeight(weight * w);
 	secondary->setTagOrigin(tagOrigin);
 	secondary->setNuclearMassTable(NuclearMassPtr);
+	#ifdef __CUDACC__
+	secondary->properties.copy(properties);
+	#else
 	for (PropertyMap::const_iterator it = properties.begin(); it != properties.end(); ++it) {
-		secondary->setProperty(it->first, it->second);		
+		secondary->setProperty(it->first, it->second);
 	}
+	#endif
 	secondary->source = source;
 	secondary->previous = previous;
 	secondary->created = previous;
@@ -239,9 +284,13 @@ void Candidate::addSecondary(int id, double energy, Vector3d position, double w,
 	secondary->setWeight(weight * w);
 	secondary->setTagOrigin(tagOrigin);
 	secondary->setNuclearMassTable(NuclearMassPtr);
+	#ifdef __CUDACC__
+	secondary->properties.copy(properties);
+	#else
 	for (PropertyMap::const_iterator it = properties.begin(); it != properties.end(); ++it) {
-		secondary->setProperty(it->first, it->second);		
+		secondary->setProperty(it->first, it->second);
 	}
+	#endif
 	secondary->source = source;
 	secondary->previous = previous;
 	secondary->created = previous;

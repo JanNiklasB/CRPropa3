@@ -35,12 +35,16 @@ public:
 	ParticleState created; /**< Particle state of parent particle at the time of creation */
 	ParticleState current; /**< Current particle state */
 	ParticleState previous; /**< Particle state at the end of the previous step */
-	NuclearMassTable* NuclearMassPtr;  ///< initialized in ModuleList.h to save storage and enable GPU support
+	NuclearMassTable* NuclearMassPtr=NULL;  ///< initialized in ModuleList.h to save storage and enable GPU support
 
-	Candidate** secondaries; /**< Secondary particles from interactions */
-	int secondariesSize;
+	Candidate** secondaries=NULL; /**< Secondary particles from interactions */
+	std::size_t secondariesSize=0;
 
-	typedef Loki::AssocVector<std::string, Variant> PropertyMap;
+	#ifdef __CUDACC__
+	typedef AssocVector<const char*, Variant> PropertyMap;
+	#else
+	typedef Loki::AssocVector<const char*, Variant> PropertyMap;
+	#endif
 	PropertyMap properties; /**< Map of property names and their values. */
 
 	/** Parent candidate. 0 if no parent (initial particle). Must not be a ref_ptr to prevent circular referencing. */
@@ -52,7 +56,7 @@ private:
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
 	double currentStep; /**< Size of the currently performed step in [m] comoving units */
 	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
-	std::string tagOrigin; /**< Name of interaction/source process which created this candidate*/
+	const char* tagOrigin; /**< Name of interaction/source process which created this candidate*/
 	double time; /**< Time [s] that has passed in the laboratory frame of reference */
 
 	uint64_t* nextSerialNumber=NULL;
@@ -77,7 +81,7 @@ public:
 		Vector3d direction = Vector3d(-1, 0, 0),
 		double z = 0,
 		double weight = 1., 
-		std::string tagOrigin = "PRIM"
+		const char* tagOrigin = "PRIM"
 	);
 
 	/** Creates a candidate with predefined NuclearMassTable
@@ -98,7 +102,7 @@ public:
 		Vector3d direction = Vector3d(-1, 0, 0),
 		double z = 0,
 		double weight = 1., 
-		std::string tagOrigin = "PRIM"
+		const char* tagOrigin = "PRIM"
 	);
 
 	/**
@@ -147,8 +151,8 @@ public:
 	/**
 	 Sets the tagOrigin of the candidate. Can be used to trace back the interactions
 	 */
-	CUDA_CALLABLE_MEMBER void setTagOrigin(std::string tagOrigin);
-	std::string getTagOrigin() const;
+	CUDA_CALLABLE_MEMBER void setTagOrigin(const char* tagOrigin);
+	CUDA_CALLABLE_MEMBER const char* getTagOrigin() const;
 
 	/**
 	 Sets the time of the candidate.
@@ -161,10 +165,15 @@ public:
 	 */
 	CUDA_CALLABLE_MEMBER void limitNextStep(double step);
 
+	/// This function sets a property and creates one if it does not exist
 	void setProperty(const std::string &name, const Variant &value);
+	/// This functions sets a property only if it exists
+	CUDA_CALLABLE_MEMBER void setProperty(const char* name, const Variant &value);
+	CUDA_CALLABLE_MEMBER const Variant &getProperty(const char* name) const;
 	const Variant &getProperty(const std::string &name) const;
 	bool removeProperty(const std::string &name);
 	bool hasProperty(const std::string &name) const;
+	CUDA_CALLABLE_MEMBER bool hasProperty(const char* name) const;
 
 	/**
 	 Add a new candidate to the list of secondaries.
