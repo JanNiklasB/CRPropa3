@@ -6,6 +6,7 @@
 #define CUDA_CONSTANT __constant__
 #include <cuda_runtime.h>
 #include <cuda.h>
+#include <cuda/std/cstdlib>
 #include <iostream>
 
 // see answer of talonmies on https://stackoverflow.com/a/14038590/30769038

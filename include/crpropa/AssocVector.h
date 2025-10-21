@@ -36,6 +36,88 @@
 #include <iterator>
 #include <map>
 
+#ifdef __CUDACC__
+#include <thrust/universal_vector.h>
+#include <cuda/std/array>
+#include "crpropa/Variant.h"
+
+namespace crpropa
+{
+    template<class A, class B>
+    class AssocVector{
+        private:
+            typedef cuda::std::pair<A, B> DATA;
+            typedef DATA* DATAVEC;
+
+            DATAVEC data=NULL;
+            std::size_t dataSize=0;
+            
+        public:
+
+            CUDA_CALLABLE_MEMBER AssocVector(){};
+
+            CUDA_CALLABLE_MEMBER void insert(const char* name, int val){
+                DATA* tmp = new DATA[dataSize+1];
+                for (std::size_t i=0; i<dataSize; i++)
+                    tmp[i] = data[i];
+                tmp[dataSize].first = name;
+                tmp[dataSize].second = val;
+                delete[] data;
+                data = tmp;
+                dataSize++;
+		    }
+
+            CUDA_CALLABLE_MEMBER void erase(std::size_t i){
+                erase(data, dataSize, i);
+            }
+
+            CUDA_CALLABLE_MEMBER void copy(const AssocVector& other){
+                dataSize = other.size();
+                data = new DATA[dataSize];
+                for(std::size_t i=0; i<dataSize; i++){
+                    data[i] = other[i];
+                }
+            }
+            
+            /// Finds first instance of i
+            CUDA_CALLABLE_MEMBER std::size_t find(A i) const{
+                std::size_t counter = 0;
+                for(DATA entry : data){
+                    if(entry.first == i) break;
+                    counter++;
+                }
+                return counter;
+            }
+
+            /// Finds first instance of i
+            CUDA_CALLABLE_MEMBER std::size_t find(B i) const{
+                std::size_t counter = 0;
+                for(DATA entry : data){
+                    if(entry.second == i) break;
+                    counter++;
+                }
+                return counter;
+            }
+            
+            CUDA_CALLABLE_MEMBER DATA& operator[](std::size_t i) const{
+                return data[i];
+            }
+
+            CUDA_CALLABLE_MEMBER B& operator[](A i) const{
+                return data[find(i)].second;
+            }
+
+            CUDA_CALLABLE_MEMBER A& operator[](B i) const{
+                return data[find(i)].first;
+            }
+
+            CUDA_CALLABLE_MEMBER bool empty() const{ return data.empty(); }
+            CUDA_CALLABLE_MEMBER std::size_t size() const{ return data.size();}
+            CUDA_CALLABLE_MEMBER std::size_t max_size() const{ return data.max_size(); }
+    };
+
+}
+#endif
 
 namespace Loki
 {
