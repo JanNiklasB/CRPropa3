@@ -8,8 +8,8 @@
 #include <algorithm>
 #ifdef CRPROPA_HAVE_PYTHON
 #include <Python.h>
-#endif // CRPROPA_HAVE_PYTHON
 #include <numpy/arrayobject.h>
+#endif // CRPROPA_HAVE_PYTHON
 #include <unistd.h>
 
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
