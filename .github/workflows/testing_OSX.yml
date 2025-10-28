@@ -34,12 +34,13 @@ jobs:
       
         # define paths for LLVM, Python, and OpenMP
         export LLVM_DIR=$(brew --prefix llvm@15)
-        export PYTHON_VERSION=3.13
+        export PYTHON_VERSION=3.14
         export LLVM_VERSION=15.0.7
         export OMP_VERSION=$(brew list --versions libomp | awk '{print $2}')
         export OMP_DIR=$(brew --prefix libomp)
-        export PYTHON_DIR=/Library/Frameworks/Python.framework/Versions/3.13/
-        
+        export PYTHON_DIR=/Library/Frameworks/Python.framework/Versions/$PYTHON_VERSION/
+        export Numpy_dir=`pip show numpy | grep Location | awk '{print $2}'`
+
         # print paths for debugging
         echo "Using LLVM_DIR: $LLVM_DIR"
         echo "Using OMP_DIR: $OMP_DIR"
@@ -59,7 +60,7 @@ jobs:
           -DOpenMP_C_LIB_NAMES=libomp.dylib \
           -DOpenMP_CXX_LIB_NAMES=libomp.dylib \
           -DNO_TCMALLOC=TRUE \
-          -DPython_NumPy_INCLUDE_DIR=/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/numpy/core/include
+          -DPython_NumPy_INCLUDE_DIR=$Numpy_dir/core/include
      - name: Build CRPropa
        run: |
          cd build
