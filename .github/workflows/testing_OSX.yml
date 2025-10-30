@@ -60,7 +60,7 @@ jobs:
           -DOpenMP_C_LIB_NAMES=libomp.dylib \
           -DOpenMP_CXX_LIB_NAMES=libomp.dylib \
           -DNO_TCMALLOC=TRUE \
-          -DPython_NumPy_INCLUDE_DIR=$Numpy_dir/core/include
+          -DPython_NumPy_INCLUDE_DIR=$Numpy_dir/numpy/core/include
      - name: Build CRPropa
        run: |
          cd build
