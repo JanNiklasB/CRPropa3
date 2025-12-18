@@ -67,8 +67,16 @@ double ParticleState::getMass() const {
 	return pmass;
 }
 
+void ParticleState::setMass(double Mass) {
+	pmass = Mass;
+}
+
 double ParticleState::getCharge() const {
 	return charge;
+}
+
+void ParticleState::setCharge(int ChargeNumber) {
+	charge = ChargeNumber * eplus;
 }
 
 double ParticleState::getLorentzFactor() const {

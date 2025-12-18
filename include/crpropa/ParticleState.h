@@ -90,10 +90,18 @@ public:
 	 @returns Charge of the particle [in Coulombs]
 	 */
 	double getCharge() const;
+	/** Sets the charge manually, use with caution!
+	 @param ChargeNumber the charge number, set negative for negative charges 
+	 */
+	void setCharge(int ChargeNumber);
 	/** Get mass of the particle.
 	 @returns Mass of the particle [kg]
 	 */
 	double getMass() const;
+	/** Sets the particle mass manually, use with caution!
+	 @param Mass particle mass
+	 */
+	void setMass(double Mass);
 
 	/** Set Lorentz factor and modify the particle's energy accordingly.
 	 @param gamma		Lorentz factor
