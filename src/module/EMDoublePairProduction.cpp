@@ -191,37 +191,34 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
 }
 
 void EMDoublePairProduction::performInteraction(Candidate *candidate) const {
+
+	// Use assumption of Lee 96 arXiv:9604098
+	// Energy is equally shared between one e+e- pair, but take mass of second e+e- pair into account.
+	// This approximation has been shown to be valid within -1.5%.
+	double z = candidate->getRedshift();
+	double E = candidate->current.getEnergy() * (1 + z);
+	double Ee = (E - 2 * mass_electron * c_squared) / 2;
+
   // the photon is lost after the interaction
   candidate->setActive(false);
-  
+
   if (not haveElectrons)
     return;
   
-  // Use assumption of Lee 96 arXiv:9604098
-  // Energy is equally shared between one e+e- pair, but take mass of second e+e- pair into account.
-  // This approximation has been shown to be valid within -1.5%.
-  double z = candidate->getRedshift();
-  double E = candidate->current.getEnergy() * (1 + z);
-  double Ee = (E - 2 * mass_electron * c_squared) / 2;
-  
-  Random &random = Random::instance();
-  Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
-  
-  double f = Ee / E;
-  
-  if (haveElectrons) {
-    
-    if (random.rand() < pow(1 - f, thinning)) {
-      double w = 1. / pow(1 - f, thinning);
-      candidate->addSecondary( 11, Ee / (1 + z), pos, w, interactionTag);
-    }
-    
-    if (random.rand() < pow(f, thinning)) {
-      double w = 1. / pow(f, thinning);
-      candidate->addSecondary(-11, Ee / (1 + z), pos, w, interactionTag);
-    }
-  }
-  
+	Random &random = Random::instance();
+	Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
+
+	double f = Ee / E;
+
+		if (random.rand() < pow(1 - f, thinning)) {
+			double w = 1. / pow(1 - f, thinning);
+			candidate->addSecondary( 11, Ee / (1 + z), pos, w, interactionTag);
+		} 
+		if (random.rand() < pow(f, thinning)) {
+			double w = 1. / pow(f, thinning);
+			candidate->addSecondary(-11, Ee / (1 + z), pos, w, interactionTag);
+		}
+
 }
 
 void EMDoublePairProduction::process(Candidate *candidate) const {

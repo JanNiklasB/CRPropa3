@@ -106,6 +106,8 @@ void HDF5Output::open(const std::string& filename) {
 	sid = H5Tcreate(H5T_COMPOUND, sizeof(OutputRow));
 	if (fields.test(TrajectoryLengthColumn))
 		H5Tinsert(sid, "D", HOFFSET(OutputRow, D), H5T_NATIVE_DOUBLE);
+	if (fields.test(TimeColumn))
+		H5Tinsert(sid, "time", HOFFSET(OutputRow, time), H5T_NATIVE_DOUBLE);
 	if (fields.test(RedshiftColumn))
 		H5Tinsert(sid, "z", HOFFSET(OutputRow, z), H5T_NATIVE_DOUBLE);
 	if (fields.test(SerialNumberColumn))
@@ -204,6 +206,7 @@ void HDF5Output::open(const std::string& filename) {
 	insertStringAttribute("OutputType", outputName);
 	insertStringAttribute("Version", g_GIT_DESC);
 	insertDoubleAttribute("LengthScale", this->lengthScale);
+	insertDoubleAttribute("TimeScale", this->timeScale);
 	insertDoubleAttribute("EnergyScale", this->energyScale);
 
 	// add ranom seeds
@@ -248,7 +251,7 @@ void HDF5Output::close() {
 }
 
 void HDF5Output::process(Candidate* candidate) const {
-	#pragma omp critical
+	#pragma omp critical(HDFOutput)
 	{
 	if (file == -1)
 		// This is ugly, but necesary as otherwise the user has to manually open the
@@ -258,6 +261,7 @@ void HDF5Output::process(Candidate* candidate) const {
 
 	OutputRow r;
 	r.D = candidate->getTrajectoryLength() / lengthScale;
+	r.time = candidate->getTime() / timeScale;
 	r.z = candidate->getRedshift();
 
 	r.SN = candidate->getSerialNumber();
@@ -316,7 +320,7 @@ void HDF5Output::process(Candidate* candidate) const {
 			pos += v.copyToBuffer(&r.propertyBuffer[pos]);
 	}
 
-	#pragma omp critical
+	#pragma omp critical(HDFOutput)
 	{
 		const_cast<HDF5Output*>(this)->candidatesSinceFlush++;
 		Output::process(candidate);

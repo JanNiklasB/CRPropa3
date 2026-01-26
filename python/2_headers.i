@@ -280,6 +280,11 @@
 %feature("director") crpropa::AbstractCondition;
 %include "crpropa/Module.h"
 
+%template(OutputRefPtr) crpropa::ref_ptr<Output>;
+%feature("director") crpropa::Output;
+%ignore crpropa::Output::dumpIndexList(std::vector<int>);
+%include "crpropa/module/Output.h"
+
 %implicitconv crpropa::ref_ptr<crpropa::MagneticField>;
 %template(MagneticFieldRefPtr) crpropa::ref_ptr<crpropa::MagneticField>;
 %feature("director") crpropa::MagneticField;
@@ -337,6 +342,7 @@
 %implicitconv crpropa::ref_ptr<crpropa::CylindricalProjectionMap>;
 %template(CylindricalProjectionMapRefPtr) crpropa::ref_ptr<crpropa::CylindricalProjectionMap>;
 
+%include "crpropa/advectionField/TimeDependentAdvectionField.h"
 %include "crpropa/magneticField/MagneticFieldGrid.h"
 %include "crpropa/magneticField/GalacticMagneticField.h"
 %feature("notabstract") QuimbyMagneticFieldAdapter;
@@ -346,6 +352,8 @@
 %include "crpropa/magneticField/PolarizedSingleModeMagneticField.h"
 %include "crpropa/magneticField/PT11Field.h"
 %include "crpropa/magneticField/TF17Field.h"
+%include "crpropa/magneticField/UF23Field.h"
+%include "crpropa/magneticField/KST24Field.h"
 %include "crpropa/magneticField/ArchimedeanSpiralField.h"
 %include "crpropa/magneticField/CMZField.h"
 %include "crpropa/magneticField/turbulentField/TurbulentField.h"
@@ -399,8 +407,6 @@
   }
 }
 
-
-%include "crpropa/module/Output.h"
 %include "crpropa/module/DiffusionSDE.h"
 %include "crpropa/module/TextOutput.h"
 %include "crpropa/module/HDF5Output.h"
@@ -439,7 +445,7 @@
         crpropa::ModuleList::iterator _end) :
           cur(_cur), end(_end) {
           }
-      ModuleListIterator* __iter__() { 
+      ModuleListIterator* __iter__() {
         return this;
       }
       crpropa::ModuleList::iterator cur;
@@ -460,7 +466,7 @@
   ModuleListIterator __iter__() {
     return ModuleListIterator($self->begin(), $self->end());
   }
-  
+
   crpropa::ref_ptr<crpropa::Module> __getitem__(size_t i) {
     if (i >= $self->size()) {
             throw RangeError();
@@ -486,8 +492,8 @@
       crpropa::ParticleCollector::iterator _end) :
         cur(_cur), end(_end) {
         }
-    ParticleCollectorIterator* __iter__() { 
-      return this; 
+    ParticleCollectorIterator* __iter__() {
+      return this;
     }
     crpropa::ParticleCollector::iterator cur;
     crpropa::ParticleCollector::iterator end;
@@ -554,6 +560,3 @@
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;
 %include "crpropa/module/Acceleration.h"
-
-
-

@@ -42,6 +42,7 @@ namespace crpropa {
  . z			 RedshiftColumn
  . tag			 CandidateTagColumn
  . weight		 WeightColumn
+ . time    		 TimeColumn
 
  Some output types are pre-defined: 
  . Trajectory1D
@@ -52,16 +53,18 @@ namespace crpropa {
  They can be easily customised by enabling/disabling specific columns.
  */
 class Output: public Module {
-protected:
-	double lengthScale, energyScale;
-	std::bitset<64> fields;
-
+public: 
 	struct Property
 	{
 		std::string name;
 		std::string comment;
 		Variant defaultValue;
 	};
+
+protected:
+	double lengthScale, timeScale, energyScale;
+	std::bitset<64> fields;
+
 	std::vector<Property> properties;
 
 	bool oneDimensional;
@@ -88,7 +91,8 @@ public:
 		CreatedDirectionColumn,
 		CandidateTagColumn,
 		SerialNumberColumn,
-		WeightColumn
+		WeightColumn,
+		TimeColumn
 	};
 	enum OutputType {
 		Trajectory1D,
@@ -117,10 +121,17 @@ public:
 	 @param scale	energy scale (scale = 1 corresponds to 1 Joule)
 	 */
 	void setEnergyScale(double scale);
+	double getEnergyScale() const;
 	/** Set length scale.
 	 @param scale	length scale (scale = 1 corresponds to 1 meter)
 	 */
 	void setLengthScale(double scale);
+	double getLengthScale() const;
+	/** Set time scale.
+	 @param scale	time scale (scale = 1 corresponds to 1 second)
+	 */
+	void setTimeScale(double scale);
+	double getTimeScale() const;
 	/** Set type of output.
 	 @param outputType	type of output: Trajectory1D, Trajectory3D, Event1D, Event3D, Everything
 	 */
@@ -163,6 +174,18 @@ public:
 	size_t size() const;
 
 	void process(Candidate *) const;
+
+	/**	
+	 * write the indices of not started candidates into the output file. 
+	 * Used for interrupting the simulation
+	 * @param indices list of not started indices
+	 */
+	virtual void dumpIndexList(std::vector<int> indices) {
+		std::cout << "indices:\t"; 
+		for (int i = 0; i < indices.size(); i++) 
+			std::cout << indices[i] << ", ";
+		std::cout << "\n";
+	};
 };
 
 /** @}*/

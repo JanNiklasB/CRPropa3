@@ -458,6 +458,7 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
     candidate->addSecondary(-11, Ee / (1 + z), pos, w, interactionTag);
     
   }
+  
 }
 
 void EMPairProduction::process(Candidate *candidate) const {

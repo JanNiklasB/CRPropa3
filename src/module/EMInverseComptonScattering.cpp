@@ -401,6 +401,7 @@ class ICSSecondariesEnergyDistribution {
 };
 
 void EMInverseComptonScattering::performInteraction(Candidate *candidate) const {
+
   // scale the particle energy instead of background photons
   double z = candidate->getRedshift();
   double E = candidate->current.getEnergy() * (1 + z);
