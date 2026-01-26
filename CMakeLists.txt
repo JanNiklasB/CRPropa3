@@ -57,7 +57,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 
-
 # ----------------------------------------------------------------------------
 # Version info from Git
 # ----------------------------------------------------------------------------
