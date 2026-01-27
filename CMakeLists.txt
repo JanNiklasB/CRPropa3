@@ -155,6 +155,11 @@ add_subdirectory(libs/sophia)
 list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
 
+# nanoflann (header-only, provided)
+target_include_directories(crpropa
+    PRIVATE ${CMAKE_SOURCE_DIR}/libs/nanoflann
+)
+
 # Galactic magnetic lenses
 option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" ON)
 option(INSTALL_EIGEN "Install provided EIGEN headers" OFF)

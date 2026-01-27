@@ -22,10 +22,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libmuparser-dev python3-dev python-dev python3-numpy python-numpy python3-setuptools python-setuptools libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
-      - name: Install nanoflann
-  	run: |
-    	  git clone https://github.com/jlblancoc/nanoflann.git
-          sudo cp -r nanoflann/include/nanoflann /usr/local/include/
       - name: Set up the build
         env:
           CXX: ${{ matrix.config.cxx }}
