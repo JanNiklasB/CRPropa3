@@ -156,9 +156,12 @@ list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
 
 # nanoflann (header-only, provided)
-target_include_directories(crpropa
-    PRIVATE ${CMAKE_SOURCE_DIR}/libs/nanoflann
-)
+add_subdirectory(libs/nanoflann)
+list(APPEND CRPROPA_EXTRA_LIBRARIES nanoflann)
+list(APPEND CRPROPA_EXTRA_INCLUDES libs/nanoflann/)
+#target_include_directories(crpropa
+#    PUBLIC ${CMAKE_SOURCE_DIR}/libs/nanoflann
+#)
 
 # Galactic magnetic lenses
 option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" ON)
@@ -446,11 +449,11 @@ else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
 
-find_package(nanoflann REQUIRED)
+#find_package(nanoflann REQUIRED)
 # add_executable(crpropa test.cpp)
 # Ensure the nanoflann include directory is added
 # include_directories(${nanoflann_INCLUDE_DIRS})
-target_link_libraries(crpropa nanoflann::nanoflann)
+#target_link_libraries(crpropa nanoflann::nanoflann)
 
 # ----------------------------------------------------------------------------
 # Python
