@@ -158,10 +158,7 @@ list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
 # nanoflann (header-only, provided)
 add_subdirectory(libs/nanoflann)
 list(APPEND CRPROPA_EXTRA_LIBRARIES nanoflann)
-list(APPEND CRPROPA_EXTRA_INCLUDES libs/nanoflann/include/)
-#target_include_directories(crpropa
-#    PUBLIC ${CMAKE_SOURCE_DIR}/libs/nanoflann
-#)
+list(APPEND CRPROPA_EXTRA_INCLUDES libs/nanoflann/include)
 
 # Galactic magnetic lenses
 option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" ON)
