@@ -113,11 +113,11 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
 
     std::vector<std::vector<double>> tabRate;
     
-    std::__fs::filesystem::path dir = filepath;
+    std::filesystem::path dir = filepath;
     std::unordered_map<int, Vector3d> photonDict;
     int iFile = 0;
     
-  for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
+  for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
     
     std::string filename = dir_entry.path().string();
     std::ifstream infile(filename.c_str());

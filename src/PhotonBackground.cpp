@@ -237,11 +237,11 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
         
     } else {
         
-        std::__fs::filesystem::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
+        std::filesystem::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
         std::unordered_map<int, Vector3d> photonDict;
         int iFile = 0;
     
-        for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dirE}) {
+        for (auto const& dir_entry : std::filesystem::directory_iterator{dirE}) {
             
             std::vector<double> vE = readPhotonEnergy(dir_entry.path().string());
             
@@ -249,9 +249,9 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
             break;
         }
     
-        std::__fs::filesystem::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
+        std::filesystem::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
         
-        for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dirD}) {
+        for (auto const& dir_entry : std::filesystem::directory_iterator{dirD}) {
             
             double x, y, z;
             std::string str;

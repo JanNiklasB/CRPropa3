@@ -115,11 +115,11 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
     
     std::vector<std::vector<double>> tabRate;
     
-    std::__fs::filesystem::path dir = filepath;
+    std::filesystem::path dir = filepath;
     std::unordered_map<int, Vector3d> photonDict;
     int iFile = 0;
     
-  for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
+  for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
     
     // the input filename here should be a string
     //check if it is correct, i.e. a proper filename string
@@ -243,10 +243,10 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
   std::vector<std::vector<double>> tabs;
   std::vector<std::vector<std::vector<double>>> tabCDF;
   
-  std::__fs::filesystem::path dir = filepath;
+  std::filesystem::path dir = filepath;
   int iFile = 0;
   
-  for (auto const& dir_entry : std::__fs::filesystem::directory_iterator{dir}) {
+  for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
     
     std::vector<double> vecE;
     std::vector<double> vecs;
