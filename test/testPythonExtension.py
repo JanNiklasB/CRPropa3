@@ -158,7 +158,7 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
                 self.isRedshiftDependent = True
                 self.isPositionDependent = False
                 
-            def getPhotonDensity(self, energy, z):
+            def getPhotonDensity(self, energy, z, pos):
                 return self.density
 
             def getFieldName(self):
@@ -188,7 +188,7 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
             def getFieldName(self):
                 return 'CMB'
 
-            def getPhotonDensity(self, ePhoton, z):
+            def getPhotonDensity(self, ePhoton, z, pos):
                 return self.val
                 
         constDensity = 1

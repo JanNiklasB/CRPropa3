@@ -295,7 +295,7 @@ public:
  */
 class IRB_Finke22: public TabularPhotonField {
 public:
-	IRB_Finke22() : TabularPhotonField("IRB_Finke22", true) {}
+	IRB_Finke22() : TabularPhotonField("IRB_Finke22", true, false) {}
 };
 
 /**
