@@ -20,7 +20,10 @@ jobs:
      - name: Preinstall 
        run: | 
          brew install hdf5 fftw cfitsio muparser libomp swig python3
-         pip install numpy==1.26.4 cmake
+         python3 -m venv venv
+         source venv/bin/activate
+         python -m pip install --upgrade pip
+         python -m pip install numpy==1.26.4 cmake
      - name: Set up the build
        env:
          CXX: ${{ matrix.config.cxx }}
@@ -30,7 +33,7 @@ jobs:
        run: |
         mkdir build
         cd build
-        cmake .. -DENABLE_PYTHON=True  -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
+        cmake .. -DENABLE_PYTHON=True -DPython_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python -DCMAKE_CXX_STANDARD=17  -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
      - name: Build CRPropa
        run: |
          cd build
