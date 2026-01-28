@@ -12,12 +12,6 @@ set(CRPROPA_EXTRA_LIBRARIES)
 set(CRPROPA_SWIG_DEFINES)
 set(CRPROPA_SWIG_INPUTS)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
-        target_link_libraries(crpropa PUBLIC stdc++fs)
-    endif()
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCXX AND NOT APPLE)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--as-needed")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--as-needed")
@@ -447,12 +441,6 @@ else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
 
-#find_package(nanoflann REQUIRED)
-# add_executable(crpropa test.cpp)
-# Ensure the nanoflann include directory is added
-# include_directories(${nanoflann_INCLUDE_DIRS})
-#target_link_libraries(crpropa nanoflann::nanoflann)
-
 # ----------------------------------------------------------------------------
 # Python
 # ----------------------------------------------------------------------------
@@ -547,6 +535,16 @@ if(ENABLE_PYTHON AND Python_FOUND)
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
+
+#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+#    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+#        target_link_libraries(crpropa PUBLIC stdc++fs)
+#    endif()
+#endif()
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	target_link_libraries(crpropa stdc++fs)
+endif()
 
 target_include_directories(crpropa
     PUBLIC
