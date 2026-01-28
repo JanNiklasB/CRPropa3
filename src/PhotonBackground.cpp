@@ -15,12 +15,15 @@
 #include <sstream>
 #include <unordered_map>
 
-#include <filesystem>
-
 #if defined(__APPLE__) && defined(_LIBCPP_VERSION)
-  namespace fs = std::__fs::filesystem;
+    #include <filesystem>
+    namespace fs = std::__fs::filesystem;
+#elif defined(__GNUC__) && (__GNUC__ < 10)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
 #else
-  namespace fs = std::filesystem;
+    #include <filesystem>
+    namespace fs = std::filesystem;
 #endif
 
 namespace crpropa {

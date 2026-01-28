@@ -442,17 +442,8 @@ else()
 endif(BUILD_DOC)
 
 # Only add stdc++fs for older GCC (needed for Ubuntu 20)
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-        OUTPUT_VARIABLE GCC_VERSION
-    )
-    string(REGEX MATCHALL "[0-9]+" GCC_VERSION_PARTS ${GCC_VERSION})
-    list(GET GCC_VERSION_PARTS 0 GCC_MAJOR)
-    if (GCC_MAJOR LESS 11)
-        message(STATUS "GCC version < 11 detected, linking stdc++fs")
-        target_link_libraries(crpropa PRIVATE stdc++fs)
-    endif()
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+    target_link_libraries(crpropa stdc++fs)
 endif()
 
 # ----------------------------------------------------------------------------
