@@ -9,6 +9,12 @@
 #include <stdexcept>
 #include <filesystem>
 
+#if defined(__APPLE__) && defined(_LIBCPP_VERSION)
+  namespace fs = std::__fs::filesystem;
+#else
+  namespace fs = std::filesystem;
+#endif
+
 namespace crpropa {
 
 static const double mec2 = mass_electron * c_squared;
@@ -103,11 +109,11 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
   
   std::vector<std::vector<double>> tabRate;
   
-  std::filesystem::path dir = filepath;
+  fs::path dir = filepath;
   std::unordered_map<int, Vector3d> photonDict;
   int iFile = 0;
   
-  for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
+  for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     // the input filename here should be a string
     //check if it is correct, i.e. a proper filename string
@@ -230,10 +236,10 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
   std::vector<std::vector<double>> tabs;
   std::vector<std::vector<std::vector<double>>> tabCDF;
   
-  std::filesystem::path dir = filepath;
+  fs::path dir = filepath;
   int iFile = 0;
   
-  for (auto const& dir_entry : std::filesystem::directory_iterator{dir}) {
+  for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     std::vector<double> vecE;
     std::vector<double> vecs;

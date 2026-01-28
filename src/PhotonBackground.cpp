@@ -17,6 +17,12 @@
 
 #include <filesystem>
 
+#if defined(__APPLE__) && defined(_LIBCPP_VERSION)
+  namespace fs = std::__fs::filesystem;
+#else
+  namespace fs = std::filesystem;
+#endif
+
 namespace crpropa {
 
 TabularPhotonField::TabularPhotonField(std::string fieldName, bool isRedshiftDependent, bool isPositionDependent) {
@@ -237,11 +243,11 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
         
     } else {
         
-        std::filesystem::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
+        fs::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
         std::unordered_map<int, Vector3d> photonDict;
         int iFile = 0;
     
-        for (auto const& dir_entry : std::filesystem::directory_iterator{dirE}) {
+        for (auto const& dir_entry : fs::directory_iterator{dirE}) {
             
             std::vector<double> vE = readPhotonEnergy(dir_entry.path().string());
             
@@ -249,9 +255,9 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
             break;
         }
     
-        std::filesystem::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
+        fs::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
         
-        for (auto const& dir_entry : std::filesystem::directory_iterator{dirD}) {
+        for (auto const& dir_entry : fs::directory_iterator{dirD}) {
             
             double x, y, z;
             std::string str;
