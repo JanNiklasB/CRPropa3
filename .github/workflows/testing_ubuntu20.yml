@@ -2,20 +2,19 @@ name: crpropa-testing_ubuntu20
 on: [push, pull_request]
 
 jobs:
-  jobs:
   linux:
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
         config:
-          - name: ubuntu-20
-            os: ubuntu-20.04
-            cxx: g++-9
-            cc: gcc-9
-            fc: gfortran-9
-            swig_builtin: Off
-            py: /usr/bin/python3
+         - name: "ubuntu-20"
+           os: ubuntu-20.04
+           cxx: "g++-9"
+           cc: "gcc-9"
+           fc: "gfortran-9"
+           swig_builtin: "Off" #uses swig 4.0.1
+           py: "/usr/bin/python3" #python 3.8
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,13 +30,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DENABLE_PYTHON=True \ 
-            -DENABLE_TESTING=On \
-            -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \
-            -DSIMD_EXTENSIONS=native \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DCMAKE_CXX_FLAGS="-std=c++17 -Wall -Wextra  -I${{ github.workspace }}/libs/nanoflann/include"      
-     - name: Build CRPropa
+          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS=native
+      - name: Build CRPropa
         run: |
           cd build
           make
