@@ -441,6 +441,25 @@ else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
 
+#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+#    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+#        target_link_libraries(crpropa PUBLIC stdc++fs)
+#    endif()
+#endif()
+# Only add stdc++fs for older GCC (needed for Ubuntu 20)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
+        OUTPUT_VARIABLE GCC_VERSION
+    )
+    string(REGEX MATCHALL "[0-9]+" GCC_VERSION_PARTS ${GCC_VERSION})
+    list(GET GCC_VERSION_PARTS 0 GCC_MAJOR)
+    if (GCC_MAJOR LESS 10)
+        message(STATUS "GCC version < 10 detected, linking stdc++fs")
+        target_link_libraries(crpropa PRIVATE stdc++fs)
+    endif()
+endif()
+
 # ----------------------------------------------------------------------------
 # Python
 # ----------------------------------------------------------------------------
@@ -535,16 +554,6 @@ if(ENABLE_PYTHON AND Python_FOUND)
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
-
-#if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-#    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
-#        target_link_libraries(crpropa PUBLIC stdc++fs)
-#    endif()
-#endif()
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	target_link_libraries(crpropa stdc++fs)
-endif()
 
 target_include_directories(crpropa
     PUBLIC
