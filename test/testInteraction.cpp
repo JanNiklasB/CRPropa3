@@ -801,7 +801,7 @@ TEST(EMPairProduction, secondaries) {
 			}
 
 			// test energy conservation
-			EXPECT_DOUBLE_NEAR(Ep, Etot, 1e-9);
+			EXPECT_DOUBLE_EQ(Ep, Etot);
 		}
 	}
 }
