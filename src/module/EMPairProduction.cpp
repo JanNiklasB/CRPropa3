@@ -457,9 +457,6 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
   if (not std::isfinite(Ee) || not std::isfinite(Ep))
     return;
   
-  // photon is lost after interacting
-  candidate->setActive(false);
-  
   // sample random position along current step
   Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
   // apply sampling

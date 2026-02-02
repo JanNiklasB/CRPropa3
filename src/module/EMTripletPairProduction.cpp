@@ -333,9 +333,6 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
 }
 
 void EMTripletPairProduction::performInteraction(Candidate *candidate) const {
-  int id = candidate->current.getId();
-  if  (abs(id) != 11)
-    return;
   
   // scale the particle energy instead of background photons
   double z = candidate->getRedshift();
