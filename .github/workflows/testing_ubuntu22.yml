@@ -44,7 +44,7 @@ jobs:
       - name: Run tests
         run: |
           cd build
-          make test
+          make test ARGS="--output-on-failure"
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v4
