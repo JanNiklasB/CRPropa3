@@ -717,7 +717,7 @@ TEST(EMPairProduction, allBackgrounds) {
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
   
-  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98/
+  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98";
   if (!fs::exists(dir)) {
     std::cout << "Photon background tables not available" << std::endl;
   } else {
@@ -831,7 +831,7 @@ TEST(EMDoublePairProduction, allBackgrounds) {
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
   
-  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98/
+  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98";
   if (!fs::exists(dir)) {
     std::cout << "Photon background tables not available" << std::endl;
   } else {
@@ -946,7 +946,7 @@ TEST(EMTripletPairProduction, allBackgrounds) {
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
   
-  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98/
+  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98";
   if (!fs::exists(dir)) {
     std::cout << "Photon background tables not available" << std::endl;
   } else {
@@ -1062,7 +1062,7 @@ TEST(EMInverseComptonScattering, allBackgrounds) {
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
   
-  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98/
+  fs::path dir = getDataPath("") + "Scaling/ISRF_Freudenreich98";
   if (!fs::exists(dir)) {
     std::cout << "Photon background tables not available" << std::endl;
   } else {
