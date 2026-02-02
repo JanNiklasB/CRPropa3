@@ -18,8 +18,10 @@
 #include <fstream>
 
 #if defined(__APPLE__) && defined(_LIBCPP_VERSION)
+  #include <filesystem>
   namespace fs = std::__fs::filesystem;
 #else
+  #include <filesystem>
   namespace fs = std::filesystem;
 #endif
 
