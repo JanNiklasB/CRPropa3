@@ -119,12 +119,17 @@ std::string EMInverseComptonScattering::splitFilename(const std::string str) {
 
 void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep) {
     
-    std::vector<std::vector<double>> tabRate;
+  std::vector<std::vector<double>> tabRate;
     
-    fs::path dir = filepath;
-    std::unordered_map<int, Vector3d> photonDict;
-    int iFile = 0;
-    
+  fs::path dir = filepath;
+  std::unordered_map<int, Vector3d> photonDict;
+  int iFile = 0;
+  
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
+  
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     // the input filename here should be a string
@@ -251,6 +256,11 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
   
   fs::path dir = filepath;
   int iFile = 0;
+  
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
   
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     

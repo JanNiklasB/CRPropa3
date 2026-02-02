@@ -124,6 +124,11 @@ void EMPairProduction::initRatePositionDependentPhotonField(std::string filepath
   std::unordered_map<int, Vector3d> photonDict;
   int iFile = 0;
   
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
+  
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     std::string filename = dir_entry.path().string();
@@ -248,7 +253,11 @@ void EMPairProduction::initCumulativeRatePositionDependentPhotonField(std::strin
   
   fs::path dir = filepath;
   int iFile = 0;
-  //int nCDFSusp = 0;
+
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
   
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     

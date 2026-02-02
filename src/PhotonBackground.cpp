@@ -173,7 +173,7 @@ void TabularPhotonField::initRedshiftScaling() {
 void TabularPhotonField::checkInputData() const {
   if (this->isRedshiftDependent) {
     
-    if (this->photonDensity.size() != this->photonEnergies.size() * this-> redshifts.size())
+  if (this->photonDensity.size() != this->photonEnergies.size() * this-> redshifts.size())
       throw std::runtime_error("TabularPhotonField::checkInputData: length of photon density input is unequal to length of photon energy input times length of redshift input");
     
   } else {
@@ -245,69 +245,81 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
         throw std::runtime_error("Photon Field " + fieldName + " is not position dependent! It is not the correct class. \n");
         
     } else {
+      
+      fs::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
+      
+      if (!fs::exists(dirE)) {
+          warning() << "Photon tables not found in " << dirE << std::endl;
+          return;
+      }
+      
+      std::unordered_map<int, Vector3d> photonDict;
+      int iFile = 0;
+      
+      for (auto const& dir_entry : fs::directory_iterator{dirE}) {
         
-        fs::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
-        std::unordered_map<int, Vector3d> photonDict;
-        int iFile = 0;
-    
-        for (auto const& dir_entry : fs::directory_iterator{dirE}) {
-            
-            std::vector<double> vE = readPhotonEnergy(dir_entry.path().string());
-            
-            this->photonEnergies = vE;
-            break;
-        }
-    
-        fs::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
+        std::vector<double> vE = readPhotonEnergy(dir_entry.path().string());
         
-        for (auto const& dir_entry : fs::directory_iterator{dirD}) {
-            
-            double x, y, z;
-            std::string str;
-            std::stringstream ss;
-            
-            
-            std::string filename = splitFilename(dir_entry.path().string());
-            ss << filename;
-            
-            //Getline function to take and store the x, y, z coordinates of each node
-            int iLine = 0;
-            // it ensures the double numbers are of the type 1.00329, with the . for the decimal part
-            std::locale::global(std::locale("C"));
-            
-            while (getline(ss, str, '_')) {
-                if (iLine == 2) {
-                    x = -stod(str) * kpc;
-                }
-                if (iLine == 3) {
-                    y = stod(str) * kpc;
-                }
-                if (iLine == 4) {
-                    z = stod(str) * kpc;
-                }
-                iLine = iLine + 1;
-            }
-            
-            Vector3d vPos(x, y, z);
-            
-            if (hasSurface() and !surface->isInside(vPos))
-                continue;
-                
-            photonDict[iFile] = vPos;
-            
-            nLoadedFiles = nLoadedFiles + 1;
-            iFile = iFile + 1;
-            
-            std::vector<double> vD = readPhotonDensity(dir_entry.path().string());
-            this->photonDensity.push_back(vD);
-            
+        this->photonEnergies = vE;
+        break;
+        
+      }
+      
+      fs::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
+      
+      if (!fs::exists(dirE)) {
+          warning() << "Photon tables not found in " << dirE << std::endl;
+          return;
+      }
+      
+      for (auto const& dir_entry : fs::directory_iterator{dirD}) {
+        
+        double x, y, z;
+        std::string str;
+        std::stringstream ss;
+        
+        
+        std::string filename = splitFilename(dir_entry.path().string());
+        ss << filename;
+        
+        //Getline function to take and store the x, y, z coordinates of each node
+        int iLine = 0;
+        // it ensures the double numbers are of the type 1.00329, with the . for the decimal part
+        std::locale::global(std::locale("C"));
+        
+        while (getline(ss, str, '_')) {
+          if (iLine == 2) {
+            x = -stod(str) * kpc;
+          }
+          if (iLine == 3) {
+            y = stod(str) * kpc;
+          }
+          if (iLine == 4) {
+            z = stod(str) * kpc;
+          }
+          iLine = iLine + 1;
         }
         
-        if (this->photonDensity.empty())
-            throw std::runtime_error("Tabular spatial photon field for " + fieldName + " empty! Check if the surface is properly set.");
+        Vector3d vPos(x, y, z);
         
-        this->photonDict = photonDict;
-        checkInputData();
+        if (hasSurface() and !surface->isInside(vPos))
+          continue;
+        
+        photonDict[iFile] = vPos;
+        
+        nLoadedFiles = nLoadedFiles + 1;
+        iFile = iFile + 1;
+        
+        std::vector<double> vD = readPhotonDensity(dir_entry.path().string());
+        this->photonDensity.push_back(vD);
+        
+      }
+      
+      if (this->photonDensity.empty())
+        throw std::runtime_error("Tabular spatial photon field for " + fieldName + " empty! Check if the surface is properly set.");
+      
+      this->photonDict = photonDict;
+      checkInputData();
     }
 }
 

@@ -113,6 +113,11 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
   std::unordered_map<int, Vector3d> photonDict;
   int iFile = 0;
   
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
+  
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     // the input filename here should be a string
@@ -238,6 +243,11 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
   
   fs::path dir = filepath;
   int iFile = 0;
+  
+  if (!fs::exists(dir)) {
+      warning() << "Photon tables not found in " << dir << std::endl;
+      return;
+  }
   
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
