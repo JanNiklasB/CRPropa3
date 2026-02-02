@@ -118,6 +118,10 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
       return;
   }
   
+  if (!fs::exists(dir)) {
+      GTEST_SKIP() << "Photon tables not available";
+  }
+  
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     // the input filename here should be a string
@@ -247,6 +251,10 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
   if (!fs::exists(dir)) {
       std::cout << "Photon tables not found in " << dir << std::endl;
       return;
+  }
+  
+  if (!fs::exists(dir)) {
+      GTEST_SKIP() << "Photon tables not available";
   }
   
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
