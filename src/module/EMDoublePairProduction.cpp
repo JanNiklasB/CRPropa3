@@ -128,10 +128,6 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
       return;
   }
   
-  if (!fs::exists(dir)) {
-      GTEST_SKIP() << "Photon tables not available";
-  }
-  
   for (auto const& dir_entry : fs::directory_iterator{dir}) {
     
     std::string filename = dir_entry.path().string();

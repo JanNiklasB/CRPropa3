@@ -252,11 +252,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
           std::cout << "Photon tables not found in " << dirE << std::endl;
           return;
       }
-      
-      if (!fs::exists(dirE)) {
-          GTEST_SKIP() << "Photon tables not available";
-      }
-      
+    
       std::unordered_map<int, Vector3d> photonDict;
       int iFile = 0;
       
@@ -275,11 +271,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
           std::cout << "Photon tables not found in " << dirD << std::endl;
           return;
       }
-      
-      if (!fs::exists(dirD)) {
-          GTEST_SKIP() << "Photon tables not available";
-      }
-      
+     
       for (auto const& dir_entry : fs::directory_iterator{dirD}) {
         
         double x, y, z;

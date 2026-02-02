@@ -17,6 +17,12 @@
 
 #include <fstream>
 
+#if defined(__APPLE__) && defined(_LIBCPP_VERSION)
+  namespace fs = std::__fs::filesystem;
+#else
+  namespace fs = std::filesystem;
+#endif
+
 namespace crpropa {
 
 // ElectronPairProduction -----------------------------------------------------
@@ -710,9 +716,16 @@ TEST(EMPairProduction, allBackgrounds) {
 	em.setPhotonField(ebl);
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
-  ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
-  em.setPhotonField(isrf);
-	ebl = new IRB_Stecker05();
+  
+  fs::path dir = getDataPath("") / "Scaling/ISRF_Freudenreich98/
+  if (!fs::exists(dir)) {
+    std::cout << "Photon background tables not available" << std::endl;
+  } else {
+    ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
+    em.setPhotonField(isrf);
+  }
+  
+  ebl = new IRB_Stecker05();
 	em.setPhotonField(ebl);
 	ebl = new IRB_Franceschini08();
 	em.setPhotonField(ebl);
@@ -817,8 +830,15 @@ TEST(EMDoublePairProduction, allBackgrounds) {
 	em.setPhotonField(ebl);
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
-  ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
-  em.setPhotonField(isrf);
+  
+  fs::path dir = getDataPath("") / "Scaling/ISRF_Freudenreich98/
+  if (!fs::exists(dir)) {
+    std::cout << "Photon background tables not available" << std::endl;
+  } else {
+    ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
+    em.setPhotonField(isrf);
+  }
+  
 	ebl = new IRB_Stecker05();
 	em.setPhotonField(ebl);
 	ebl = new IRB_Franceschini08();
@@ -925,8 +945,15 @@ TEST(EMTripletPairProduction, allBackgrounds) {
 	em.setPhotonField(ebl);
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
-  ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
-  em.setPhotonField(isrf);
+  
+  fs::path dir = getDataPath("") / "Scaling/ISRF_Freudenreich98/
+  if (!fs::exists(dir)) {
+    std::cout << "Photon background tables not available" << std::endl;
+  } else {
+    ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
+    em.setPhotonField(isrf);
+  }
+  
 	ebl = new IRB_Stecker05();
 	em.setPhotonField(ebl);
 	ebl = new IRB_Franceschini08();
@@ -1034,8 +1061,15 @@ TEST(EMInverseComptonScattering, allBackgrounds) {
 	em.setPhotonField(ebl);
 	ref_ptr<PhotonField> urb = new URB_Protheroe96();
 	em.setPhotonField(urb);
-  ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
-  em.setPhotonField(isrf);
+  
+  fs::path dir = getDataPath("") / "Scaling/ISRF_Freudenreich98/
+  if (!fs::exists(dir)) {
+    std::cout << "Photon background tables not available" << std::endl;
+  } else {
+    ref_ptr<PhotonField> isrf = new ISRF_Freudenreich98(nullptr);
+    em.setPhotonField(isrf);
+  }
+  
 	ebl = new IRB_Stecker05();
 	em.setPhotonField(ebl);
 	ebl = new IRB_Franceschini08();
