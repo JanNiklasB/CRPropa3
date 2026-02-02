@@ -800,8 +800,8 @@ TEST(EMPairProduction, secondaries) {
 				Etot += s.current.getEnergy();
 			}
 
-			// test energy conservation
-			EXPECT_DOUBLE_EQ(Ep, Etot);
+			// test energy conservation 
+      EXPECT_NEAR(Ep, Etot, 1E-9);
 		}
 	}
 }

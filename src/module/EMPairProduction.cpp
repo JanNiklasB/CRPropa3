@@ -417,13 +417,13 @@ public:
 
 void EMPairProduction::performInteraction(Candidate *candidate) const {
   
+  // cosmic ray photon is lost after interacting
+  candidate->setActive(false);
+  
   // scale particle energy instead of background photon energy
   double z = candidate->getRedshift();
   double E = candidate->current.getEnergy() * (1 + z);
   Vector3d position = candidate->current.getPosition();
-  
-  // cosmic ray photon is lost after interacting
-  candidate->setActive(false);
   
   // check if secondary electron pair needs to be produced
   if (not haveElectrons)
