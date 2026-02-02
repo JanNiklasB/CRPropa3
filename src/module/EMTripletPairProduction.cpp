@@ -114,7 +114,7 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
   int iFile = 0;
   
   if (!fs::exists(dir)) {
-      warning() << "Photon tables not found in " << dir << std::endl;
+      std::cout << "Photon tables not found in " << dir << std::endl;
       return;
   }
   
@@ -245,7 +245,7 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
   int iFile = 0;
   
   if (!fs::exists(dir)) {
-      warning() << "Photon tables not found in " << dir << std::endl;
+      std::cout << "Photon tables not found in " << dir << std::endl;
       return;
   }
   

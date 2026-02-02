@@ -249,7 +249,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
       fs::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
       
       if (!fs::exists(dirE)) {
-          warning() << "Photon tables not found in " << dirE << std::endl;
+          std::cout << "Photon tables not found in " << dirE << std::endl;
           return;
       }
       
@@ -268,7 +268,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, bool
       fs::path dirD = getDataPath("") + "Scaling/" + this->fieldName + "/photonDensity/";
       
       if (!fs::exists(dirE)) {
-          warning() << "Photon tables not found in " << dirE << std::endl;
+          std::cout << "Photon tables not found in " << dirE << std::endl;
           return;
       }
       

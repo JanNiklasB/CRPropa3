@@ -124,7 +124,7 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
   int iFile = 0;
   
   if (!fs::exists(dir)) {
-      warning() << "Photon tables not found in " << dir << std::endl;
+      std::cout << "Photon tables not found in " << dir << std::endl;
       return;
   }
   
