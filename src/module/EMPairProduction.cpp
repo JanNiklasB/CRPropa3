@@ -417,9 +417,6 @@ public:
 
 void EMPairProduction::performInteraction(Candidate *candidate) const {
   
-  // cosmic ray photon is lost after interacting
-  candidate->setActive(false);
-  
   // scale particle energy instead of background photon energy
   double z = candidate->getRedshift();
   double E = candidate->current.getEnergy() * (1 + z);
@@ -467,8 +464,10 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
   if (random.rand() < pow(1 - f, thinning)) {
     double w = 1. / pow(1 - f, thinning);
     candidate->addSecondary(-11, Ee / (1 + z), pos, w, interactionTag);
-    
   }
+  
+  // cosmic ray photon is lost after interacting
+  candidate->setActive(false);
   
 }
 
