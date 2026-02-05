@@ -28,7 +28,7 @@ class PropagationBP: public Module {
 public:
 	class Y {
 	public:
-		Vector3d x, u; /*< phase-point: position and direction */
+		Vector3d x, u; /*< phase-point: position and velocity */
 
 		Y() {
 		}
@@ -79,14 +79,14 @@ public:
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
-	 * @param dir	current direction of the candidate
+	 * @param vel	current velocity of the candidate
 	 * @param step	current step size of the candidate
 	 * @param z		current redshift is needed to calculate the magnetic field
 	 * @param q		current charge of the candidate
 	 * @param m		current mass of the candidate
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d  pos, Vector3d  dir, double step, double z, double q, double m) const;
+	Y dY(Vector3d pos, Vector3d vel, double step, double z, double q, double m) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step

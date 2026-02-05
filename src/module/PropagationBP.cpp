@@ -16,10 +16,10 @@ namespace crpropa {
 	}
 
 
-	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double step,
+	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d vel, double step,
 			double z, double q, double m) const {
 		// half leap frog step in the position
-		pos += dir * step / 2.;
+		pos += vel.getUnitVector() * step / 2.;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
@@ -30,12 +30,12 @@ namespace crpropa {
 		Vector3d v_help;
 
 		// Boris push
-		v_help = dir + dir.cross(t);
-		dir = dir + v_help.cross(s);
+		v_help = vel + vel.cross(t);
+		vel = vel + v_help.cross(s);
 
 		// the other half leap frog step in the position
-		pos += dir * step / 2.;
-		return Y(pos, dir);
+		pos += vel.getUnitVector() * step / 2.;
+		return Y(pos, vel);
 	}
 
 
@@ -64,7 +64,7 @@ namespace crpropa {
 		ParticleState &current = candidate->current;
 		candidate->previous = current;
 
-		Y yIn(current.getPosition(), current.getDirection());
+		Y yIn(current.getPosition(), current.getVelocity());
 
 		// calculate charge of particle
 		double q = current.getCharge();
@@ -73,7 +73,7 @@ namespace crpropa {
 		// rectilinear propagation for neutral particles
 		if (q == 0) {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
-			current.setPosition(yIn.x + yIn.u * step);
+			current.setPosition(yIn.x + yIn.u.getUnitVector() * step);
 			candidate->setCurrentStep(step);
 			candidate->setNextStep(maxStep);
 			return;
