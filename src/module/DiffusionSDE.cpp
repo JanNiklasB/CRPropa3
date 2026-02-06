@@ -51,7 +51,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
-	double h = clip(candidate->getNextStep(), minStep, maxStep) / c_light;
+	double h = clip(candidate->getNextStep(), minStep, maxStep) / candidate->getVelocity();
 	Vector3d PosIn = current.getPosition();
 	Vector3d DirIn = current.getDirection();
 
@@ -68,8 +68,8 @@ void DiffusionSDE::process(Candidate *candidate) const {
 			driftStep(Pos, LinProp, h, time);
 		}
 
-		current.setPosition(Pos + LinProp + dir*h*c_light);
-		candidate->setCurrentStep(h * c_light);
+		current.setPosition(Pos + LinProp + dir*h*candidate->getVelocity());
+		candidate->setCurrentStep(h * candidate->getVelocity());
 		candidate->setNextStep(maxStep);
 		return;
 	}
@@ -99,30 +99,30 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	Vector3d DirOut = Vector3d(0.);
 
 
-	double propTime = TStep * sqrt(h) / c_light;
+	double propStep = TStep * sqrt(h);
 	size_t counter = 0;
 	double r=42.; //arbitrary number larger than one
 
 	do {
 		Vector3d PosOut = Vector3d(0.);
 		Vector3d PosErr = Vector3d(0.);
-	  	tryStep(PosIn, PosOut, PosErr, z, propTime);
+	  	tryStep(PosIn, PosOut, PosErr, z, propStep);
 	    // calculate the relative position error r and the next time step h
 	  	r = PosErr.getR() / tolerance;
-	  	propTime *= 0.5;
+	  	propStep *= 0.5;
 		counter += 1;
 
     // Check for better break condition
-	} while (r > 1 && fabs(propTime) >= minStep/c_light);
+	} while (r > 1 && fabs(propStep) >= minStep);
 
 
 	size_t stepNumber = pow(2, counter-1);
-	double allowedTime = TStep * sqrt(h) / c_light / stepNumber;
+	double allowedStep = TStep * sqrt(h) / stepNumber;
 	Vector3d Start = PosIn;
 	Vector3d PosOut = Vector3d(0.);
 	Vector3d PosErr = Vector3d(0.);
 	for (size_t j=0; j<stepNumber; j++) {
-		tryStep(Start, PosOut, PosErr, z, allowedTime);
+		tryStep(Start, PosOut, PosErr, z, allowedStep);
 		Start = PosOut;
 	}
 
@@ -138,15 +138,15 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		if (advectionField){
 			driftStep(Pos, LinProp, h, time);
 			current.setPosition(Pos + LinProp);
-	 		candidate->setCurrentStep(h*c_light);
-	  		double newStep = 5*h*c_light;
+	 		candidate->setCurrentStep(h*candidate->getVelocity());
+	  		double newStep = 5*h*candidate->getVelocity();
 			newStep = clip(newStep, minStep, maxStep);
 	  		candidate->setNextStep(newStep);
 	  		return;
 		}
-		current.setPosition(Pos + dir*h*c_light);
-	 	candidate->setCurrentStep(h*c_light);
-		double newStep = 5*h*c_light;
+		current.setPosition(Pos + dir*h*candidate->getVelocity());
+	 	candidate->setCurrentStep(h*candidate->getVelocity());
+		double newStep = 5*h*candidate->getVelocity();
 		newStep = clip(newStep, minStep, maxStep);
 	  	candidate->setNextStep(newStep);
 	  	return;
@@ -196,14 +196,14 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	DirOut = Random::instance().randConeVector(TVec, M_PI/2.);
 	current.setPosition(PO);
 	current.setDirection(DirOut);
-	candidate->setCurrentStep(h * c_light);
+	candidate->setCurrentStep(h * candidate->getVelocity());
 
 	double nextStep;
 	if (stepNumber>1){
-		nextStep = h*pow(stepNumber, -2.)*c_light;
+		nextStep = h*pow(stepNumber, -2.)*candidate->getVelocity();
 	}
 	else {
-		nextStep = 4 * h*c_light;
+		nextStep = 4 * h*candidate->getVelocity();
 	}
 
 	candidate->setNextStep(nextStep);
@@ -244,7 +244,7 @@ void DiffusionSDE::tryStep(const Vector3d &PosIn, Vector3d &POut, Vector3d &PosE
 		// update k_i = direction of the regular magnetic mean field
 		Vector3d BField = getMagneticFieldAtPosition(y_n, z);
 
-		k[i] = BField.getUnitVector() * c_light;
+		k[i] = BField.getUnitVector();
 
 		POut += k[i] * b[i] * propStep;
 		PosErr +=  (k[i] * (b[i] - bs[i])) * propStep / kpc;
