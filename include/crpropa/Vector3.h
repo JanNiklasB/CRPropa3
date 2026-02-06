@@ -12,7 +12,11 @@
 #endif // CRPROPA_HAVE_PYTHON
 #include <unistd.h>
 
+#if defined(Python_FOUND) or defined(SWIG)
+#include <Python.h>
+#include <numpy/arrayobject.h>
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
+#endif
 
 namespace crpropa {
 
@@ -424,6 +428,8 @@ public:
 		return buffer;
 	}
 
+
+	#if defined(Python_FOUND) or defined(SWIG)
 	// ----------------------------
 	// 	Python numpy interface 
 	// ----------------------------
