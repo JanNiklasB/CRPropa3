@@ -104,6 +104,7 @@ public:
 	void setMass(double Mass);
 
 	/** Set Lorentz factor and modify the particle's energy accordingly.
+	 * Watch out to not choose gamma smaller then the numerical precission
 	 @param gamma		Lorentz factor
 	 */
 	void setLorentzFactor(double gamma);

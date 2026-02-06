@@ -82,7 +82,7 @@ namespace crpropa {
 		Y yOut, yErr;
 		double newStep = step;
 		double z = candidate->getRedshift();
-		double m = current.getEnergy()/(c_squared);
+		double m = current.getEnergy()/(c_squared); // relativistic mass
 
 		// if minStep is the same as maxStep the adaptive algorithm with its error
 		// estimation is not needed and the computation time can be saved:

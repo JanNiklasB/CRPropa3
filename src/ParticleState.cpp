@@ -29,7 +29,7 @@ const Vector3d &ParticleState::getPosition() const {
 }
 
 void ParticleState::setDirection(const Vector3d &dir) {
-	direction = dir / dir.getR();
+	direction = dir.getUnitVector();
 }
 
 const Vector3d &ParticleState::getDirection() const {
@@ -50,7 +50,7 @@ double ParticleState::getRigidity() const {
 
 void ParticleState::setId(int newId) {
 	id = newId;
-	pmass = particleMass(id);
+	setMass(particleMass(id));
 	if (isNucleus(id)) {
 		charge = chargeNumber(id) * eplus;
 		if (id < 0)
@@ -59,8 +59,8 @@ void ParticleState::setId(int newId) {
 		charge = HepPID::charge(id) * eplus;
 	}
 
-	// energy has to be at least restmass
-	energy = std::max(pmass*c_squared, energy);
+	// reset energy in case pmass*c_squared is now larger
+	setEnergy(energy);
 }
 
 int ParticleState::getId() const {
@@ -93,8 +93,12 @@ void ParticleState::setLorentzFactor(double lf) {
 }
 
 Vector3d ParticleState::getVelocity() const {
-	if (getMass()==0) return direction*c_light;
-	return direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
+	if (getMass()==0) 
+		return direction*c_light;
+	else if (getLorentzFactor()==1)  // can happen if if gamma-1 < numericalPrecission
+		return direction * sqrt((energy-pmass*c_squared)*2/pmass);  // non relativistic case
+	else
+		return direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
 }
 
 Vector3d ParticleState::getMomentum() const {
