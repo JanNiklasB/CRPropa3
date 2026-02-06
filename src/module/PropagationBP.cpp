@@ -25,7 +25,7 @@ namespace crpropa {
 		Vector3d B = getFieldAtPosition(pos, z);
 
 		// Boris help vectors
-		Vector3d t = B * q / 2 / m * step / c_light;
+		Vector3d t = B * q / 2 / m * step / vel.getR();
 		Vector3d s = t * 2 / (1 + t.dot(t));
 		Vector3d v_help;
 
@@ -82,7 +82,7 @@ namespace crpropa {
 		Y yOut, yErr;
 		double newStep = step;
 		double z = candidate->getRedshift();
-		double m = current.getEnergy()/(c_light * c_light);
+		double m = current.getEnergy()/(c_squared);
 
 		// if minStep is the same as maxStep the adaptive algorithm with its error
 		// estimation is not needed and the computation time can be saved:

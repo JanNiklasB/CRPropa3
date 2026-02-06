@@ -50,7 +50,7 @@ void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 
 PropagationCK::Y PropagationCK::dYdt(const Y &y, ParticleState &p, double z) const {
 	// normalize direction vector to prevent numerical losses
-	Vector3d velocity = y.u.getUnitVector() * c_light;
+	Vector3d velocity = y.u.getUnitVector() * p.getVelocity().getR();
 	
 	// get B field at particle position
 	Vector3d B = getFieldAtPosition(y.x, z);
@@ -99,7 +99,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	// if minStep is the same as maxStep the adaptive algorithm with its error
 	// estimation is not needed and the computation time can be saved:
 	if (minStep == maxStep){
-		tryStep(yIn, yOut, yErr, step / c_light, current, z);
+		tryStep(yIn, yOut, yErr, step / candidate->getVelocity(), current, z);
 	} else {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
 		newStep = step;
@@ -107,7 +107,7 @@ void PropagationCK::process(Candidate *candidate) const {
 
 		// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 		while (true) {
-			tryStep(yIn, yOut, yErr, step / c_light, current, z);
+			tryStep(yIn, yOut, yErr, step / candidate->getVelocity(), current, z);
 			r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
 			if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 				if (step == minStep)  // already minimum step size
