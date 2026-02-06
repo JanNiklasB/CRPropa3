@@ -86,7 +86,7 @@ public:
 	 * @param m		current mass of the candidate
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d pos, Vector3d vel, double step, double z, double q, double m) const;
+	Y virtual dY(Vector3d pos, Vector3d vel, double step, double z, double q, double m) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
