@@ -6,10 +6,6 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-#ifdef CRPROPA_HAVE_PYTHON
-#include <Python.h>
-#include <numpy/arrayobject.h>
-#endif // CRPROPA_HAVE_PYTHON
 #include <unistd.h>
 
 #if defined(Python_FOUND) or defined(SWIG)
@@ -421,19 +417,13 @@ public:
 		data[2] = f;
 		return *this;
 	}
-	
-	const std::string getDescription() {
-		char buffer[256];
-		sprintf(buffer, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
-		return buffer;
-	}
 
 
 	#if defined(Python_FOUND) or defined(SWIG)
 	// ----------------------------
 	// 	Python numpy interface 
 	// ----------------------------
-#ifdef CRPROPA_HAVE_PYTHON
+
 	PyObject* __array__() {
 		npy_intp dims[1] = {3};
 		PyObject *array;
@@ -451,6 +441,12 @@ public:
 
 	size_t __len__() {
 		return 3;
+	}
+
+	const std::string getDescription() {
+		char buffer[256];
+		sprintf(buffer, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
+		return buffer;
 	}
 	
 	// initialize the vector from a numpy array
@@ -500,8 +496,8 @@ public:
 		// free the reference to the numpy array
 		Py_DECREF(array);
 	}
-#endif // CRPROPA_HAVE_PYTHON	
-
+	#endif
+	
 };
 
 #ifndef SWIG
@@ -530,5 +526,3 @@ typedef Vector3<float> Vector3f;
 }  // namespace crpropa
 
 #endif  // CRPROPA_VECTOR3_H
-
-

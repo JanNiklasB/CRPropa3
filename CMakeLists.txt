@@ -455,8 +455,7 @@ find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development NumPy)
 if(ENABLE_PYTHON AND Python_FOUND)
   find_package(SWIG 3.0 REQUIRED)
   include_directories(${Python_INCLUDE_DIRS})
-  add_definitions(-DCRPROPA_HAVE_PYTHON)
-  list(APPEND CRPROPA_SWIG_DEFINES -DCRPROPA_HAVE_PYTHON)
+  add_definitions(-DPython_FOUND)
 
   # print Python info in detail
   message(STATUS "Python: Found!")
