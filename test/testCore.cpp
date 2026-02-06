@@ -46,18 +46,44 @@ TEST(ParticleState, direction) {
 }
 
 TEST(ParticleState, velocity) {
-	ParticleState particle;
-	Vector3d v(1, 1, 0);
-	particle.setDirection(v);
-	EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light);
+	{
+		// massless particle
+		ParticleState particle;
+		Vector3d v(1, 1, 0);
+		particle.setDirection(v);
+		EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light);
+	}
+
+	{
+		// proton
+		ParticleState particle;
+		particle.setId(nucleusId(1, 1));
+		Vector3d v(1, 1, 0);
+		particle.setDirection(v);
+		EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light*sqrt(1-1/pow(particle.getLorentzFactor(), 2)));
+	}
 }
 
 TEST(ParticleState, momentum) {
-	ParticleState particle;
-	Vector3d v(0, 1, 0);
-	particle.setDirection(v);
-	particle.setEnergy(100 * EeV);
-	EXPECT_TRUE(particle.getMomentum() == v * (particle.getEnergy() / c_light));
+	{
+		// massless particle
+		ParticleState particle;
+		Vector3d v(0, 1, 0);
+		particle.setDirection(v);
+		particle.setEnergy(100 * EeV);
+		EXPECT_TRUE(particle.getMomentum() == v * (particle.getEnergy() / c_light));
+	}
+
+	{
+		// proton
+		ParticleState particle;
+		particle.setId(nucleusId(1, 1));
+		Vector3d v(0, 1, 0);
+		particle.setDirection(v);
+		double energy = 100*EeV;
+		particle.setEnergy(100 * EeV);
+		EXPECT_TRUE(particle.getMomentum() == v * sqrt( pow(energy/c_light, 2) - pow(particle.getMass()*c_light, 2) ) );
+	}
 }
 
 TEST(ParticleState, id) {
@@ -184,7 +210,7 @@ TEST(Candidate, currentStep) {
 
 	EXPECT_DOUBLE_EQ(candidate.getCurrentStep(), 1 * Mpc);
 	EXPECT_DOUBLE_EQ(candidate.getTrajectoryLength(), 1 * Mpc);
-	EXPECT_DOUBLE_EQ(candidate.getTime(), 1 * Mpc / c_light);
+	EXPECT_DOUBLE_EQ(candidate.getTime(), 1 * Mpc / candidate.getVelocity());
 }
 
 TEST(Candidate, limitNextStep) {

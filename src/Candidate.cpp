@@ -58,7 +58,8 @@ double Candidate::getTrajectoryLength() const {
 }
 
 double Candidate::getVelocity() const {
-	return c_light;
+	if(current.getMass()==0) return c_light;
+	else return current.getVelocity().getR();
 }
 
 double Candidate::getWeight() const {

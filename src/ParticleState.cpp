@@ -7,6 +7,7 @@
 #include "HepPID/ParticleIDMethods.hh"
 
 #include <cstdlib>
+#include <cmath>
 #include <sstream>
 
 namespace crpropa {
@@ -36,7 +37,7 @@ const Vector3d &ParticleState::getDirection() const {
 }
 
 void ParticleState::setEnergy(double newEnergy) {
-	energy = std::max(0., newEnergy); // prevent negative energies
+	energy = std::max(pmass*c_squared, newEnergy); // energy has to be at least restmass
 }
 
 double ParticleState::getEnergy() const {
@@ -57,6 +58,9 @@ void ParticleState::setId(int newId) {
 	} else {
 		charge = HepPID::charge(id) * eplus;
 	}
+
+	// energy has to be at least restmass
+	energy = std::max(pmass*c_squared, energy);
 }
 
 int ParticleState::getId() const {
@@ -85,15 +89,16 @@ double ParticleState::getLorentzFactor() const {
 
 void ParticleState::setLorentzFactor(double lf) {
 	lf = std::max(0., lf); // prevent negative Lorentz factors
-	energy = lf * pmass * c_squared;
+	setEnergy(lf * pmass * c_squared);
 }
 
 Vector3d ParticleState::getVelocity() const {
-	return direction * c_light;
+	if (getMass()==0) return direction*c_light;
+	return direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
 }
 
 Vector3d ParticleState::getMomentum() const {
-	return direction * (energy / c_light);
+	return direction * sqrt( pow(energy/c_light, 2) - pow(pmass*c_light, 2) );
 }
 
 std::string ParticleState::getDescription() const {
