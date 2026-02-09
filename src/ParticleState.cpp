@@ -37,7 +37,7 @@ const Vector3d &ParticleState::getDirection() const {
 }
 
 void ParticleState::setEnergy(double newEnergy) {
-	energy = std::max(pmass*c_squared, newEnergy); // energy has to be at least restmass
+	energy = std::max(0., newEnergy);
 }
 
 double ParticleState::getEnergy() const {
@@ -58,9 +58,6 @@ void ParticleState::setId(int newId) {
 	} else {
 		charge = HepPID::charge(id) * eplus;
 	}
-
-	// reset energy in case pmass*c_squared is now larger
-	setEnergy(energy);
 }
 
 int ParticleState::getId() const {
@@ -84,25 +81,34 @@ void ParticleState::setCharge(int ChargeNumber) {
 }
 
 double ParticleState::getLorentzFactor() const {
-	return energy / (pmass * c_squared);
+	if (getMass()==0)
+		return INFINITY;
+	return getEnergy()/getMass()/c_squared + 1;
 }
 
 void ParticleState::setLorentzFactor(double lf) {
 	lf = std::max(0., lf); // prevent negative Lorentz factors
-	setEnergy(lf * pmass * c_squared);
+	setEnergy((lf-1) * pmass * c_squared);
+}
+
+double ParticleState::getBeta() const {
+	return getVelocity().getR()/c_squared;
 }
 
 Vector3d ParticleState::getVelocity() const {
+	Vector3d velocity;
 	if (getMass()==0) 
-		return direction*c_light;
+		velocity = getDirection()*c_light;
 	else if (getLorentzFactor()==1)  // can happen if if gamma-1 < numericalPrecission
-		return direction * sqrt((energy-pmass*c_squared)*2/pmass);  // non relativistic case
+		velocity = getDirection() * sqrt(getEnergy()*2/getMass());  // non relativistic case
 	else
-		return direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
+		velocity = getDirection() * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
+
+	return velocity;
 }
 
 Vector3d ParticleState::getMomentum() const {
-	return direction * sqrt( pow(energy/c_light, 2) - pow(pmass*c_light, 2) );
+	return getLorentzFactor()*getMass()*getVelocity();
 }
 
 std::string ParticleState::getDescription() const {

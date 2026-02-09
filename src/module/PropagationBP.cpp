@@ -66,6 +66,11 @@ namespace crpropa {
 
 		Y yIn(current.getPosition(), current.getVelocity());
 
+		// if particle has no velocity it is not effected by the magnetic field:
+		if (yIn.u.getR() == 0) {
+			return;
+		}
+
 		// calculate charge of particle
 		double q = current.getCharge();
 		double step = maxStep;
@@ -82,7 +87,7 @@ namespace crpropa {
 		Y yOut, yErr;
 		double newStep = step;
 		double z = candidate->getRedshift();
-		double m = current.getEnergy()/(c_squared); // relativistic mass
+		double m = current.getLorentzFactor()*current.getMass(); // relativistic mass
 
 		// if minStep is the same as maxStep the adaptive algorithm with its error
 		// estimation is not needed and the computation time can be saved:
@@ -96,7 +101,7 @@ namespace crpropa {
 			// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 			while (true) {
 				tryStep(yIn, yOut, yErr, step, current, z, q, m);
-				r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
+				r = yErr.u.getUnitVector().getR() / tolerance;  // ratio of absolute direction error and tolerance
 				if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 					if (step == minStep)  // already minimum step size
 						break;

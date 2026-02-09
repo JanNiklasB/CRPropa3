@@ -58,11 +58,11 @@ public:
 	 */
 	const Vector3d &getDirection() const;
 
-	/** Set energy of particle.
+	/** Set kinetic energy of particle.
 	 @param newEnergy	energy to be assigned to particle [in Joules]
 	 */
 	void setEnergy(double newEnergy);
-	/** Get energy of particle.
+	/** Get kinetic energy of particle.
 	 @returns Energy of particle [in Joules]
 	 */
 	double getEnergy() const;
@@ -112,6 +112,11 @@ public:
 	 @returns Lorentz factor of particle
 	 */
 	double getLorentzFactor() const;
+
+	/** Get Beta = (v/c)^2 
+	 @returns Beta
+	*/
+	double getBeta() const;
 
 	/** Get velocity: direction times the speed of light.
 	 @returns Velocity of particle [m/s]
