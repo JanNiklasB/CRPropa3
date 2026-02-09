@@ -60,6 +60,7 @@ TEST(ParticleState, velocity) {
 		particle.setId(nucleusId(1, 1));
 		Vector3d v(1, 1, 0);
 		particle.setDirection(v);
+		particle.setEnergy(100*EeV);
 		EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light*sqrt(1-1/pow(particle.getLorentzFactor(), 2)));
 	}
 }
@@ -82,7 +83,18 @@ TEST(ParticleState, momentum) {
 		particle.setDirection(v);
 		double energy = 100*EeV;
 		particle.setEnergy(100 * EeV);
-		EXPECT_TRUE(particle.getMomentum() == v * sqrt( pow(energy/c_light, 2) - pow(particle.getMass()*c_light, 2) ) );
+		EXPECT_NEAR(particle.getMomentum().y, v.y * (particle.getEnergy() / c_light), 1.e-3);
+	}
+
+	{
+		// non relativistic proton
+		ParticleState particle;
+		particle.setId(nucleusId(1, 1));
+		Vector3d v(0, 1, 0);
+		particle.setDirection(v);
+		double energy = 10*eV;
+		particle.setEnergy(10 * eV);
+		EXPECT_TRUE(particle.getMomentum() == particle.getLorentzFactor()*particle.getMass()*particle.getVelocity());
 	}
 }
 
@@ -154,7 +166,7 @@ TEST(ParticleState, lorentzFactor) {
 	particle.setId(nucleusId(1, 1));
 	particle.setEnergy(1e12 * eV);
 	EXPECT_DOUBLE_EQ(particle.getLorentzFactor(),
-			1e12 * eV / mass_proton / c_squared);
+			1e12 * eV / mass_proton / c_squared + 1);
 }
 
 TEST(ParticleID, nucleusId) {

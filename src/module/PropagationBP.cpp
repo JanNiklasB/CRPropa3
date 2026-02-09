@@ -101,7 +101,7 @@ namespace crpropa {
 			// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 			while (true) {
 				tryStep(yIn, yOut, yErr, step, current, z, q, m);
-				r = yErr.u.getUnitVector().getR() / tolerance;  // ratio of absolute direction error and tolerance
+				r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
 				if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 					if (step == minStep)  // already minimum step size
 						break;

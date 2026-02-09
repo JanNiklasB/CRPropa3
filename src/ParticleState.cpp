@@ -81,9 +81,9 @@ void ParticleState::setCharge(int ChargeNumber) {
 }
 
 double ParticleState::getLorentzFactor() const {
-	if (getMass()==0)
+	if (pmass==0)
 		return INFINITY;
-	return getEnergy()/getMass()/c_squared + 1;
+	return energy/pmass/c_squared + 1;
 }
 
 void ParticleState::setLorentzFactor(double lf) {
@@ -97,18 +97,20 @@ double ParticleState::getBeta() const {
 
 Vector3d ParticleState::getVelocity() const {
 	Vector3d velocity;
-	if (getMass()==0) 
-		velocity = getDirection()*c_light;
+	if (pmass==0) 
+		velocity = direction*c_light;
 	else if (getLorentzFactor()==1)  // can happen if if gamma-1 < numericalPrecission
-		velocity = getDirection() * sqrt(getEnergy()*2/getMass());  // non relativistic case
+		velocity = direction * sqrt(energy*2/pmass);  // non relativistic case
 	else
-		velocity = getDirection() * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
+		velocity = direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
 
 	return velocity;
 }
 
 Vector3d ParticleState::getMomentum() const {
-	return getLorentzFactor()*getMass()*getVelocity();
+	if (pmass==0)
+		return direction*energy/c_light;
+	return getLorentzFactor()*pmass*getVelocity();
 }
 
 std::string ParticleState::getDescription() const {
