@@ -123,7 +123,7 @@ namespace crpropa {
 		}
 
 		current.setPosition(yOut.x);
-		current.setDirection(yOut.u.getUnitVector());
+		current.setDirection(yOut.u);
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);
 	}

@@ -108,7 +108,7 @@ Vector3d ParticleState::getVelocity() const {
 }
 
 Vector3d ParticleState::getMomentum() const {
-	if (pmass==0)
+	if (pmass==0 or getLorentzFactor()==INFINITY)
 		return direction*energy/c_light;
 	return getLorentzFactor()*pmass*getVelocity();
 }
@@ -118,7 +118,9 @@ std::string ParticleState::getDescription() const {
 	ss << "Particle " << id << ", ";
 	ss << "E = " << energy / EeV << " EeV, ";
 	ss << "x = " << position / Mpc << " Mpc, ";
-	ss << "p = " << direction;
+	ss << "dir = " << direction << ", ";
+	ss << "p = " << getMomentum() << "kg*m/s, ";
+	ss << "v = " << getVelocity() << "m/s, " ;
 	return ss.str();
 }
 
