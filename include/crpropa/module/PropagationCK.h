@@ -26,7 +26,7 @@ class PropagationCK: public Module {
 public:
 	class Y {
 	public:
-		Vector3d x, u; /*< phase-point: position and direction */
+		Vector3d x, u; /*< phase-point: position and velocity */
 
 		Y() {
 		}
