@@ -38,7 +38,7 @@ jobs:
         cmake .. \
           -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv \
           -DENABLE_PYTHON=True \
-          -Python_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python \
+          -DPython_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python \
           -DCMAKE_CXX_STANDARD=17 \
           -DENABLE_TESTING=On \
           -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \
