@@ -40,10 +40,9 @@ jobs:
           -DENABLE_PYTHON=True \
           -DPython_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python \
           -DCMAKE_CXX_STANDARD=17 \
-          -DCMAKE_CXX_FLAGS="-std=c++17 -stdlib=libc++ -mcpu=native" \
+          -DCMAKE_CXX_FLAGS="-std=c++17 -stdlib=libc++" \
           -DENABLE_TESTING=On \
           -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \
-          -DSIMD_EXTENSIONS=native \
           -DPython_INSTALL_PACKAGE_DIR=$GITHUB_WORKSPACE/venv/lib/python3.14/site-packages
 
      - name: Build CRPropa
