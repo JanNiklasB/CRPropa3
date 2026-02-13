@@ -40,7 +40,7 @@ jobs:
           -DENABLE_PYTHON=True \
           -DPython_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python \
           -DCMAKE_CXX_STANDARD=17 \
-          -DCMAKE_CXX_FLAGS="-std=c++17 -stdlib=libc++" \
+          -DCMAKE_CXX_FLAGS="-std=c++17 -stdlib=libc++ -mcpu=native" \
           -DENABLE_TESTING=On \
           -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \
           -DSIMD_EXTENSIONS=native \
