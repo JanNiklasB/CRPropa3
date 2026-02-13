@@ -58,6 +58,7 @@ jobs:
           -DCMAKE_C_COMPILER=$LLVM_DIR/bin/clang \
           -DCMAKE_CXX_COMPILER=$LLVM_DIR/bin/clang++ \
           -DCMAKE_CXX_FLAGS="-std=c++17 -stdlib=libc++" \
+          -DCMAKE_CXX_STANDARD=17 \
           -DOpenMP_CXX_FLAGS="-fopenmp -I${OMP_DIR}/include" \
           -DOpenMP_C_FLAGS="-fopenmp =libomp -I$OMP_DIR/include" \
           -DOpenMP_libomp_LIBRARY=$OMP_DIR/$OMP_VERSION/lib/libomp.dylib \
