@@ -156,6 +156,11 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
 list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 
+# xsf (provided)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/xsf)
+# list(APPEND CRPROPA_EXTRA_LIBRARIES xsf)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/xsf/include)
+
 # Galactic magnetic lenses
 option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" OFF)
 option(INSTALL_EIGEN "Install provided EIGEN headers" OFF)
@@ -561,6 +566,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTA
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/xsf/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # ------------------------------------------------------------------
 # Documentation
