@@ -140,6 +140,18 @@ public:
 	double randExponential();
 	/// Normal distributed random number
 	double randNorm( const double& mean = 0.0, const double& variance = 1.0 );
+	/** Return a real number from a normal truncated (Gaussian) distribution 
+	 * This function returns a normal truncated distribution inside the given range.
+	 * It utilizes a modified version of Gipps sampling algorithm,
+	 * see Kotecha and Djuric 1999: "GIBBS SAMPLING APPROACH FOR GENERATION OF TRUNCATED
+	 * MULTIVARIATE GAUSSIAN RANDOM VARIABLES"
+	 @param minimum
+	 @param maximum
+	 @param mean
+	 @param variance
+	*/
+	double randNormTrunc( const double& minimum, const double& maximum,
+		const double& mean = 0.0, const double& variance = 1.0);
 	/// Uniform distribution in [min, max]
 	double randUniform(double min, double max);
 	/// Rayleigh distributed random number
