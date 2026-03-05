@@ -119,8 +119,8 @@ double Random::randNorm(const double& mean, const double& variance) {
 double Random::randNormTrunc( const double& minimum, const double& maximum,
 	const double& mean, const double& variance){
 
-	auto F = [](double x){ return 1./2.*(1.+xsf::erf(x/sqrt(2.)));};
-	auto FINV = [](double x){ return sqrt(2.)*xsf::cephes::erfinv(2.*x-1.);};
+	auto F = [](double x){ return 1./2.*(xsf::erfc(-x/sqrt(2.)));};
+	auto FINV = [](double x){ return -sqrt(2.)*xsf::cephes::erfcinv(2.*x);};
 	double x = (randNorm(mean, variance)-mean)/variance;
 	double FA = F((minimum-mean)/variance);
 	return FINV(F(x)*(F((maximum-mean)/variance)-FA) + FA)*variance+mean;
