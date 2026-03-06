@@ -1,6 +1,4 @@
 #include "crpropa/InteractionRates.h"
-#include "crpropa/Referenced.h"
-#include "crpropa/Vector3.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 

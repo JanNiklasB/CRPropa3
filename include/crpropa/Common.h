@@ -51,6 +51,13 @@ double interpolateEquidistant(double x, double lo, double hi,
 size_t closestIndex(double x, const std::vector<double> &X);
 /** @}*/
 
+// Takes the filename from a full data path. Used in EM* modules.
+std::string splitFilename(const std::string str) {
+  std::size_t found = str.find_last_of("/\\");
+  std::string s = str.substr(found + 1);
+  return s;
+}
+/** @}*/
 
 // pow implementation as template for integer exponents pow_integer<2>(x)
 // evaluates to x*x

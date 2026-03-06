@@ -1,9 +1,7 @@
 #include "crpropa/module/EMDoublePairProduction.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
-#include "crpropa/PhotonBackground.h"
-#include "crpropa/InteractionRates.h"
-#include "crpropa/Geometry.h"
+#include "crpropa/Common.h"
 
 #include <fstream>
 #include <locale>
@@ -52,6 +50,7 @@ void EMDoublePairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
     initRatePositionDependentPhotonField(getDataPath("EMDoublePairProduction/"+fname+"/Rate/"), intRatesPosDep);
     
   }
+  
 }
 
 void EMDoublePairProduction::setHaveElectrons(bool haveElectrons) {
@@ -70,8 +69,8 @@ void EMDoublePairProduction::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 
-bool EMDoublePairProduction::hasSurface() const {
-    return this->surface != nullptr;
+ref_ptr<Surface> EMDoublePairProduction::getSurface() const {
+    return this->surface;
 }
 
 void EMDoublePairProduction::initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom) {
@@ -110,7 +109,7 @@ void EMDoublePairProduction::initRate(std::string filename, InteractionRatesHomo
 std::string EMDoublePairProduction::splitFilename(const std::string str) {
   
   std::size_t found = str.find_last_of("/\\");
-  std::string s = str.substr(found+1);
+  std::string s = str.substr(found + 1);
   return s;
   
 }
@@ -166,7 +165,7 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
     
     Vector3d vPos(x, y, z);
     
-    if (hasSurface() and !surface->isInside(vPos))
+    if (getSurface() and !getSurface()->isInside(vPos))
       continue;
     
     photonDict[iFile] = vPos;
@@ -191,7 +190,7 @@ void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string fi
     iFile = iFile + 1;
     infile.close();
     
-}
+  }
 
   if (tabRate.empty())
     throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
@@ -233,7 +232,8 @@ void EMDoublePairProduction::performInteraction(Candidate *candidate) const {
 }
 
 void EMDoublePairProduction::process(Candidate *candidate) const {
-	// check if photon
+	
+  // check if photon
 	if (candidate->current.getId() != 22)
 		return;
 
@@ -244,7 +244,6 @@ void EMDoublePairProduction::process(Candidate *candidate) const {
 
 	// interaction rate
   double rate = this->interactionRates->getProcessRate(E, position);
-	
     
   if (rate < 0)
     return;

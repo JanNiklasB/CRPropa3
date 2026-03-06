@@ -39,12 +39,12 @@ private:
 
 public:
 	/** Constructor
+   The object used to load, store and access to the interaction rates of the process is the interactionRates pointer.
 	 @param photonField		target photon field
 	 @param haveElectrons	if true, add secondary electrons as candidates
 	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
 	 @param limit			step size limit as fraction of mean free path
    @param surface   suface to enclose the grid nodes to be loaded
-   @param interactionRates(hidden) object to store and access to the interaction rates of the process
 	 */
 	EMTripletPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons = false, double thinning = 0, double limit = 0.1, ref_ptr<Surface> surface = nullptr);
 
@@ -68,7 +68,7 @@ public:
    * @param surface closed surface to confine the grid to be  uploaded
    */
   void setSurface(ref_ptr<Surface> surface);
-  bool hasSurface() const;
+  ref_ptr<Surface> getSurface() const;
     
 	/** set a custom interaction tag to trace back this interaction
 	 * @param tag string that will be added to the candidate and output
@@ -76,17 +76,16 @@ public:
 	void setInteractionTag(std::string tag);
 	std::string getInteractionTag() const;
 	
+  /** init*Rate(...) function loads the interaction rate, in the proper object of the InteractionRates class, for the homogenouos background photon fields.  */
 	void initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom);
 	void initCumulativeRate(std::string filename, InteractionRatesHomogeneous* intRatesHom);
-    
+  
+  /** init*RatePositionDependentPhotonField(...) is used to load the rates, in the dedicated object of the InteractionRates class, for spatial dependent photon fields in the interaction module constructor.  */
   void initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep);
   void initCumulativeRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep);
     
 	void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate) const;
-
-protected:
-    std::string splitFilename(const std::string str);
 
 };
 /** @}*/

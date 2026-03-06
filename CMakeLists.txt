@@ -7,7 +7,7 @@ set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
 if(APPLE)
     message(STATUS "Building on macOS, using C++11")
     set(CMAKE_CXX_STANDARD 11)
-#    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
 else()
     message(STATUS "Building on Linux/Ubuntu, using C++17")
     set(CMAKE_CXX_STANDARD 17)
@@ -153,6 +153,11 @@ endif(ENABLE_COVERAGE)
 add_subdirectory(libs/kiss)
 list(APPEND CRPROPA_EXTRA_LIBRARIES kiss)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/kiss/include)
+
+# nanoflann (provided)
+add_subdirectory(libs/nanoflann)
+list(APPEND CRPROPA_EXTRA_LIBRARIES nanoflann)
+list(APPEND CRPROPA_EXTRA_INCLUDES libs/nanoflann/include)
 
 # HepID (provided)
 add_subdirectory(libs/HepPID)
@@ -549,11 +554,6 @@ if(ENABLE_PYTHON AND Python_FOUND)
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
-
-target_include_directories(crpropa
-    PUBLIC
-        ${CMAKE_SOURCE_DIR}/libs/nanoflann/include
-)
 
 # ----------------------------------------------------------------------------
 # Install

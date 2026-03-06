@@ -1,7 +1,7 @@
 #include "crpropa/module/EMTripletPairProduction.h"
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
-#include "crpropa/Geometry.h"
+#include "crpropa/Common.h"
 
 #include <fstream>
 #include <locale>
@@ -68,8 +68,8 @@ void EMTripletPairProduction::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 
-bool EMTripletPairProduction::hasSurface() const {
-    return this->surface != nullptr;
+ref_ptr<Surface> EMTripletPairProduction::getSurface() const {
+    return this->surface;
 }
 
 void EMTripletPairProduction::initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom) {
@@ -97,12 +97,6 @@ void EMTripletPairProduction::initRate(std::string filename, InteractionRatesHom
   intRatesHom->setTabulatedEnergy(tabEnergy);
   intRatesHom->setTabulatedRate(tabRate);
   
-}
-
-std::string EMTripletPairProduction::splitFilename(const std::string str) {
-            std::size_t found = str.find_last_of("/\\");
-            std::string s = str.substr(found+1);
-            return s;
 }
 
 void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep) {
@@ -158,7 +152,7 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
     
     Vector3d vPos(x, y, z);
     
-    if (hasSurface() and !surface->isInside(vPos))
+    if (getSurface() and !getSurface()->isInside(vPos))
       continue;
     
     photonDict[iFile] = vPos;
@@ -289,7 +283,7 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
     
     Vector3d vPos(x, y, z);
     
-    if (hasSurface() and !surface->isInside(vPos))
+    if (getSurface() and !getSurface()->isInside(vPos))
       continue;
     
     // skip header

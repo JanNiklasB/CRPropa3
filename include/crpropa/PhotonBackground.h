@@ -61,8 +61,8 @@ public:
     return this->isPositionDependent;
   }
   
-  bool hasSurface() const {
-    return this->surface != nullptr;
+  ref_ptr<Surface> getSurface() const {
+    return this->surface;
   }
   
   void setFieldName(std::string fieldName) {
@@ -88,7 +88,7 @@ protected:
  */
 class TabularPhotonField: public PhotonField {
 public:
-	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true);
+	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = false);
 
 	double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
 	double getRedshiftScaling(double z) const;
@@ -121,7 +121,7 @@ protected:
  */
 class TabularSpatialPhotonField: public PhotonField {
 public:
-    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = true, ref_ptr<Surface> surface = nullptr);
+    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = false, const bool isPositionDependent = true, ref_ptr<Surface> surface = nullptr);
     
     double getPhotonDensity(double ePhoton = 0., double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
     double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const;
@@ -131,13 +131,12 @@ protected:
     std::vector<double> readPhotonEnergy(std::string filePath);
     std::vector<double> readPhotonDensity(std::string filePath);
     void checkInputData() const;
-    std::string splitFilename(const std::string str) const;
     
     /** Apply a surface that confine the position dependent photon field
      * @param surface closed surface to confine the nodes of grid to be uploaded */
     void setSurface(ref_ptr<Surface> surface);
     
-    std::vector<double> photonEnergies; // assuming all the nodes in the grid have the same energy binning!
+    std::vector<double> photonEnergies; // assuming all the nodes in the grid have the same energy binning
     std::vector<std::vector<double>> photonDensity;
     std::unordered_map<int, Vector3d> photonDict;
 };
@@ -152,7 +151,7 @@ protected:
  */
 class IRB_Kneiske04: public TabularPhotonField {
 public:
-	IRB_Kneiske04() : TabularPhotonField("IRB_Kneiske04", true, false) {}
+	IRB_Kneiske04() : TabularPhotonField("IRB_Kneiske04", true) {}
 };
 
 /**
@@ -165,7 +164,7 @@ public:
  */
 class IRB_Stecker05: public TabularPhotonField {
 public:
-	IRB_Stecker05() : TabularPhotonField("IRB_Stecker05", true, false) {}
+	IRB_Stecker05() : TabularPhotonField("IRB_Stecker05", true) {}
 };
 
 /**
@@ -178,7 +177,7 @@ public:
  */
 class IRB_Franceschini08: public TabularPhotonField {
 public:
-	IRB_Franceschini08() : TabularPhotonField("IRB_Franceschini08", true, false) {}
+	IRB_Franceschini08() : TabularPhotonField("IRB_Franceschini08", true) {}
 };
 
 /**
@@ -191,7 +190,7 @@ public:
  */
 class IRB_Finke10: public TabularPhotonField {
 public:
-	IRB_Finke10() : TabularPhotonField("IRB_Finke10", true, false) {}
+	IRB_Finke10() : TabularPhotonField("IRB_Finke10", true) {}
 };
 
 /**
@@ -204,7 +203,7 @@ public:
  */
 class IRB_Dominguez11: public TabularPhotonField {
 public:
-	IRB_Dominguez11() : TabularPhotonField("IRB_Dominguez11", true, false) {}
+	IRB_Dominguez11() : TabularPhotonField("IRB_Dominguez11", true) {}
 };
 
 /**
@@ -217,7 +216,7 @@ public:
  */
 class IRB_Gilmore12: public TabularPhotonField {
 public:
-	IRB_Gilmore12() : TabularPhotonField("IRB_Gilmore12", true, false) {}
+	IRB_Gilmore12() : TabularPhotonField("IRB_Gilmore12", true) {}
 };
 
 /**
@@ -230,7 +229,7 @@ public:
  */
 class IRB_Stecker16_upper: public TabularPhotonField {
 public:
-	IRB_Stecker16_upper() : TabularPhotonField("IRB_Stecker16_upper", true, false) {}
+	IRB_Stecker16_upper() : TabularPhotonField("IRB_Stecker16_upper", true) {}
 };
 
 /**
@@ -243,7 +242,7 @@ public:
  */
 class IRB_Stecker16_lower: public TabularPhotonField {
 public:
-	IRB_Stecker16_lower() : TabularPhotonField("IRB_Stecker16_lower", true, false) {}
+	IRB_Stecker16_lower() : TabularPhotonField("IRB_Stecker16_lower", true) {}
 };
 
 /**
@@ -256,7 +255,7 @@ public:
  */
 class IRB_Saldana21: public TabularPhotonField {
 public:
-	IRB_Saldana21() : TabularPhotonField("IRB_Saldana21", true, false) {}
+	IRB_Saldana21() : TabularPhotonField("IRB_Saldana21", true) {}
 };
 
 /**
@@ -269,7 +268,7 @@ public:
  */
 class IRB_Saldana21_upper: public TabularPhotonField {
 public:
-	IRB_Saldana21_upper() : TabularPhotonField("IRB_Saldana21_upper", true, false) {}
+	IRB_Saldana21_upper() : TabularPhotonField("IRB_Saldana21_upper", true) {}
 };
 
 /**
@@ -282,7 +281,7 @@ public:
  */
 class IRB_Saldana21_lower: public TabularPhotonField {
 public:
-	IRB_Saldana21_lower() : TabularPhotonField("IRB_Saldana21_lower", true, false) {}
+	IRB_Saldana21_lower() : TabularPhotonField("IRB_Saldana21_lower", true) {}
 };
 
 /**
@@ -295,7 +294,7 @@ public:
  */
 class IRB_Finke22: public TabularPhotonField {
 public:
-	IRB_Finke22() : TabularPhotonField("IRB_Finke22", true, false) {}
+	IRB_Finke22() : TabularPhotonField("IRB_Finke22", true) {}
 };
 
 /**
@@ -308,7 +307,7 @@ public:
  */
 class URB_Protheroe96: public TabularPhotonField {
 public:
-	URB_Protheroe96() : TabularPhotonField("URB_Protheroe96", false, false) {}
+	URB_Protheroe96() : TabularPhotonField("URB_Protheroe96", false) {}
 };
 
 /**
@@ -323,7 +322,7 @@ public:
  */
 class URB_Fixsen11: public TabularPhotonField {
 public:
-	URB_Fixsen11() : TabularPhotonField("URB_Fixsen11", false, false) {}
+	URB_Fixsen11() : TabularPhotonField("URB_Fixsen11", false) {}
 };
 
 /**
@@ -336,7 +335,7 @@ public:
  */
 class URB_Nitu21: public TabularPhotonField {
 public:
-	URB_Nitu21() : TabularPhotonField("URB_Nitu21", false, false) {}
+	URB_Nitu21() : TabularPhotonField("URB_Nitu21", false) {}
 };
 
 /**
@@ -349,7 +348,7 @@ public:
  */
 class ISRF_Freudenreich98: public TabularSpatialPhotonField {
 public:
-    ISRF_Freudenreich98(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Freudenreich98", false, true, surface) {}
+    ISRF_Freudenreich98(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Freudenreich98", surface) {}
 };
 
 /**
@@ -362,17 +361,8 @@ public:
  */
 class ISRF_Robitaille12: public TabularSpatialPhotonField {
 public:
-    ISRF_Robitaille12(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Robitaille12", false, true, surface) {}
+    ISRF_Robitaille12(ref_ptr<Surface> surface) : TabularSpatialPhotonField("ISRF_Robitaille12", surface) {}
 };
-
-/**
-Test for CMB position depedent (7 nodes) ----> to compare the results between the homogeneous CMB with the position dependent one for EMPP
- */
-class CMB_PositionDependent: public TabularSpatialPhotonField {
-public:
-    CMB_PositionDependent() : TabularSpatialPhotonField("CMB_PositionDependent", false, true) {}
-};
-
 
 /**
  @class BlackbodyPhotonField

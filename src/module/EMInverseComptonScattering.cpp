@@ -2,7 +2,6 @@
 #include "crpropa/Units.h"
 #include "crpropa/Random.h"
 #include "crpropa/Common.h"
-#include "crpropa/Geometry.h"
 
 #include "crpropa/InteractionRates.h"
 
@@ -78,8 +77,8 @@ void EMInverseComptonScattering::setSurface(ref_ptr<Surface> surface) {
     this->surface = surface;
 }
 
-bool EMInverseComptonScattering::hasSurface() const {
-    return this->surface != nullptr;
+ref_ptr<Surface> EMInverseComptonScattering::getSurface() const {
+    return this->surface;
 }
 
 void EMInverseComptonScattering::initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom) {
@@ -106,14 +105,6 @@ void EMInverseComptonScattering::initRate(std::string filename, InteractionRates
   
   intRatesHom->setTabulatedEnergy(tabEnergy);
   intRatesHom->setTabulatedRate(tabRate);
-  
-}
-
-std::string EMInverseComptonScattering::splitFilename(const std::string str) {
-  
-  std::size_t found = str.find_last_of("/\\");
-  std::string s = str.substr(found+1);
-  return s;
   
 }
 
@@ -170,7 +161,7 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
     
     Vector3d vPos(x, y, z);
     
-    if (hasSurface() and !surface->isInside(vPos))
+    if (getSurface() and !getSurface()->isInside(vPos))
       continue;
     
     photonDict[iFile] = vPos;
@@ -300,7 +291,7 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
     
     Vector3d vPos(x, y, z);
     
-    if (hasSurface() and !surface->isInside(vPos))
+    if (getSurface() and !getSurface()->isInside(vPos))
       continue;
     
     // skip header
@@ -330,10 +321,6 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
         cdf.push_back(a / Mpc);
       }
       vecCDF.push_back(cdf);
-    }
-    
-    if (vecs.size() != vecE.size()) {
-      std::cout << "suspVec (CDF) index: " << iFile << std::endl;
     }
     
     iFile = iFile + 1;
