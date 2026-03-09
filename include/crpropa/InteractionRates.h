@@ -14,29 +14,29 @@
 namespace crpropa {
 
 struct PointCloud {
-    std::vector<Vector3d> points;
-    std::vector<int> ids;
+	std::vector<Vector3d> points;
+	std::vector<int> ids;
 
-    inline size_t kdtree_get_point_count() const { return points.size(); }
+	inline size_t kdtree_get_point_count() const { return points.size(); }
 
-    inline double kdtree_get_pt(const size_t idx, const size_t dim) const {
-        if (dim == 0) return points[idx].x;
-        if (dim == 1) return points[idx].y;
-        return points[idx].z;
-    }
+	inline double kdtree_get_pt(const size_t idx, const size_t dim) const {
+		if (dim == 0) return points[idx].x;
+		if (dim == 1) return points[idx].y;
+		return points[idx].z;
+	}
 
-    // optional bounding-box computation (required by nanoflann)
-    template <class BBOX>
-    bool kdtree_get_bbox(BBOX& /*bb*/) const {
-        return false;  // no bounding box optimization
-    }
-    
+	// optional bounding-box computation (required by nanoflann)
+	template <class BBOX>
+	bool kdtree_get_bbox(BBOX& /*bb*/) const {
+		return false;  // no bounding box optimization
+	}
+	
 };
 
 using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
-    nanoflann::L2_Simple_Adaptor<double, PointCloud>,
-    PointCloud,
-    3
+	nanoflann::L2_Simple_Adaptor<double, PointCloud>,
+	PointCloud,
+	3
 >;
 
 /**
@@ -50,20 +50,20 @@ using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
  */
 class InteractionRates: public Referenced {
 public:
-    virtual double getProcessRate(const double E, const Vector3d &position) const = 0;
-    virtual void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const = 0;
-    
-    std::string getRatesName() const {
-        return this->ratesName;
-    }
-    
-    bool hasPositionDependence() const {
-        return this->isPositionDependent;
-    }
-    
-    void setRatesName(std::string ratesName) {
-        this->ratesName = ratesName;
-    }
+	virtual double getProcessRate(const double E, const Vector3d &position) const = 0;
+	virtual void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const = 0;
+	
+	std::string getRatesName() const {
+		return this->ratesName;
+	}
+	
+	bool hasPositionDependence() const {
+		return this->isPositionDependent;
+	}
+	
+	void setRatesName(std::string ratesName) {
+		this->ratesName = ratesName;
+	}
 
 protected: 
 
@@ -78,34 +78,34 @@ protected:
  */
 class InteractionRatesHomogeneous: public InteractionRates {
 public:
-    InteractionRatesHomogeneous();
-    
-    std::vector<double> getTabulatedEnergy() const;
-    std::vector<double> getTabulatedRate() const;
-    std::vector<double> getTabulatedE() const;
-    std::vector<double> getTabulateds() const;
-    std::vector<std::vector<double>> getTabulatedCDF() const;
-    
-    double getProcessRate(const double E, const Vector3d &position) const;
-    void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const;
-    
-    void setTabulatedEnergy (std::vector<double>& tabEnergy);
-    void setTabulatedRate (std::vector<double>& tabRate);
-    void setTabulatedE (std::vector<double>& tabE);
-    void setTabulateds (std::vector<double>& tabs);
-    void setTabulatedCDF (std::vector<std::vector<double>>& tabCDF);
-    
+	InteractionRatesHomogeneous();
+	
+	std::vector<double> getTabulatedEnergy() const;
+	std::vector<double> getTabulatedRate() const;
+	std::vector<double> getTabulatedE() const;
+	std::vector<double> getTabulateds() const;
+	std::vector<std::vector<double>> getTabulatedCDF() const;
+	
+	double getProcessRate(const double E, const Vector3d &position) const;
+	void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const;
+	
+	void setTabulatedEnergy (std::vector<double>& tabEnergy);
+	void setTabulatedRate (std::vector<double>& tabRate);
+	void setTabulatedE (std::vector<double>& tabE);
+	void setTabulateds (std::vector<double>& tabs);
+	void setTabulatedCDF (std::vector<std::vector<double>>& tabCDF);
+	
 protected:
-    
-    // tabulated interaction rates 1/lambda(E)
-    std::vector<double> tabEnergy; //!< electron energy in [J]
-    std::vector<double> tabRate; //!< interaction rate in [1/m]
-    
-    // tabulated CDF(s_kin, E) = cumulative differential interaction rate
-    std::vector<double> tabE; //!< electron energy in [J]
-    std::vector<double> tabs; //!< s_kin = s - m^2 in [J**2]
-    std::vector<std::vector<double>> tabCDF; //!< cumulative interaction rate
-    
+	
+	// tabulated interaction rates 1/lambda(E)
+	std::vector<double> tabEnergy; //!< electron energy in [J]
+	std::vector<double> tabRate; //!< interaction rate in [1/m]
+	
+	// tabulated CDF(s_kin, E) = cumulative differential interaction rate
+	std::vector<double> tabE; //!< electron energy in [J]
+	std::vector<double> tabs; //!< s_kin = s - m^2 in [J**2]
+	std::vector<std::vector<double>> tabCDF; //!< cumulative interaction rate
+	
 };
 
 /**
@@ -115,45 +115,45 @@ protected:
 class InteractionRatesPositionDependent: public InteractionRates {
 
 public:
-    InteractionRatesPositionDependent();
-    
-    int findClosestGridPoint(const Vector3d &position) const;
-    
-    std::vector<double> getTabulatedEnergy() const;
-    std::vector<std::vector<double>> getTabulatedRate() const;
-    std::vector<double> getTabulatedE() const;
-    std::vector<std::vector<double>> getTabulateds() const;
-    std::vector<std::vector<std::vector<double>>> getTabulatedCDF() const;
-    std::unordered_map<int, Vector3d> getPhotonDict() const;
-    std::vector<double> getClosestRate(const Vector3d &position) const;
-    std::vector<double> getClosests(const Vector3d &position) const;
-    std::vector<std::vector<double>> getClosestCDF(const Vector3d &position) const;
-    
-    double getProcessRate(const double E, const Vector3d &position) const;
-    void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const;
-    
-    void setTabulatedEnergy (std::vector<double>& tabEnergy);
-    void setTabulatedRate (std::vector<std::vector<double>>& tabRate);
-    void setTabulatedE (std::vector<double>& tabE);
-    void setTabulateds (std::vector<std::vector<double>>& tabs);
-    void setTabulatedCDF (std::vector<std::vector<std::vector<double>>>& tabCDF);
-    void setPhotonDict (std::unordered_map<int, Vector3d>& photonDict);
+	InteractionRatesPositionDependent();
+	
+	int findClosestGridPoint(const Vector3d &position) const;
+	
+	std::vector<double> getTabulatedEnergy() const;
+	std::vector<std::vector<double>> getTabulatedRate() const;
+	std::vector<double> getTabulatedE() const;
+	std::vector<std::vector<double>> getTabulateds() const;
+	std::vector<std::vector<std::vector<double>>> getTabulatedCDF() const;
+	std::unordered_map<int, Vector3d> getPhotonDict() const;
+	std::vector<double> getClosestRate(const Vector3d &position) const;
+	std::vector<double> getClosests(const Vector3d &position) const;
+	std::vector<std::vector<double>> getClosestCDF(const Vector3d &position) const;
+	
+	double getProcessRate(const double E, const Vector3d &position) const;
+	void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const;
+	
+	void setTabulatedEnergy (std::vector<double>& tabEnergy);
+	void setTabulatedRate (std::vector<std::vector<double>>& tabRate);
+	void setTabulatedE (std::vector<double>& tabE);
+	void setTabulateds (std::vector<std::vector<double>>& tabs);
+	void setTabulatedCDF (std::vector<std::vector<std::vector<double>>>& tabCDF);
+	void setPhotonDict (std::unordered_map<int, Vector3d>& photonDict);
 
 protected:
-    
-    // tabulated interaction rates 1/lambda(E)
-    std::vector<double> tabEnergy; //!< electron energy in [J], assuming the same energy binning in each node
-    std::vector<std::vector<double>> tabRate; //!< interaction rate in [1/m]
-    
-    // tabulated CDF(s_kin, E) = cumulative differential interaction rate
-    std::vector<double> tabE; //!< electron energy in [J], assuming the same energy binning in each node
-    std::vector<std::vector<double>> tabs; //!< s_kin = s - m^2 in [J**2]
-    std::vector<std::vector<std::vector<double>>> tabCDF; //!< cumulative interaction rate
-    std::unordered_map<int, Vector3d> photonDict; //!< dictionary to link tables to spatial coordinates
-    
-    PointCloud cloud; //!< point cloud for nanoflann KD-tree
-    KDTree* tree = nullptr; //!< pointer to the KD Tree
-    
+	
+	// tabulated interaction rates 1/lambda(E)
+	std::vector<double> tabEnergy; //!< electron energy in [J], assuming the same energy binning in each node
+	std::vector<std::vector<double>> tabRate; //!< interaction rate in [1/m]
+	
+	// tabulated CDF(s_kin, E) = cumulative differential interaction rate
+	std::vector<double> tabE; //!< electron energy in [J], assuming the same energy binning in each node
+	std::vector<std::vector<double>> tabs; //!< s_kin = s - m^2 in [J**2]
+	std::vector<std::vector<std::vector<double>>> tabCDF; //!< cumulative interaction rate
+	std::unordered_map<int, Vector3d> photonDict; //!< dictionary to link tables to spatial coordinates
+	
+	PointCloud cloud; //!< point cloud for nanoflann KD-tree
+	KDTree* tree = nullptr; //!< pointer to the KD Tree
+	
 };
 
 } // namespace crpropa
