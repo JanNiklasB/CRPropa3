@@ -287,7 +287,6 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, ref_
     
     photonDict[iFile] = vPos;
     
-    nLoadedFiles = nLoadedFiles + 1;
     iFile = iFile + 1;
     
     std::vector<double> vD = readPhotonDensity(dir_entry.path().string());
