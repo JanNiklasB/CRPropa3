@@ -88,7 +88,7 @@ protected:
  */
 class TabularPhotonField: public PhotonField {
 public:
-	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true, const bool isPositionDependent = false);
+	TabularPhotonField(const std::string fieldName, const bool isRedshiftDependent = true);
 
 	double getPhotonDensity(double ePhoton, double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
 	double getRedshiftScaling(double z) const;
@@ -121,7 +121,7 @@ protected:
  */
 class TabularSpatialPhotonField: public PhotonField {
 public:
-    TabularSpatialPhotonField(const std::string fieldName, const bool isRedshiftDependent = false, const bool isPositionDependent = true, ref_ptr<Surface> surface = nullptr);
+    TabularSpatialPhotonField(const std::string fieldName, ref_ptr<Surface> surface = nullptr);
     
     double getPhotonDensity(double ePhoton = 0., double z = 0., const Vector3d &pos = Vector3d(0.,0.,0.)) const;
     double getMinimumPhotonEnergy(double z, const Vector3d &pos = Vector3d(0.,0.,0.)) const;
