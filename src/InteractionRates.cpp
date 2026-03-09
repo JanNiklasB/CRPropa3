@@ -10,10 +10,10 @@
 
 namespace crpropa {
 
-InteractionRatesHomogeneous::InteractionRatesHomogeneous(std::string ratesName, bool isPositionDependent) : InteractionRates() {
+InteractionRatesHomogeneous::InteractionRatesHomogeneous() {
   
-  this->ratesName = ratesName;
-  this->isPositionDependent = isPositionDependent;
+  this->ratesName = "interactionRatesHomogeneous";
+  this->isPositionDependent = false;
   
 }
 
@@ -77,9 +77,9 @@ void InteractionRatesHomogeneous::setTabulatedCDF(std::vector<std::vector<double
     this->tabCDF = tabCDF;
 }
 
-InteractionRatesPositionDependent::InteractionRatesPositionDependent(std::string ratesName, bool isPositionDependent) : InteractionRates() {
-    this->ratesName = ratesName;
-    this->isPositionDependent = isPositionDependent;
+InteractionRatesPositionDependent::InteractionRatesPositionDependent() {
+    this->ratesName = "interactionRatesPositionDependent";
+    this->isPositionDependent = true;
 
 }
 

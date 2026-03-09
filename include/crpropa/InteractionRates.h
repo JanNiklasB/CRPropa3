@@ -50,11 +50,6 @@ using KDTree = nanoflann::KDTreeSingleIndexAdaptor<
  */
 class InteractionRates: public Referenced {
 public:
-    InteractionRates() {
-        this->ratesName = "AbstractInteractionRates";
-        this->isPositionDependent = false;
-    }
-    
     virtual double getProcessRate(const double E, const Vector3d &position) const = 0;
     virtual void loadPerformInteractionTabs(const Vector3d &position, std::vector<double> &tabE, std::vector<double> &tabs, std::vector<std::vector<double>> &tabCDF) const = 0;
     
@@ -72,8 +67,8 @@ public:
 
 protected: 
 
-  std::string ratesName;
-  bool isPositionDependent; 
+  std::string ratesName = "AbstractInteractionRates";
+  bool isPositionDependent = false; 
 
 };
 
@@ -83,7 +78,7 @@ protected:
  */
 class InteractionRatesHomogeneous: public InteractionRates {
 public:
-    InteractionRatesHomogeneous(const std::string ratesName, const bool isPositionDependent = true);
+    InteractionRatesHomogeneous();
     
     std::vector<double> getTabulatedEnergy() const;
     std::vector<double> getTabulatedRate() const;
@@ -120,7 +115,7 @@ protected:
 class InteractionRatesPositionDependent: public InteractionRates {
 
 public:
-    InteractionRatesPositionDependent(const std::string ratesName, const bool isPositionDependent = true);
+    InteractionRatesPositionDependent();
     
     int findClosestGridPoint(const Vector3d &position) const;
     
