@@ -39,6 +39,14 @@ private:
   std::string interactionTag = "EMPP";
   ref_ptr<InteractionRates> interactionRates;
     
+  // tabulated interaction rate 1/lambda(E)
+	std::vector<double> tabEnergy;  //!< electron energy in [J]
+	std::vector<double> tabRate;  //!< interaction rate in [1/m]
+	
+	// tabulated CDF(s_kin, E) = cumulative differential interaction rate
+	std::vector<double> tabE;  //!< electron energy in [J]
+	std::vector<double> tabs;  //!< s_kin = s - m^2 in [J**2]
+	std::vector< std::vector<double> > tabCDF;  //!< cumulative interaction rate
 public:
 	/** Constructor
    The object used to load, store and access to the interaction rates of the process is the interactionRates pointer.
@@ -71,19 +79,52 @@ public:
   void setSurface(ref_ptr<Surface> surface);
   ref_ptr<Surface> getSurface() const;
     
-	/** set a custom interaction tag to trace back this interaction
-	 * @param tag string that will be added to the candidate and output
-	 */	
-	void setInteractionTag(std::string tag);
-	std::string getInteractionTag() const;
+  /** set a custom interaction tag to trace back this interaction
+   * @param tag string that will be added to the candidate and output
+   */
+  void setInteractionTag(std::string tag);
+  std::string getInteractionTag() const;
 
-  /** init*Rate(...) function loads the interaction rate, in the proper object of the InteractionRates class, for the homogenouos background photon fields.  */
-  void initRate(std::string filename, InteractionRatesHomogeneous* intRatesHom);
-  void initCumulativeRate(std::string filename, InteractionRatesHomogeneous* intRatesHom);
+  /** Loads the interaction rate
+   * (THIS FUNCTION WILL BE DEPRICATED SOON, use initRate(filename intRates) instead)
+   * @param filename The name of the file containing the interaction rates
+   */
+  void initRate(std::string filename);
+  /** Loads the cumultative interaction rate
+   * (THIS FUNCTION WILL BE DEPRICATED SOON, use initRate(filename intRates) instead)
+   * @param filename The name of the file containing the interaction rates
+   */
+  void initCumulativeRate(std::string filename);
+
+    /** Loads the interaction rate in InteractionRates class
+   * This function loads the interaction rate, in the proper object 
+   * of the InteractionRates class, for the homogenouos background photon fields.
+   * @param filename The name of the file containing the interaction rates
+   * @param intRatesHom TODO
+   */
+  void initRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom);
+  /** Loads the cumultative interaction rate in InteractionRates class
+   * This function is used to load the rates, in the dedicated object of the InteractionRates
+   * class, for spatial dependent photon fields in the interaction module constructor.
+   * @param filename The name of the file containing the interaction rates
+   * @param intRatesPosDep TODO
+   */
+  void initCumulativeRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom);
   
-  /** init*RatePositionDependentPhotonField(...) is used to load the rates, in the dedicated object of the InteractionRates class, for spatial dependent photon fields in the interaction module constructor.  */
-  void initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep);
-  void initCumulativeRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep);
+  /** Loads the interaction rate in InteractionRates class
+   * This function is used to load the rates, in the dedicated object of the InteractionRates
+   * class, for spatial dependent photon fields in the interaction module constructor.
+   * @param filename The name of the file containing the interaction rates
+   * @param intRatesPosDep TODO
+   */
+  void initRatePositionDependentPhotonField(std::string filename, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep);
+  /** Loads the cumultative interaction rate in InteractionRates class
+   * This function is used to load the rates, in the dedicated object of the InteractionRates
+   * class, for spatial dependent photon fields in the interaction module constructor.
+   * @param filename The name of the file containing the interaction rates
+   * @param intRatesPosDep TODO
+   */
+  void initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep);
     
 	void performInteraction(Candidate *candidate) const;
 	void process(Candidate *candidate) const;
