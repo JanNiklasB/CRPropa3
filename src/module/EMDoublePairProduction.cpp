@@ -106,14 +106,6 @@ void EMDoublePairProduction::initRate(std::string filename, InteractionRatesHomo
     
 }
 
-std::string EMDoublePairProduction::splitFilename(const std::string str) {
-  
-  std::size_t found = str.find_last_of("/\\");
-  std::string s = str.substr(found + 1);
-  return s;
-  
-}
-
 void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string filepath, InteractionRatesPositionDependent* intRatesPosDep) {
 
   std::vector<std::vector<double>> tabRate;
