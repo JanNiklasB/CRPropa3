@@ -34,20 +34,16 @@ void EMTripletPairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	std::string fname = photonField->getFieldName();
 	setDescription("EMTripletPairProduction: " + fname);
 	if (!this->photonField->hasPositionDependence()){
-		
 		this->interactionRates = new InteractionRatesHomogeneous();
-		InteractionRatesHomogeneous* intRatesHom = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
 		
-		initRate(getDataPath("EMTripletPairProduction/rate_" + fname + ".txt"), intRatesHom);
-		initCumulativeRate(getDataPath("EMTripletPairProduction/cdf_" + fname + ".txt"), intRatesHom);
+		initRate(getDataPath("EMTripletPairProduction/rate_" + fname + ".txt"));
+		initCumulativeRate(getDataPath("EMTripletPairProduction/cdf_" + fname + ".txt"));
 		
 	} else {
-		
 		this->interactionRates = new InteractionRatesPositionDependent();
-		InteractionRatesPositionDependent* intRatesPosDep = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
 		
-		initRatePositionDependentPhotonField(getDataPath("EMTripletPairProduction/"+fname+"/Rate/"), intRatesPosDep);
-		initCumulativeRatePositionDependentPhotonField(getDataPath("EMTripletPairProduction/"+fname+"/CumulativeRate/"), intRatesPosDep);
+		initRatePositionDependentPhotonField(getDataPath("EMTripletPairProduction/"+fname+"/Rate/"));
+		initCumulativeRatePositionDependentPhotonField(getDataPath("EMTripletPairProduction/"+fname+"/CumulativeRate/"));
 		
 	}
 }
@@ -73,70 +69,13 @@ ref_ptr<Surface> EMTripletPairProduction::getSurface() const {
 }
 
 void EMTripletPairProduction::initRate(std::string filename) {
-	std::ifstream infile(filename.c_str());
+	// check if intRates are position dependent and throw error: 
+	if (this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMTripletPairProduction: The InteractionRates \
+			are position dependent and where called in initRate, please either \
+			use initRate(filename, intRateHom) or initRatePositionDependentPhotonField(filepath)");
+	InteractionRatesHomogeneous* intRates = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
 
-	if (!infile.good())
-		throw std::runtime_error("EMTripletPairProduction: could not open file " + filename);
-
-	// clear previously loaded interaction rates
-	tabEnergy.clear();
-	tabRate.clear();
-
-	while (infile.good()) {
-		if (infile.peek() != '#') {
-			double a, b;
-			infile >> a >> b;
-			if (infile) {
-				tabEnergy.push_back(pow(10, a) * eV);
-				tabRate.push_back(b / Mpc);
-			}
-		}
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-	}
-	infile.close();
-}
-
-void EMTripletPairProduction::initCumulativeRate(std::string filename) {
-	std::ifstream infile(filename.c_str());
-
-	if (!infile.good())
-		throw std::runtime_error(
-				"EMTripletPairProduction: could not open file " + filename);
-
-	// clear previously loaded tables
-	tabE.clear();
-	tabs.clear();
-	tabCDF.clear();
-	
-	// skip header
-	while (infile.peek() == '#')
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-
-	// read s values in first line
-	double a;
-	infile >> a; // skip first value
-	while (infile.good() and (infile.peek() != '\n')) {
-		infile >> a;
-		tabs.push_back(pow(10, a) * eV * eV);
-	}
-
-	// read all following lines: E, cdf values
-	while (infile.good()) {
-		infile >> a;
-		if (!infile)
-			break;  // end of file
-		tabE.push_back(pow(10, a) * eV);
-		std::vector<double> cdf;
-		for (int i = 0; i < tabs.size(); i++) {
-			infile >> a;
-			cdf.push_back(a / Mpc);
-		}
-		tabCDF.push_back(cdf);
-	}
-	infile.close();
-}
-
-void EMTripletPairProduction::initRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom) {
 	std::ifstream infile(filename.c_str());
 	
 	std::vector<double> tabEnergy;
@@ -158,12 +97,24 @@ void EMTripletPairProduction::initRate(std::string filename, ref_ptr<Interaction
 	}
 	infile.close();
 	
-	intRatesHom->setTabulatedEnergy(tabEnergy);
-	intRatesHom->setTabulatedRate(tabRate);
+	intRates->setTabulatedEnergy(tabEnergy);
+	intRates->setTabulatedRate(tabRate);
 	
 }
 
-void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep) {
+void EMTripletPairProduction::initRate(std::string filename, ref_ptr<InteractionRates> intRatesHom) {
+	this->interactionRates = intRatesHom;
+	initRate(filename);
+}
+
+void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string filepath) {
+	// check if intRates are position dependent and throw error: 
+	if (!this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMTripletPairProduction: The InteractionRates \
+			are not position dependent and where called in initRatePositionDependentPhotonField, \
+			please either use initRatePositionDependentPhotonField(filepath, intRateHom)\
+			or initRate(filename)");
+	InteractionRatesPositionDependent* intRates = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
 	
 	std::vector<std::vector<double>> tabRate;
 	
@@ -228,7 +179,7 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
 				if (infile) {
 					if (iFile == 0) {
 						vecEnergy.push_back(pow(10, a) * eV);
-						intRatesPosDep->setTabulatedEnergy(vecEnergy);
+						intRates->setTabulatedEnergy(vecEnergy);
 					}
 					vecRate.push_back(b / Mpc);
 				}
@@ -245,12 +196,24 @@ void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string f
 	if (tabRate.empty())
 		throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
 	
-	intRatesPosDep->setTabulatedRate(tabRate);
-	intRatesPosDep->setPhotonDict(photonDict);
+	intRates->setTabulatedRate(tabRate);
+	intRates->setPhotonDict(photonDict);
 	
 }
-		 
-void EMTripletPairProduction::initCumulativeRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom) {
+
+void EMTripletPairProduction::initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep) {
+	this->interactionRates = intRatesPosDep;
+	initRatePositionDependentPhotonField(filepath);
+}
+
+void EMTripletPairProduction::initCumulativeRate(std::string filename) {
+	// check if intRates are position dependent and throw error: 
+	if (this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMTripletPairProduction: The InteractionRates \
+			are position dependent and where called in initRate, please either \
+			use initRate(filename, intRateHom) or initRatePositionDependentPhotonField(filepath)");
+	InteractionRatesHomogeneous* intRates = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
+
 	std::ifstream infile(filename.c_str());
 	
 	std::vector<double> tabE;
@@ -288,13 +251,25 @@ void EMTripletPairProduction::initCumulativeRate(std::string filename, ref_ptr<I
 	}
 	infile.close();
 	
-	intRatesHom->setTabulatedE(tabE);
-	intRatesHom->setTabulateds(tabs);
-	intRatesHom->setTabulatedCDF(tabCDF);
+	intRates->setTabulatedE(tabE);
+	intRates->setTabulateds(tabs);
+	intRates->setTabulatedCDF(tabCDF);
 	
 }
 
-void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep) {
+void EMTripletPairProduction::initCumulativeRate(std::string filename, ref_ptr<InteractionRates> intRatesHom) {
+	this->interactionRates = intRatesHom;
+	initCumulativeRate(filename);
+}
+
+void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std::string filepath) {
+	// check if intRates are position dependent and throw error: 
+	if (!this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMTripletPairProduction: The InteractionRates \
+			are not position dependent and where called in initRatePositionDependentPhotonField, \
+			please either use initRatePositionDependentPhotonField(filepath, intRateHom)\
+			or initRate(filename)");
+	InteractionRatesPositionDependent* intRates = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
 	
 	std::vector<std::vector<double>> tabs;
 	std::vector<std::vector<std::vector<double>>> tabCDF;
@@ -369,7 +344,7 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
 				break;  // end of file
 			if (iFile == 0) {
 				vecE.push_back(pow(10, a) * eV);
-				intRatesPosDep->setTabulatedE(vecE);
+				intRates->setTabulatedE(vecE);
 			}
 			std::vector<double> cdf;
 			for (int i = 0; i < tabs.size(); i++) {
@@ -385,9 +360,15 @@ void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std
 		infile.close();
 	}
 	
-	intRatesPosDep->setTabulateds(tabs);
-	intRatesPosDep->setTabulatedCDF(tabCDF);
+	intRates->setTabulateds(tabs);
+	intRates->setTabulatedCDF(tabCDF);
 	
+}
+
+void EMTripletPairProduction::initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep) {
+	this->interactionRates = intRatesPosDep;
+	initCumulativeRatePositionDependentPhotonField(filepath);
+
 }
 
 void EMTripletPairProduction::performInteraction(Candidate *candidate) const {

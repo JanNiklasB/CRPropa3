@@ -43,20 +43,16 @@ void EMInverseComptonScattering::setPhotonField(ref_ptr<PhotonField> photonField
 	setDescription("EMInverseComptonScattering: " + fname);
 	
 	if (!this->photonField->hasPositionDependence()) {
-		
 		this->interactionRates = new InteractionRatesHomogeneous();
-		InteractionRatesHomogeneous* intRatesHom = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
-		
-		initRate(getDataPath("EMInverseComptonScattering/rate_" + fname + ".txt"), intRatesHom);
-		initCumulativeRate(getDataPath("EMInverseComptonScattering/cdf_" + fname + ".txt"), intRatesHom);
+
+		initRate(getDataPath("EMInverseComptonScattering/rate_" + fname + ".txt"));
+		initCumulativeRate(getDataPath("EMInverseComptonScattering/cdf_" + fname + ".txt"));
 		
 	} else {
-		
 		this->interactionRates = new InteractionRatesPositionDependent();
-		InteractionRatesPositionDependent* intRatesPosDep = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
-		
-		initRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/Rate/"), intRatesPosDep);
-		initCumulativeRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/CumulativeRate/"), intRatesPosDep);
+	
+		initRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/Rate/"));
+		initCumulativeRatePositionDependentPhotonField(getDataPath("EMInverseComptonScattering/"+fname+"/CumulativeRate/"));
 		
 	}
 }
@@ -82,69 +78,13 @@ ref_ptr<Surface> EMInverseComptonScattering::getSurface() const {
 }
 
 void EMInverseComptonScattering::initRate(std::string filename) {
-	std::ifstream infile(filename.c_str());
+	// check if intRates are position dependent and throw error: 
+	if (this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMInverseComptonScattering: The InteractionRates \
+			are position dependent and where called in initRate, please either \
+			use initRate(filename, intRateHom) or initRatePositionDependentPhotonField(filepath)");
+	InteractionRatesHomogeneous* intRates = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
 
-	if (!infile.good())
-		throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-
-	// clear previously loaded tables
-	tabEnergy.clear();
-	tabRate.clear();
-
-	while (infile.good()) {
-		if (infile.peek() != '#') {
-			double a, b;
-			infile >> a >> b;
-			if (infile) {
-				tabEnergy.push_back(pow(10, a) * eV);
-				tabRate.push_back(b / Mpc);
-			}
-		}
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-	}
-	infile.close();
-}
-
-void EMInverseComptonScattering::initCumulativeRate(std::string filename) {
-	std::ifstream infile(filename.c_str());
-
-	if (!infile.good())
-		throw std::runtime_error("EMInverseComptonScattering: could not open file " + filename);
-
-	// clear previously loaded tables
-	tabE.clear();
-	tabs.clear();
-	tabCDF.clear();
-	
-	// skip header
-	while (infile.peek() == '#')
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-
-	// read s values in first line
-	double a;
-	infile >> a; // skip first value
-	while (infile.good() and (infile.peek() != '\n')) {
-		infile >> a;
-		tabs.push_back(pow(10, a) * eV * eV);
-	}
-
-	// read all following lines: E, cdf values
-	while (infile.good()) {
-		infile >> a;
-		if (!infile)
-			break;  // end of file
-		tabE.push_back(pow(10, a) * eV);
-		std::vector<double> cdf;
-		for (int i = 0; i < tabs.size(); i++) {
-			infile >> a;
-			cdf.push_back(a / Mpc);
-		}
-		tabCDF.push_back(cdf);
-	}
-	infile.close();
-}
-
-void EMInverseComptonScattering::initRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom) {
 	std::ifstream infile(filename.c_str());
 	
 	std::vector<double> tabEnergy;
@@ -166,13 +106,25 @@ void EMInverseComptonScattering::initRate(std::string filename, ref_ptr<Interact
 	}
 	infile.close();
 	
-	intRatesHom->setTabulatedEnergy(tabEnergy);
-	intRatesHom->setTabulatedRate(tabRate);
+	intRates->setTabulatedEnergy(tabEnergy);
+	intRates->setTabulatedRate(tabRate);
 	
 }
 
-void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep) {
-		
+void EMInverseComptonScattering::initRate(std::string filename, ref_ptr<InteractionRates> intRatesHom) {
+	this->interactionRates = intRatesHom;
+	initRate(filename);
+}
+
+void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::string filepath) {
+	// check if intRates are position dependent and throw error: 
+	if (!this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMInverseComptonScattering: The InteractionRates \
+			are not position dependent and where called in initRatePositionDependentPhotonField, \
+			please either use initRatePositionDependentPhotonField(filepath, intRateHom)\
+			or initRate(filename)");
+	InteractionRatesPositionDependent* intRates = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
+
 	std::vector<std::vector<double>> tabRate;
 		
 	fs::path dir = filepath;
@@ -236,7 +188,7 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
 				if (infile) {
 					if (iFile == 0) {
 						vecEnergy.push_back(pow(10, a) * eV);
-						intRatesPosDep->setTabulatedEnergy(vecEnergy);
+						intRates->setTabulatedEnergy(vecEnergy);
 					}
 					vecRate.push_back(b / Mpc);
 				}
@@ -254,13 +206,24 @@ void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::strin
 	if (tabRate.empty())
 		throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
 		
-	intRatesPosDep->setTabulatedRate(tabRate);
-	intRatesPosDep->setPhotonDict(photonDict);
+	intRates->setTabulatedRate(tabRate);
+	intRates->setPhotonDict(photonDict);
 		
 }
 
-void EMInverseComptonScattering::initCumulativeRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom) {
-	
+void EMInverseComptonScattering::initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep) {
+	this->interactionRates = intRatesPosDep;
+	initRatePositionDependentPhotonField(filepath);
+}
+
+void EMInverseComptonScattering::initCumulativeRate(std::string filename) {
+	// check if intRates are position dependent and throw error: 
+	if (this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMInverseComptonScattering: The InteractionRates \
+			are position dependent and where called in initRate, please either \
+			use initRate(filename, intRateHom) or initRatePositionDependentPhotonField(filepath)");
+	InteractionRatesHomogeneous* intRates = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
+
 	std::ifstream infile(filename.c_str());
 	
 	std::vector<double> tabE;
@@ -297,14 +260,26 @@ void EMInverseComptonScattering::initCumulativeRate(std::string filename, ref_pt
 	}
 	infile.close();
 	
-	intRatesHom->setTabulatedE(tabE);
-	intRatesHom->setTabulateds(tabs);
-	intRatesHom->setTabulatedCDF(tabCDF);
+	intRates->setTabulatedE(tabE);
+	intRates->setTabulateds(tabs);
+	intRates->setTabulatedCDF(tabCDF);
 	
 }
 
-void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep) {
-	
+void EMInverseComptonScattering::initCumulativeRate(std::string filename, ref_ptr<InteractionRates> intRatesHom) {
+	this->interactionRates = intRatesHom;
+	initCumulativeRate(filename);
+}
+
+void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(std::string filepath) {
+	// check if intRates are position dependent and throw error: 
+	if (!this->interactionRates->hasPositionDependence())
+		throw std::runtime_error("EMInverseComptonScattering: The InteractionRates \
+			are not position dependent and where called in initRatePositionDependentPhotonField, \
+			please either use initRatePositionDependentPhotonField(filepath, intRateHom)\
+			or initRate(filename)");
+	InteractionRatesPositionDependent* intRates = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
+
 	std::vector<std::vector<double>> tabs;
 	std::vector<std::vector<std::vector<double>>> tabCDF;
 	
@@ -376,7 +351,7 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
 				break;  // end of file
 			if (iFile == 0) {
 				vecE.push_back(pow(10, a) * eV);
-				intRatesPosDep->setTabulatedE(vecE);
+				intRates->setTabulatedE(vecE);
 			}
 			std::vector<double> cdf;
 			for (int i = 0; i < tabs.size(); i++) {
@@ -393,9 +368,14 @@ void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(
 		infile.close();
 	}
 	
-	intRatesPosDep->setTabulateds(tabs);
-	intRatesPosDep->setTabulatedCDF(tabCDF);
+	intRates->setTabulateds(tabs);
+	intRates->setTabulatedCDF(tabCDF);
 	
+}
+
+void EMInverseComptonScattering::initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep) {
+	this->interactionRates = intRatesPosDep;
+	initCumulativeRatePositionDependentPhotonField(filepath);
 }
 
 // Class to calculate the energy distribution of the ICS photon and to sample from it

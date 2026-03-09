@@ -36,10 +36,6 @@ private:
 	ref_ptr<Surface> surface;
 	std::string interactionTag = "EMDP";
 	ref_ptr<InteractionRates> interactionRates;
-	
-	// tabulated interaction rate 1/lambda(E)
-	std::vector<double> tabEnergy;  //!< electron energy in [J]
-	std::vector<double> tabRate;  //!< interaction rate in [1/m]
 public:
 	/** Constructor
 	 The object used to load, store and access to the interaction rates of the process is the interactionRates pointer.
@@ -80,24 +76,26 @@ public:
 	std::string getInteractionTag() const;
 		
 	/** Loads the interaction rate
-	 * (THIS FUNCTION WILL BE DEPRICATED SOON, use initRate(filename intRates) instead)
+	 * This function loads the interaction rate
 	 * @param filename The name of the file containing the interaction rates
 	 */
 	void initRate(std::string filename);
-	/** Loads the interaction rate in InteractionRates class
-	 * This function loads the interaction rate, in the proper object 
-	 * of the InteractionRates class, for the homogenouos background photon fields.
+	/** Loads the interaction rate in provided InteractionRates class
 	 * @param filename The name of the file containing the interaction rates
 	 * @param intRatesHom TODO
 	 */
-	void initRate(std::string filename, ref_ptr<InteractionRatesHomogeneous> intRatesHom);
-	/** Loads the interaction rate in InteractionRates class
+	void initRate(std::string filepath, ref_ptr<InteractionRates> intRatesHom);
+	/** Loads the postion dependent interaction rate
+	 * @param filepath The name of the folder containing the interaction rates
+	 */
+	void initRatePositionDependentPhotonField(std::string filepath);
+	/** Loads the interaction rate in provided InteractionRates class
 	 * This function is used to load the rates, in the dedicated object of the InteractionRates
 	 * class, for spatial dependent photon fields in the interaction module constructor.
-	 * @param filename The name of the file containing the interaction rates
+	 * @param filepath The name of the folder containing the interaction rates
 	 * @param intRatesPosDep TODO
 	 */
-	void initRatePositionDependentPhotonField(std::string filename, ref_ptr<InteractionRatesPositionDependent> intRatesPosDep);
+	void initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep);
 	
 	void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate) const;
