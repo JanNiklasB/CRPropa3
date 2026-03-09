@@ -155,8 +155,6 @@ list(APPEND CRPROPA_EXTRA_LIBRARIES kiss)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/kiss/include)
 
 # nanoflann (provided)
-add_subdirectory(libs/nanoflann)
-list(APPEND CRPROPA_EXTRA_LIBRARIES nanoflann)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/nanoflann/include)
 
 # HepID (provided)
