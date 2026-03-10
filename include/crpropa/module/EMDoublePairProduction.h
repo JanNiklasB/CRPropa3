@@ -68,34 +68,27 @@ public:
 	 */
 	void setSurface(ref_ptr<Surface> surface);
 	ref_ptr<Surface> getSurface() const;
+
+	/** set a custom interaction rate
+	 * With this function you can change the type of interaction rate,
+	 * if you would for example like to change from a homogeneous to a position
+	 * dependent interaction rate.
+	 * @param intRates ref_ptr to a InteractionRates class
+	 */
+	void setInteractionRates(ref_ptr<InteractionRates> intRates);
+	ref_ptr<InteractionRates> getInteractionRates() const;
 	
 	/** set a custom interaction tag to trace back this interaction
 	 * @param tag string that will be added to the candidate and output
 	 */
 	void setInteractionTag(std::string tag);
 	std::string getInteractionTag() const;
-		
+
 	/** Loads the interaction rate
-	 * This function loads the interaction rate
-	 * @param filename The name of the file containing the interaction rates
+	 * This function loads the interaction rate from a given file/folder.
+	 * @param path The name of the file/folder containing the interaction rates
 	 */
-	void initRate(std::string filename);
-	/** Loads the interaction rate in provided InteractionRates class
-	 * @param filename The name of the file containing the interaction rates
-	 * @param intRatesHom TODO
-	 */
-	void initRate(std::string filepath, ref_ptr<InteractionRates> intRatesHom);
-	/** Loads the postion dependent interaction rate
-	 * @param filepath The name of the folder containing the interaction rates
-	 */
-	void initRatePositionDependentPhotonField(std::string filepath);
-	/** Loads the interaction rate in provided InteractionRates class
-	 * This function is used to load the rates, in the dedicated object of the InteractionRates
-	 * class, for spatial dependent photon fields in the interaction module constructor.
-	 * @param filepath The name of the folder containing the interaction rates
-	 * @param intRatesPosDep TODO
-	 */
-	void initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep);
+	void initRate(std::string path);
 	
 	void process(Candidate *candidate) const;
 	void performInteraction(Candidate *candidate) const;

@@ -37,13 +37,18 @@ void EMDoublePairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	std::string fname = photonField->getFieldName();
 	setDescription("EMDoublePairProduction: " + fname);
 	
+	// choose the right interaction rates for the used photon field
 	if (!this->photonField->hasPositionDependence()) {
-		this->interactionRates = new InteractionRatesHomogeneous();
-		initRate(getDataPath("EMDoublePairProduction/rate_" + fname + ".txt"));
+		this->interactionRates = new InteractionRatesHomogeneous(
+			getDataPath("EMDoublePairProduction/rate_" + fname + ".txt")
+		);
 		
 	} else {
-		this->interactionRates = new InteractionRatesPositionDependent();
-		initRatePositionDependentPhotonField(getDataPath("EMDoublePairProduction/"+fname+"/Rate/"));
+		this->interactionRates = new InteractionRatesPositionDependent(
+			getDataPath("EMDoublePairProduction/"+fname+"/Rate/"),
+			"",
+			this->surface
+		);
 		
 	}
 	
@@ -69,147 +74,16 @@ ref_ptr<Surface> EMDoublePairProduction::getSurface() const {
 		return this->surface;
 }
 
-void EMDoublePairProduction::initRate(std::string filename) {
-	// check if intRates are position dependent and throw error: 
-	if (this->interactionRates->hasPositionDependence())
-		throw std::runtime_error("EMDoublePairProduction: The InteractionRates \
-			are position dependent and where called in initRate, please either \
-			use initRate(filename, intRateHom) or initRatePositionDependentPhotonField(filepath)");
-	InteractionRatesHomogeneous* intRates = static_cast<InteractionRatesHomogeneous*>(this->interactionRates.get());
-	
-	
-	std::ifstream infile(filename.c_str());
-
-	std::vector<double> tabEnergy;
-	std::vector<double> tabRate;
-		
-	if (!infile.good())
-		throw std::runtime_error("EMDoublePairProduction: could not open file " + filename);
-
-	while (infile.good()) {
-		
-		if (infile.peek() != '#') {
-			
-			double a, b;
-			infile >> a >> b;
-			
-			if (infile) {
-				tabEnergy.push_back(pow(10, a) * eV);
-				tabRate.push_back(b / Mpc);
-			}
-			
-		}
-		infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-		
-	}
-	
-	infile.close();
-		
-	intRates->setTabulatedEnergy(tabEnergy);
-	intRates->setTabulatedRate(tabRate);
-		
+void EMDoublePairProduction::setInteractionRates(ref_ptr<InteractionRates> intRates) {
+	this->interactionRates = intRates;
 }
 
-void EMDoublePairProduction::initRate(std::string filename, ref_ptr<InteractionRates> intRatesHom) {
-	this->interactionRates = intRatesHom;
-	initRate(filename);
+ref_ptr<InteractionRates> EMDoublePairProduction::getInteractionRates() const {
+	return this->interactionRates;
 }
 
-void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string filepath) {
-	// check if intRates are position dependent and throw error: 
-	if (!this->interactionRates->hasPositionDependence())
-		throw std::runtime_error("EMDoublePairProduction: The InteractionRates \
-			are not position dependent and where called in initRatePositionDependentPhotonField, \
-			please either use initRatePositionDependentPhotonField(filepath, intRateHom)\
-			or initRate(filename)");
-	InteractionRatesPositionDependent* intRates = static_cast<InteractionRatesPositionDependent*>(this->interactionRates.get());
-	std::vector<std::vector<double>> tabRate;
-		
-	fs::path dir = filepath;
-	std::unordered_map<int, Vector3d> photonDict;
-	int iFile = 0;
-	
-	if (!fs::exists(dir)) {
-			std::cout << "Photon tables not found in " << dir << std::endl;
-			return;
-	}
-	
-	for (auto const& dir_entry : fs::directory_iterator{dir}) {
-		
-		std::string filename = dir_entry.path().string();
-		std::ifstream infile(filename.c_str());
-		
-		std::vector<double> vecEnergy;
-		std::vector<double> vecRate;
-		
-		if (!infile.good())
-			throw
-			std::runtime_error("EMDoublePairProduction: could not open file " + filename);
-		
-		double x, y, z;
-		std::string str;
-		std::stringstream ss;
-		
-		std::string filename_split = splitFilename(dir_entry.path().string());
-		ss << filename_split;
-		
-		int iLine = 0;
-		
-		std::locale::global(std::locale("C"));
-		
-		while (getline(ss, str, '_')) {
-			if (iLine == 3) {
-				x = -std::stod(str) * kpc;
-			}
-			if (iLine == 4) {
-				y = std::stod(str) * kpc;
-			}
-			if (iLine == 5) {
-				z = std::stod(str) * kpc;
-			}
-			iLine = iLine + 1;
-		}
-		
-		Vector3d vPos(x, y, z);
-		
-		if (getSurface() and !getSurface()->isInside(vPos))
-			continue;
-		
-		photonDict[iFile] = vPos;
-		
-		while (infile.good()) {
-			if (infile.peek() != '#') {
-				double a, b;
-				infile >> a >> b;
-				if (infile) {
-					if (iFile == 0) {
-						vecEnergy.push_back(pow(10, a) * eV);
-						intRates->setTabulatedEnergy(vecEnergy);
-					}
-					vecRate.push_back(b / Mpc);
-				}
-			}
-			infile.ignore(std::numeric_limits < std::streamsize > ::max(), '\n');
-		}
-		
-		tabRate.push_back(vecRate);
-		
-		iFile = iFile + 1;
-		infile.close();
-		
-	}
-
-	if (tabRate.empty())
-		throw std::runtime_error("Rate's table empty! Check if the surface is properly set.");
-		
-	intRates->setTabulatedRate(tabRate);
-	intRates->setPhotonDict(photonDict);
-		
-}
-
-void EMDoublePairProduction::initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep) {
-	this->interactionRates = intRatesPosDep;
-	initRatePositionDependentPhotonField(filepath);
+void EMDoublePairProduction::initRate(std::string path) {
+	this->interactionRates->initRate(path);
 }
 
 void EMDoublePairProduction::performInteraction(Candidate *candidate) const {

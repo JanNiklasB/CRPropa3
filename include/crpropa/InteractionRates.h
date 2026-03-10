@@ -4,6 +4,7 @@
 #include "crpropa/Common.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Vector3.h"
+#include "crpropa/Geometry.h"
 
 #include <nanoflann.hpp>
 
@@ -65,6 +66,9 @@ public:
 		this->ratesName = ratesName;
 	}
 
+	virtual void initRate(std::string path) = 0;
+	virtual void initCumulativeRate(std::string path) = 0;
+
 protected: 
 
   std::string ratesName = "AbstractInteractionRates";
@@ -78,7 +82,11 @@ protected:
  */
 class InteractionRatesHomogeneous: public InteractionRates {
 public:
-	InteractionRatesHomogeneous();
+	/** Constructor of InteractionRatesHomogeneous
+	 * @param RateFile Path to the file containing the interaction rate data
+	 * @param CumulativeRateFile Path to the file containing the cumulative interaction rate data
+	 */
+	InteractionRatesHomogeneous(std::string RateFile = "", std::string CumulativeRateFile = "");
 	
 	std::vector<double> getTabulatedEnergy() const;
 	std::vector<double> getTabulatedRate() const;
@@ -94,6 +102,17 @@ public:
 	void setTabulatedE (std::vector<double>& tabE);
 	void setTabulateds (std::vector<double>& tabs);
 	void setTabulatedCDF (std::vector<std::vector<double>>& tabCDF);
+
+	/** Loads the interaction rate
+	 * This function loads the interaction rate
+	 * @param filename The name of the file containing the interaction rates
+	 */
+	void initRate(std::string filename);
+	/** Loads the cumulative interaction rate
+	 * This function loads the interaction rate
+	 * @param filename The name of the file containing the interaction rates
+	 */
+	void initCumulativeRate(std::string filename);
 	
 protected:
 	
@@ -115,7 +134,12 @@ protected:
 class InteractionRatesPositionDependent: public InteractionRates {
 
 public:
-	InteractionRatesPositionDependent();
+	/** Constructor of InteractioNRatesPositionDependent
+	 * @param RateFilePath Path containing the interaction rates files (* /Rate)
+	 * @param CumulativeRateFilePath Path containing the cumulative interaction rates files (* /CumulativeRate)
+	 * @param surface Closed surface to confine the grid nodes to be uploaded (optional)
+	 */
+	InteractionRatesPositionDependent(std::string RateFilePath = "", std::string CumulativeRateFilePath = "", ref_ptr<Surface> surface = NULL);
 	
 	int findClosestGridPoint(const Vector3d &position) const;
 	
@@ -139,6 +163,23 @@ public:
 	void setTabulatedCDF (std::vector<std::vector<std::vector<double>>>& tabCDF);
 	void setPhotonDict (std::unordered_map<int, Vector3d>& photonDict);
 
+	/** Apply a surface that confine the position dependent photon field
+	 * @param surface Closed surface to confine the grid nodes to be uploaded
+	 */
+	void setSurface(ref_ptr<Surface> surface);
+	ref_ptr<Surface> getSurface() const;
+
+	/** Loads the interaction rate
+	 * This function loads the position dependent interaction rate
+	 * @param filepath The name of the folder containing the interaction rates (* /Rate)
+	 */
+	void initRate(std::string filepath);
+	/** Loads the interaction rate
+	 * This function loads the cumulative position dependent interaction rate
+	 * @param filepath The name of the folder containing the cumulative interaction rates (* /CumulativeRate)
+	 */
+	void initCumulativeRate(std::string filepath);
+
 protected:
 	
 	// tabulated interaction rates 1/lambda(E)
@@ -153,6 +194,7 @@ protected:
 	
 	PointCloud cloud; //!< point cloud for nanoflann KD-tree
 	KDTree* tree = nullptr; //!< pointer to the KD Tree
+	ref_ptr<Surface> surface;
 	
 };
 

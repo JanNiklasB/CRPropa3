@@ -43,7 +43,7 @@ public:
 	 @param havePhotons		if true, add secondary photons as candidates
 	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
 	 @param limit			step size limit as fraction of mean free path
-	 @param surface   suface to enclose the grid nodes to be loaded
+	 @param surface			suface to enclose the grid nodes to be loaded
 	 */
 	EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons = false, double thinning = 0, double limit = 0.1, ref_ptr<Surface> surface = nullptr);
 	
@@ -74,57 +74,27 @@ public:
 	 */
 	void setInteractionTag(std::string tag);
 	std::string getInteractionTag() const;
+
+	/** set a custom interaction rate
+	 * With this function you can change the type of interaction rate,
+	 * if you would for example like to change from a homogeneous to a position
+	 * dependent interaction rate.
+	 * @param intRates ref_ptr to a InteractionRates class
+	 */
+	void setInteractionRates(ref_ptr<InteractionRates> intRates);
+	ref_ptr<InteractionRates> getInteractionRates() const;
 	
 	/** Loads the interaction rate
-	 * This function loads the interaction rate
-	 * @param filename The name of the file containing the interaction rates
+	 * This function loads the interaction rate from a given file/folder.
+	 * @param path The name of the file/folder containing the interaction rates
 	 */
-	void initRate(std::string filename);
-	/** Loads the interaction rate in InteractionRates class
-	 * This function loads the interaction rate, in the proper object 
-	 * of the InteractionRates class, for the homogenouos background photon fields.
-	 * @param filename The name of the file containing the interaction rates
-	 * @param intRatesHom TODO
-	 */
-	void initRate(std::string filename, ref_ptr<InteractionRates> intRatesHom);
+	void initRate(std::string path);
 	
 	/** Loads the cumulative interaction rate
-	 * This function loads the interaction rate
-	 * @param filename The name of the file containing the interaction rates
+	 * This function loads the interaction rate from a given file/folder.
+	 * @param path The name of the file/folder containing the interaction rates
 	 */
-	void initCumulativeRate(std::string filename);
-	/** Loads the cumultative interaction rate in InteractionRates class
-	 * This function is used to load the rates, in the dedicated object of the InteractionRates
-	 * class, for spatial dependent photon fields in the interaction module constructor.
-	 * @param filename The name of the file containing the interaction rates
-	 * @param intRatesPosDep TODO
-	 */
-	void initCumulativeRate(std::string filename, ref_ptr<InteractionRates> intRatesHom);
-	
-	/** Loads the postion dependent interaction rate
-	 * @param filepath The name of the folder containing the interaction rates
-	 */
-	void initRatePositionDependentPhotonField(std::string filepath);
-	/** Loads the interaction rate in InteractionRates class
-	 * This function is used to load the rates, in the dedicated object of the InteractionRates
-	 * class, for spatial dependent photon fields in the interaction module constructor.
-	 * @param filepath The name of the file containing the interaction rates
-	 * @param intRatesPosDep TODO
-	 */
-	void initRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep);
-
-	
-	/** Loads the cumulative postion dependent interaction rate
-	 * @param filepath The name of the folder containing the interaction rates
-	 */
-	void initCumulativeRatePositionDependentPhotonField(std::string filepath);
-	/** Loads the cumultative interaction rate in InteractionRates class
-	 * This function is used to load the rates, in the dedicated object of the InteractionRates
-	 * class, for spatial dependent photon fields in the interaction module constructor.
-	 * @param filepath The name of the file containing the interaction rates
-	 * @param intRatesPosDep TODO
-	 */
-	void initCumulativeRatePositionDependentPhotonField(std::string filepath, ref_ptr<InteractionRates> intRatesPosDep);
+	void initCumulativeRate(std::string path);
 
 
 	void process(Candidate *candidate) const;
