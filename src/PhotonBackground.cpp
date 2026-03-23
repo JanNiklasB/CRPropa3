@@ -30,6 +30,8 @@ namespace crpropa {
 TabularPhotonField::TabularPhotonField(std::string fieldName, bool isRedshiftDependent) {
 	this->fieldName = fieldName;
 	this->isRedshiftDependent = isRedshiftDependent;
+	this->isPositionDependent = false;
+	this->surface = NULL;
 	
 	readPhotonEnergy(getDataPath("") + "Scaling/" + this->fieldName + "_photonEnergy.txt");
 	readPhotonDensity(getDataPath("") + "Scaling/" + this->fieldName + "_photonDensity.txt");
@@ -225,7 +227,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, ref_
 	
 	this->fieldName = fieldName;
 	this->isRedshiftDependent = isRedshiftDependent;
-	this->isPositionDependent = isPositionDependent;
+	this->isPositionDependent = true;
 	this->surface = surface;
 	
 	fs::path dirE = getDataPath("") + "Scaling/" + this->fieldName + "/photonEnergy/";
