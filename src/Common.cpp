@@ -13,15 +13,23 @@
 
 namespace crpropa {
 
+std::string removeNullCharacter(std::string path) {
+	// check for null character in data path and remove it
+	if (path.find('\x00') != std::string::npos)
+		path.erase(std::remove(path.begin(), path.end(), '\x00'), path.end());
+	return path;
+}
+
 std::string getDataPath(std::string filename) {
 	static std::string dataPath;
+
 	if (dataPath.size())
-		return concat_path(dataPath, filename);
+		return removeNullCharacter(concat_path(dataPath, filename));
 
 	const char *env_path = getenv("CRPROPA_DATA_PATH");
 	if (env_path) {
 		if (is_directory(env_path)) {
-			dataPath = env_path;
+			dataPath = removeNullCharacter(env_path);
 			KISS_LOG_INFO << "getDataPath: use environment variable, "
 					<< dataPath << std::endl;
 			return concat_path(dataPath, filename);
@@ -32,7 +40,7 @@ std::string getDataPath(std::string filename) {
 	{
 		std::string _path = CRPROPA_INSTALL_PREFIX "/share/crpropa";
 		if (is_directory(_path)) {
-			dataPath = _path;
+			dataPath = removeNullCharacter(_path);
 			KISS_LOG_INFO
 			<< "getDataPath: use install prefix, " << dataPath << std::endl;
 			return concat_path(dataPath, filename);
@@ -41,7 +49,7 @@ std::string getDataPath(std::string filename) {
 #endif
 
 	{
-		std::string _path = executable_path() + "../data";
+		std::string _path = removeNullCharacter(executable_path() + "../data");
 		if (is_directory(_path)) {
 			dataPath = _path;
 			KISS_LOG_INFO << "getDataPath: use executable path, " << dataPath
@@ -52,7 +60,7 @@ std::string getDataPath(std::string filename) {
 
 	dataPath = "data";
 	KISS_LOG_INFO << "getDataPath: use default, " << dataPath << std::endl;
-	return concat_path(dataPath, filename);
+	return removeNullCharacter(concat_path(dataPath, filename));
 }
 
 
@@ -60,7 +68,7 @@ std::string getInstallPrefix()
 {
   std::string _path = "";
   #ifdef CRPROPA_INSTALL_PREFIX
-    _path += CRPROPA_INSTALL_PREFIX;
+	_path += CRPROPA_INSTALL_PREFIX;
   #endif
   return _path;
 };
@@ -130,6 +138,12 @@ size_t closestIndex(double x, const std::vector<double> &X) {
 		return i0;
 	else
 		return i1;
+}
+
+std::string splitFilename(const std::string str) {
+	std::size_t found = str.find_last_of("/\\");
+	std::string s = str.substr(found + 1);
+	return s;
 }
 
 } // namespace crpropa
