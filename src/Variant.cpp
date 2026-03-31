@@ -1011,7 +1011,7 @@ Variant::operator const std::vector<Variant>&() const {
 
 #define INT_FUNCTION(to_type, fun, to)                                                                                 \
 	to Variant::fun() const {                                                                                          \
-		switch (type) {                                                                                                \
+		switch (to_type) {                                                                                                \
 			case Variant::TYPE_BOOL:                                                                                   \
 				return data._t_bool ? 1 : 0;                                                                           \
 				break;                                                                                                 \
