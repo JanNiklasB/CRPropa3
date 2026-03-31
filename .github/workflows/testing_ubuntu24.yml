@@ -21,7 +21,7 @@ jobs:
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov ninja-build
           pip install numpy
       - name: Set up the build
         env:
@@ -31,15 +31,15 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
+          cmake .. -G Ninja -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
       - name: Build CRPropa
         run: |
           cd build
-          make
+          cmake --build .
       - name: Run tests
         run: |
           cd build
-          make test
+          ctest --output-on-failure
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,7 +65,7 @@ jobs:
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov ninja-build
           pip install numpy
           pip show numpy
       - name: Set up the build
@@ -76,15 +76,15 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
+          cmake .. -G Ninja -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
       - name: Build CRPropa
         run: |
           cd build
-          make
+          cmake --build .
       - name: Run tests
         run: |
           cd build
-          make test 
+          ctest --output-on-failure
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v4
