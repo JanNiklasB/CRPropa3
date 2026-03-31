@@ -52,7 +52,7 @@ void ProgressBar::setPosition(unsigned long position) {
 		std::string s = " - Finished at ";
 		s.append(ctime(&currentTime));
 		char fs[255];
-		std::sprintf(fs, "%c[%d;%dm Finished %c[%dm", 27, 1, 32, 27, 0);
+		std::snprintf(fs, 255, "%c[%d;%dm Finished %c[%dm", 27, 1, 32, 27, 0);
 		std::printf(stringTmpl.c_str(), fs, 100, "Needed",
 				int(tElapsed / 3600), (int(tElapsed) % 3600) / 60,
 				int(tElapsed) % 60, s.c_str());
@@ -68,7 +68,7 @@ void ProgressBar::setError() {
 	std::string s = " - Finished at ";
 	s.append(ctime(&currentTime));
 	char fs[255];
-	std::sprintf(fs, "%c[%d;%dm  ERROR   %c[%dm", 27, 1, 31, 27, 0);
+	std::snprintf(fs, 255, "%c[%d;%dm  ERROR   %c[%dm", 27, 1, 31, 27, 0);
 	std::printf(stringTmpl.c_str(), fs, _currentCount, "Needed",
 			int(tElapsed / 3600), (int(tElapsed) % 3600) / 60,
 			int(tElapsed) % 60, s.c_str());
