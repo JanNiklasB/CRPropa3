@@ -668,6 +668,7 @@ Variant Variant::fromString(const std::string& s, Type t) {
 			std::string s;
 			v.push_back(s);
 		}
+		return Variant(v);
 	} else {
 		std::string msg; 
 		msg += "fromString not implemented for type ";
