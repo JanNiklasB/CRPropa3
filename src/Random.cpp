@@ -390,11 +390,11 @@ void Random::initialize(const uint32_t seed) {
 void Random::reload() {
 	uint32_t *p = state;
 	int i;
-	for (i = N - M; i--; ++p)
+	for (i = +N - M; i--; ++p)
 		*p = twist(p[M], p[0], p[1]);
 	for (i = M; --i; ++p)
-		*p = twist(p[M - N], p[0], p[1]);
-	*p = twist(p[M - N], p[0], state[0]);
+		*p = twist(p[+M - N], p[0], p[1]);
+	*p = twist(p[+M - N], p[0], state[0]);
 
 	left = N, pNext = state;
 }
