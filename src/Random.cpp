@@ -282,7 +282,8 @@ uint64_t Random::randInt64()
 {
 	int64_t a = randInt();
 	int64_t b = randInt();
-	return (b + a << 32);
+	// a is shifted to the left to create a proper 64 bit integer
+	return (b + (a << 32));
 }
 
 
