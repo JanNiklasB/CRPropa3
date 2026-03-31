@@ -182,7 +182,7 @@ void TextOutput::process(Candidate *c) const {
 		p += std::snprintf(buffer + p, 1024, "%1.5E\t", c->getRedshift());
 
 	if (fields.test(SerialNumberColumn))
-		p += std::snprintf(buffer + p, 1024, "%10lu\t",
+		p += std::snprintf(buffer + p, 1024, "%10llu\t",
 				c->getSerialNumber());
 	if (fields.test(CurrentIdColumn))
 		p += std::snprintf(buffer + p, 1024, "%10i\t", c->current.getId());
@@ -208,7 +208,7 @@ void TextOutput::process(Candidate *c) const {
 	}
 
 	if (fields.test(SerialNumberColumn))
-		p += std::snprintf(buffer + p, 1024, "%10lu\t", c->getSourceSerialNumber());
+		p += std::snprintf(buffer + p, 1024, "%10llu\t", c->getSourceSerialNumber());
 	if (fields.test(SourceIdColumn))
 		p += std::snprintf(buffer + p, 1024, "%10i\t", c->source.getId());
 	if (fields.test(SourceEnergyColumn))
@@ -234,7 +234,7 @@ void TextOutput::process(Candidate *c) const {
 	}
 
 	if (fields.test(SerialNumberColumn))
-		p += std::snprintf(buffer + p, 1024, "%10lu\t",
+		p += std::snprintf(buffer + p, 1024, "%10llu\t",
 				c->getCreatedSerialNumber());
 	if (fields.test(CreatedIdColumn))
 		p += std::snprintf(buffer + p, 1024, "%10i\t", c->created.getId());
