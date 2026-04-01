@@ -19,7 +19,7 @@ jobs:
        uses: actions/checkout@v4 
      - name: Preinstall 
        run: | 
-         brew install hdf5 fftw cfitsio muparser libomp swig ninja
+         brew install hdf5 fftw cfitsio muparser libomp swig
          python3 -m venv venv
          source venv/bin/activate
          python -m pip install --upgrade pip
@@ -36,7 +36,6 @@ jobs:
         cd build
       
         cmake .. \
-          -G Ninja \
           -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv \
           -DENABLE_PYTHON=True \
           -DPython_EXECUTABLE=$GITHUB_WORKSPACE/venv/bin/python \
