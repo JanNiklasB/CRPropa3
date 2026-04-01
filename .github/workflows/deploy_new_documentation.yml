@@ -44,7 +44,7 @@ jobs:
       - name: Build CRPropa
         run: |
           cd build
-          cmake --build .
+          make -j
       - name: run test
         run: | 
           cd build
@@ -53,11 +53,11 @@ jobs:
       - name: coverage report
         run: |
           cd build
-          cmake --build . --target coverage
+          make coverage
       - name: build documentation
         run: |
           cd build
-          cmake --build . --target doc
+          make doc
       - name: move final documentation # to avoid conflict with .gitignore
         run: | 
           mv build/doc ~/final_doc 

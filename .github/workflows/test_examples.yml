@@ -36,8 +36,7 @@ jobs:
       - name: Build CRPropa
         run: |
           cd build
-          cmake --build .
-          cmake --install .
+          make install -j
       - name: convert notebooks to python 
         env: 
           PYTHONPATH: "/home/runner/.local"

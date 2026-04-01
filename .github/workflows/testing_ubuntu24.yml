@@ -21,7 +21,7 @@ jobs:
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov ninja-build
+          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
           pip install numpy
       - name: Set up the build
         env:
@@ -31,11 +31,11 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
+          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
       - name: Build CRPropa
         run: |
           cd build
-          cmake --build .
+          make
       - name: Run tests
         run: |
           cd build
@@ -80,7 +80,7 @@ jobs:
       - name: Build CRPropa
         run: |
           cd build
-          cmake --build .
+          make
       - name: Run tests
         run: |
           cd build
