@@ -205,6 +205,7 @@ endif(ENABLE_OPENMP)
 # Additional configuration OMP_SCHEDULE
 set(OMP_SCHEDULE "static,100" CACHE STRING "FORMAT type,chunksize")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/ModuleList.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp" @ONLY)
+list(APPEND CRPROPA_EXTRA_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp")
 
 # Google Performance Tools (optional as possible performance tweak for OpenMP)
 find_package(GooglePerfTools)
@@ -352,7 +353,6 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
-  ${CMAKE_CURRENT_BINARY_DIR}/src/ModuleList.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
@@ -427,9 +427,9 @@ if(BUILD_DOC)
   find_package(Doxygen)
   if(DOXYGEN_FOUND)
     MESSAGE(STATUS "Found Doxygen to build documentation")
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in" ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/doc/DoxygenLayout.xml" ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml COPYONLY)
-    add_custom_target(doxy ${DOXYGEN_EXECUTABLE} Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/DoxygenLayout.xml ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml COPYONLY)
+    add_custom_target(doxy ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 
     set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
     add_custom_target(docstrings_from_doxy
@@ -514,7 +514,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
     if(SWIG_VERSION VERSION_LESS 4.0.2)
         message(WARNING, "The SWIG builtin option should not be used with SWIG version below 4.0.2 due to https://github.com/swig/swig/issues/1595")
     endif()
-  else(ENABLE_SWIG_BUILTIN)
+  else()
     set(BUILTIN "")
   endif(ENABLE_SWIG_BUILTIN)
 
@@ -553,7 +553,7 @@ endif(ENABLE_PYTHON AND Python_FOUND)
 # Install
 # ----------------------------------------------------------------------------
 
-# makes the binary directory visible to c++, needed to have a last resort when searching for data
+# makes the binary directory visible to common.h, needed to have a last resort when searching for data
 add_definitions(-DCRPROPA_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
@@ -580,8 +580,8 @@ if(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
   find_package_handle_standard_args(Sphinx
                                     "Failed to find sphinx-build executable"
                                     SPHINX_EXECUTABLE)
-  set(SPHINX_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/doc")
-  set(SPHINX_BUILD "${CMAKE_CURRENT_BINARY_DIR}/doc")
+  set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+  set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/doc)
   add_custom_target(doc
                     ${SPHINX_EXECUTABLE} -b html
                     -Dbreathe_projects.CRPropa3=xml
