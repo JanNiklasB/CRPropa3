@@ -291,14 +291,21 @@ void TextOutput::process(Candidate *c) const {
 }
 
 void TextOutput::load(const std::string &filename, ParticleCollector *collector){
+
+	std::string line;
 	std::istream *in;
 	std::ifstream infile(filename.c_str());
+	
+	Output output;
+	double lengthScale = output.getLengthScale();
+	double timeScale = output.getTimeScale();
+	double energyScale = output.getEnergyScale();
 
 	if (!infile.good())
 		throw std::runtime_error("crpropa::TextOutput: could not open file " + filename);
 	in = &infile;
-
-		if (kiss::ends_with(filename, ".gz")){
+	
+	if (kiss::ends_with(filename, ".gz")){
 #ifdef CRPROPA_HAVE_ZLIB
 		in = new zstream::igzstream(*in);
 #else
@@ -306,20 +313,7 @@ void TextOutput::load(const std::string &filename, ParticleCollector *collector)
 #endif
 	}
 
-	load(*in, collector);
-	infile.close();
-}
-
-void TextOutput::load(std::istream &in, ParticleCollector *collector){
-
-	std::string line;
-	
-	Output output;
-	double lengthScale = output.getLengthScale();
-	double timeScale = output.getTimeScale();
-	double energyScale = output.getEnergyScale();
-
-	while (std::getline(in, line)) {
+	while (std::getline(*in, line)) {
 		std::stringstream stream(line);
 		if (stream.peek() == '#')
 			continue;
@@ -366,6 +360,7 @@ void TextOutput::load(std::istream &in, ParticleCollector *collector){
 
 		collector->process(c);
 	}
+	infile.close();
 }
 
 std::string TextOutput::getDescription() const {
