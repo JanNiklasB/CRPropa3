@@ -1,12 +1,12 @@
 #ifndef CRPROPA_MAGNETICFIELD_H
 #define CRPROPA_MAGNETICFIELD_H
 
-#include "crpropa/Units.h"
-#include "crpropa/Vector3.h"
-#include "crpropa/Referenced.h"
+#include <crpropa/Units.h>
+#include <crpropa/Vector3.h>
+#include <crpropa/Referenced.h>
 
 #ifdef CRPROPA_HAVE_MUPARSER
-#include "muParser.h"
+#include <muParser.h>
 #endif
 
 namespace crpropa {

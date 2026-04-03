@@ -4,7 +4,7 @@
 #define CRPROPA_HDF5OUTPUT_H
 
 
-#include "crpropa/module/Output.h"
+#include <crpropa/module/Output.h>
 #include <stdint.h>
 #include <ctime>
 
