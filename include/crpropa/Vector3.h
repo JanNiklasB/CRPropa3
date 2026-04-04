@@ -420,7 +420,7 @@ public:
 	
 	const std::string getDescription() {
 		char buffer[256];
-		sprintf(buffer, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
+		snprintf(buffer, 256, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
 		return buffer;
 	}
 
