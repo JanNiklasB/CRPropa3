@@ -27,6 +27,7 @@
 #include <crpropa/magneticLens/Pixelization.h>
 #include <crpropa/Units.h>
 #include <crpropa/Vector3.h>
+#include <crpropa/Referenced.h>
 
 #include <vector>
 #include <string>
@@ -155,7 +156,7 @@ class MagneticLens
 
 	// Stores the individual lenses
 	std::vector<LensPart*> _lensParts;
-	Pixelization* _pixelization;
+	ref_ptr<Pixelization> _pixelization;
 	// Checks Matrix, raises Errors if not ok - also generate
 	// _pixelization if called first time
 	void _checkMatrix(const ModelMatrixType &M);
@@ -176,7 +177,7 @@ public:
 	MagneticLens(uint8_t healpixorder) :
 			_pixelization(NULL), _minimumRigidity(DBL_MAX), _maximumRigidity(DBL_MIN)
 	{
-		_pixelization = new Pixelization(healpixorder);
+		_pixelization = std::shared_ptr<Pixelation>(new Pixelization(healpixorder));
 	}
 
 	/// Construct lens and load lens from file

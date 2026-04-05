@@ -133,8 +133,7 @@ public:
 	 The secondaries Candidate::created and Candidate::current state are set to the _current_ state of its parent, except for the secondaries current energy and particle id.
 	 Trajectory length and redshift are copied from the parent.
 	 */
-	void addSecondary(Candidate *c);
-	inline void addSecondary(ref_ptr<Candidate> c) { addSecondary(c.get()); };
+	void addSecondary(ref_ptr<Candidate> c);
 	/**
 	 Add a new candidate to the list of secondaries.
 	 @param id			particle ID of the secondary

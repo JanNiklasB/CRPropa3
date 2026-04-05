@@ -20,7 +20,7 @@ void Source::add(SourceFeature* property) {
 }
 
 ref_ptr<Candidate> Source::getCandidate() const {
-	ref_ptr<Candidate> candidate = new Candidate();
+	ref_ptr<Candidate> candidate = std::shared_ptr<Candidate>(new Candidate());
 	for (int i = 0; i < features.size(); i++)
 		(*features[i]).prepareCandidate(*candidate);
 	return candidate;
