@@ -24,7 +24,7 @@ namespace crpropa {
  The Candidate is a passive object, that holds the information about the state
  of the cosmic ray and the simulation itself.
  */
-class Candidate: public Referenced {
+class Candidate {
 public:
 	ParticleState source; /**< Particle state at the source */
 	ParticleState created; /**< Particle state of parent particle at the time of creation */

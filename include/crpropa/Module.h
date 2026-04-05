@@ -15,7 +15,7 @@ class Candidate;
  @class Module
  @brief Abstract base class for modules
  */
-class Module: public Referenced {
+class Module {
 	std::string description;
 public:
 	Module();

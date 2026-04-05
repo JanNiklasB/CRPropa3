@@ -16,7 +16,7 @@ namespace crpropa {
 
 /// @class StepLengthModifier
 /// @brief Modifies the steplength of an acceleration module.
-class StepLengthModifier : public Referenced {
+class StepLengthModifier  {
   public:
 	/// Returns an update of the steplength
 	/// @param steplength 	Modifies step length, e.g., based on scattering 

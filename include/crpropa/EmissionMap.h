@@ -10,7 +10,7 @@ namespace crpropa {
  @class CylindricalProjectionMap
  @brief 2D histogram of spherical coordinates in equal-area projection
  */
-class CylindricalProjectionMap : public Referenced {
+class CylindricalProjectionMap  {
 private:
 	size_t nPhi, nTheta;
 	double sPhi, sTheta;
@@ -62,7 +62,7 @@ public:
 
  Use SourceEmissionMap to suppress directions at the source. Use EmissionMapFiller to create EmissionMap from Observer.
  */
-class EmissionMap : public Referenced {
+class EmissionMap  {
 public:
 	typedef std::pair<int, size_t> key_t;
 	typedef std::map<key_t, ref_ptr<CylindricalProjectionMap> > map_t;

@@ -2,11 +2,7 @@
 #define CRPROPA_REFERENCED_H
 
 #include <cstddef>
-
-#ifdef DEBUG
-#include <iostream>
-#include <typeinfo>
-#endif
+#include <memory>
 
 namespace crpropa {
 /**
@@ -15,128 +11,36 @@ namespace crpropa {
  */
 
 /**
- @class Referenced
- @brief Base class for reference counting
-
- A form of memory management is needed to prevent memory leaks when using MPC in Python via SWIG.
- This base class enables reference counting.
- Every reference increases the reference counter, every dereference decreases it.
- When the counter is decreased to 0, the object is deleted.
- Candidate, Module, MagneticField and Source inherit from this class
- */
-class Referenced {
-public:
-
-	inline Referenced() :
-			_referenceCount(0) {
-	}
-
-	inline Referenced(const Referenced&) :
-			_referenceCount(0) {
-	}
-
-	inline Referenced& operator =(const Referenced&) {
-		return *this;
-	}
-
-	inline size_t addReference() const {
-		int newRef;
-#if defined(OPENMP_3_1)
-		#pragma omp atomic capture
-		{newRef = _referenceCount++;}
-#elif defined(__GNUC__)
-		newRef = __sync_add_and_fetch(&_referenceCount, 1);
-#else
-		#pragma omp critical(newRef)
-		{newRef = _referenceCount++;}
-#endif
-		return newRef;
-	}
-
-	inline size_t removeReference() const {
-#ifdef DEBUG
-		if (_referenceCount == 0)
-			std::cerr
-					<< "WARNING: Remove reference from Object with NO references: "
-					<< typeid(*this).name() << std::endl;
-#endif
-		int newRef;
-#if defined(OPENMP_3_1)
-		#pragma omp atomic capture
-		{newRef = _referenceCount--;}
-#elif defined(__GNUC__)
-		newRef = __sync_sub_and_fetch(&_referenceCount, 1);
-#else
-		#pragma omp critical(newRef)
-		{newRef = _referenceCount--;}
-#endif
-
-		if (newRef == 0) {
-			delete this;
-		}
-		return newRef;
-	}
-
-	int removeReferenceNoDelete() const {
-		return --_referenceCount;
-	}
-
-	inline size_t getReferenceCount() const {
-		return _referenceCount;
-	}
-
-protected:
-
-	virtual inline ~Referenced() {
-#ifdef DEBUG
-		if (_referenceCount)
-			std::cerr << "WARNING: Deleting Object with references: "
-					<< typeid(*this).name() << std::endl;
-#endif
-	}
-
-	mutable size_t _referenceCount;
-};
-
-inline void intrusive_ptr_add_ref(Referenced* p) {
-	p->addReference();
-}
-inline void intrusive_ptr_release(Referenced* p) {
-	p->removeReference();
-}
-
-/**
  @class ref_ptr
- @brief Referenced pointer
- */
+@brief Referenced pointer
+*/
 template<class T>
 class ref_ptr {
-public:
+	public:
 	typedef T element_type;
 
-	ref_ptr() :
-			_ptr(0) {
+	ref_ptr(){}
+	ref_ptr(T* ptr) : _ptr(ptr) {}
+	ref_ptr(const ref_ptr& rp) {
+		if(rp._is_shared)
+			_shared_ptr = rp._shared_ptr;
+		else
+			_ptr = rp._ptr;
 	}
-	ref_ptr(T* ptr) :
-			_ptr(ptr) {
-		if (_ptr)
-			_ptr->addReference();
+	template<class Other> ref_ptr(const ref_ptr<Other>& rp) {
+		if(rp._is_shared)
+			_shared_ptr = rp._shared_ptr;
+		else
+			_ptr = rp._ptr;
 	}
-	ref_ptr(const ref_ptr& rp) :
-			_ptr(rp._ptr) {
-		if (_ptr)
-			_ptr->addReference();
-	}
-	template<class Other> ref_ptr(const ref_ptr<Other>& rp) :
-			_ptr(rp._ptr) {
-		if (_ptr)
-			_ptr->addReference();
+	template<class Other> ref_ptr(const std::shared_ptr<Other>& rp) {
+		_shared_ptr = rp._shared_ptr;
+		_is_shared = true;
 	}
 
 	~ref_ptr() {
-		if (_ptr)
-			_ptr->removeReference();
 		_ptr = 0;
+		_shared_ptr = 0;
 	}
 
 	ref_ptr& operator =(const ref_ptr& rp) {
@@ -149,69 +53,103 @@ public:
 		return *this;
 	}
 
+
+	inline ref_ptr& operator =(long int ptr) {
+		_shared_ptr = ptr;
+		_ptr = ptr;
+		return *this;
+	}
+	/**
+	 * User need to check if newly assigned pointer is valid.
+	 * In case of a std::shared_ptr this function would do nothing
+	 */
 	inline ref_ptr& operator =(T* ptr) {
 		if (_ptr == ptr)
 			return *this;
-		T* tmp_ptr = _ptr;
 		_ptr = ptr;
-		if (_ptr)
-			_ptr->addReference();
-		if (tmp_ptr)
-			tmp_ptr->removeReference();
+		return *this;
+	}
+	/**
+	 * User need to check if newly assigned pointer is valid.
+	 * In case of a normal pointer this function would do nothing
+	 */
+	inline ref_ptr& operator =(std::shared_ptr<T> shared_ptr) {
+		if (_shared_ptr == shared_ptr)
+			return *this;
+		_shared_ptr = shared_ptr;
 		return *this;
 	}
 
 	operator T*() const {
-		return _ptr;
+		return get();
 	}
 
 	T& operator*() const {
-		return *_ptr;
+		if (_is_shared)
+			return *_shared_ptr;
+		else
+			return *_ptr;
 	}
 	T* operator->() const {
-		return _ptr;
+		if (_is_shared)
+			return _shared_ptr.get();
+		else
+			return _ptr;
 	}
 	T* get() const {
-		return _ptr;
+		if (_is_shared)
+			return _shared_ptr.get();
+		else
+			return _ptr;
 	}
 
-	bool operator!() const {
-		return _ptr == 0;
-	} // not required
+	/** Returns stored shared_ptr
+	 * In case of a stored normal pointer this only return NULL;
+	 * User need to check if returned pointer is valid
+	 */
+	std::shared_ptr<T> get_shared() const {
+		return _shared_ptr;
+	}
+
 	bool valid() const {
-		return _ptr != 0;
+		if (_is_shared)
+			return _shared_ptr != 0;
+		else
+			return _ptr != 0;
 	}
 
-	T* release() {
-		T* tmp = _ptr;
-		if (_ptr)
-			_ptr->removeReferenceNoDelete();
-		_ptr = 0;
-		return tmp;
+	/** swaps two reference pointer
+	 * Returns zero if unsuccessfull
+	 */
+	int swap(ref_ptr& rp) {
+		if(rp._is_shared!=_is_shared)
+			return 0;
+		if(_is_shared){
+			_shared_ptr.swap(rp._shared_ptr);
+		} else {
+			T* tmp = _ptr;
+			_ptr = rp._ptr;
+			rp._ptr = tmp;
+		}
+		return 1;
 	}
 
-	void swap(ref_ptr& rp) {
-		T* tmp = _ptr;
-		_ptr = rp._ptr;
-		rp._ptr = tmp;
+	bool is_shared() const{
+		return _is_shared;
 	}
 
-private:
+	private:
 
 	template<class Other> void assign(const ref_ptr<Other>& rp) {
-		if (_ptr == rp._ptr)
-			return;
-		T* tmp_ptr = _ptr;
+		_shared_ptr = rp._shared_ptr;
 		_ptr = rp._ptr;
-		if (_ptr)
-			_ptr->addReference();
-		if (tmp_ptr)
-			tmp_ptr->removeReference();
 	}
 
 	template<class Other> friend class ref_ptr;
 
-	T* _ptr;
+	T* _ptr = 0;
+	std::shared_ptr<T> _shared_ptr = 0;
+	bool _is_shared=false;
 };
 
 template<class T> inline
@@ -219,22 +157,27 @@ void swap(ref_ptr<T>& rp1, ref_ptr<T>& rp2) {
 	rp1.swap(rp2);
 }
 
-template<class T> inline T* get_pointer(const ref_ptr<T>& rp) {
-	return rp.get();
+template<class T, class Y> 
+inline ref_ptr<T> static_pointer_cast(const ref_ptr<Y>& rp) {
+	if (rp.is_shared())
+		return std::static_pointer_cast<T>(rp.get_shared());
+	else
+		return static_cast<T*>(rp.get());
 }
 
-template<class T, class Y> inline ref_ptr<T> static_pointer_cast(
-		const ref_ptr<Y>& rp) {
-	return static_cast<T*>(rp.get());
-}
-
-template<class T, class Y> inline ref_ptr<T> dynamic_pointer_cast(
-		const ref_ptr<Y>& rp) {
+template<class T, class Y> 
+inline ref_ptr<T> dynamic_pointer_cast(const ref_ptr<Y>& rp) {
+	if (rp.is_shared())
+		return std::dynamic_pointer_cast<T>(rp.get_shared());
+	else
 	return dynamic_cast<T*>(rp.get());
 }
 
-template<class T, class Y> inline ref_ptr<T> const_pointer_cast(
-		const ref_ptr<Y>& rp) {
+template<class T, class Y> 
+inline ref_ptr<T> const_pointer_cast(const ref_ptr<Y>& rp) {
+	if (rp.is_shared())
+		return std::const_pointer_cast<T>(rp);
+	else
 	return const_cast<T*>(rp.get());
 }
 

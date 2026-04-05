@@ -17,7 +17,7 @@ namespace crpropa {
  @class PhotonField
  @brief Abstract base class for photon fields.
  */
-class PhotonField: public Referenced {
+class PhotonField {
 public:
 	PhotonField() {
 		this->fieldName = "AbstractPhotonField";

@@ -19,7 +19,7 @@ namespace crpropa {
  @class MagneticField
  @brief Abstract base class for magnetic fields.
  */
-class MagneticField: public Referenced {
+class MagneticField {
 public:
 	virtual ~MagneticField() {
 	}

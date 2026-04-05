@@ -27,7 +27,7 @@ enum DetectionState {
  @class ObserverFeature
  @brief Abstract base class for features of observers
  */
-class ObserverFeature: public Referenced {
+class ObserverFeature {
 protected:
 	std::string description;
 public:
