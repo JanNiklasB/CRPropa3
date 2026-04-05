@@ -160,7 +160,7 @@ TEST(HDF5Output, failOnIllegalOutputFile) {
 
 //-- ParticleCollector
 TEST(ParticleCollector, size) {
-	ref_ptr<Candidate> c = new Candidate();
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate());
 	ParticleCollector output;
 
 	for (int it = 0; it < 5; ++it, output.process(c))
@@ -170,7 +170,7 @@ TEST(ParticleCollector, size) {
 }
 
 TEST(ParticleCollector, fetchItem) {
-	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1 * EeV);
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1 * EeV));
 	ParticleCollector output;
 
 	output.process(c);
@@ -179,7 +179,7 @@ TEST(ParticleCollector, fetchItem) {
 }
 
 TEST(ParticleCollector, reprocess) {
-	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1 * EeV);
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1 * EeV));
 	ParticleCollector collector;
 	ParticleCollector output;
 
@@ -190,7 +190,7 @@ TEST(ParticleCollector, reprocess) {
 }
 
 TEST(ParticleCollector, dumpload) {
-	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1.234 * EeV);
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1.234 * EeV));
 	c->current.setPosition(Vector3d(1, 2, 3));
 	c->current.setDirection(Vector3d(-1, -1, -1));
 	c->setTrajectoryLength(1 * Mpc);
@@ -224,17 +224,17 @@ TEST(ParticleCollector, getTrajectory) {
 	ParticleState p;
 	p.setPosition(Vector3d(10, 0, 0));
 	p.setDirection(Vector3d(-1, 0, 0));
-	ref_ptr<Candidate> c = new Candidate(p);
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(p));
 
-	ref_ptr<ParticleCollector> output = new ParticleCollector();
-	ref_ptr<ParticleCollector> trajectory = new ParticleCollector();
+	ref_ptr<ParticleCollector> output = std::shared_ptr<ParticleCollector>(new ParticleCollector());
+	ref_ptr<ParticleCollector> trajectory = std::shared_ptr<ParticleCollector>(new ParticleCollector());
 	trajectory->setClone(true);
 
-	ref_ptr<ModuleList> sim = new ModuleList();
-	sim->add(new SimplePropagation(1, 1));
+	ref_ptr<ModuleList> sim = std::shared_ptr<ModuleList>(new ModuleList());
+	sim->add(std::shared_ptr<SimplePropagation>(new SimplePropagation(1, 1)));
 
-	ref_ptr<Observer> obs = new Observer();
-	obs->add(new Observer1D());
+	ref_ptr<Observer> obs = std::shared_ptr<Observer>(new Observer());
+	obs->add(std::shared_ptr<Observer1D>(new Observer1D()));
 	obs->onDetection(output);
 	sim->add(obs);
 
@@ -257,15 +257,15 @@ TEST(ParticleCollector, getTrajectory) {
 
 TEST(ParticleCollector, runModuleList) {
 	ModuleList modules;
-	modules.add(new SimplePropagation());
-	modules.add(new MaximumTrajectoryLength(1 * Mpc));
+	modules.add(std::shared_ptr<SimplePropagation>(new SimplePropagation()));
+	modules.add(std::shared_ptr<MaximumTrajectoryLength>(new MaximumTrajectoryLength(1 * Mpc)));
 
 	ParticleState p;
 	p.setPosition(Vector3d(10, 0, 0));
 	p.setDirection(Vector3d(-1, 0, 0));
-	ref_ptr<Candidate> c = new Candidate(p);
+	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(p));
 
-	ref_ptr<ParticleCollector> collector = new ParticleCollector();
+	ref_ptr<ParticleCollector> collector = std::shared_ptr<ParticleCollector>(new ParticleCollector());
 
 	collector->process(c);
 

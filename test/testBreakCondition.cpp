@@ -140,27 +140,33 @@ TEST(MinimumRedshift, test) {
 }
 
 TEST(DetectionLength, test) {
-        DetectionLength detL(10);
+		DetectionLength detL(10);
 	detL.setMakeRejectedInactive(false);
-        Candidate c;
-        c.current.setPosition(Vector3d(5,0,0));
+		Candidate c;
+		c.current.setPosition(Vector3d(5,0,0));
 
-        c.setTrajectoryLength(2);
-        detL.process(&c);
-        EXPECT_TRUE(c.isActive());
+		c.setTrajectoryLength(2);
+		detL.process(&c);
+		EXPECT_TRUE(c.isActive());
 	
-        c.setCurrentStep(10);
+		c.setCurrentStep(10);
 	c.setTrajectoryLength(12);
-        detL.process(&c);
-        EXPECT_TRUE(c.isActive());
-        EXPECT_TRUE(c.hasProperty("Rejected"));
+		detL.process(&c);
+		EXPECT_TRUE(c.isActive());
+		EXPECT_TRUE(c.hasProperty("Rejected"));
 }
 
 //** ============================= Observers ================================ */
 TEST(ObserverFeature, SmallSphere) {
 	// detect if the current position is inside and the previous outside of the sphere
 	Observer obs;
-	obs.add(new ObserverSurface(new Sphere (Vector3d(0, 0, 0), 1)));
+	obs.add(
+		std::shared_ptr<ObserverSurface>(
+			new ObserverSurface(
+				std::shared_ptr<Surface>( new Sphere (Vector3d(0, 0, 0), 1))
+			)
+		)
+	);
 	Candidate c;
 	c.setNextStep(10);
 
@@ -183,7 +189,13 @@ TEST(ObserverFeature, SmallSphere) {
 TEST(ObserverFeature, LargeSphere) {
 	// detect if the current position is outside and the previous inside of the sphere
 	Observer obs;
-	obs.add(new ObserverSurface(new Sphere (Vector3d(0, 0, 0), 10)));
+	obs.add(
+		std::shared_ptr<ObserverSurface>(
+			new ObserverSurface(
+				std::shared_ptr<Surface>(new Sphere (Vector3d(0, 0, 0), 10))
+			)
+		)
+	);
 	Candidate c;
 	c.setNextStep(10);
 
@@ -205,7 +217,11 @@ TEST(ObserverFeature, LargeSphere) {
 
 TEST(ObserverFeature, Point) {
 	Observer obs;
-	obs.add(new Observer1D());
+	obs.add(
+		std::shared_ptr<ObserverFeature>(
+			new Observer1D()
+		)
+	);
 	Candidate c;
 	c.setNextStep(10);
 
@@ -226,150 +242,160 @@ TEST(ObserverFeature, Point) {
 TEST(ObserverFeature, DetectAll) {
 	// DetectAll should detect all candidates
 	Observer obs;
-	obs.add(new ObserverDetectAll());
+	obs.add(std::shared_ptr<ObserverFeature>(
+			new ObserverDetectAll()
+		)
+	);
 	Candidate c;
 	obs.process(&c);
 	EXPECT_FALSE(c.isActive());
 }
 
 TEST(ObserverFeature, TimeEvolution) {
-  Observer obs;
-  obs.setDeactivateOnDetection(false);
-  obs.setFlag("Detected", "Detected");
-  //min = 5, max = min + (numb-1)*dist = 5 + 1*5 = 10, detection can happen at [5, 10]
-  obs.add(new ObserverTimeEvolution(5, 5, 2));
-  Candidate c;
-  c.setNextStep(10);
-  c.setTrajectoryLength(3);
-  
-  // Simulate simple detections to guarantee ObserverTimeEvolution.checkDetection is working:
-  // no detection, limit next step
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
+	Observer obs;
+	obs.setDeactivateOnDetection(false);
+	obs.setFlag("Detected", "Detected");
+	//min = 5, max = min + (numb-1)*dist = 5 + 1*5 = 10, detection can happen at [5, 10]
+	obs.add(
+			std::shared_ptr<ObserverFeature>(
+				new ObserverTimeEvolution(5, 5, 2)
+			)
+		);
+	Candidate c;
+	c.setNextStep(10);
+	c.setTrajectoryLength(3);
 
-  // limit step
-  EXPECT_DOUBLE_EQ(2, c.getNextStep());
-  
-  // detection one
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(5);
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
-  EXPECT_TRUE(c.hasProperty("Detected"));
+	// Simulate simple detections to guarantee ObserverTimeEvolution.checkDetection is working:
+	// no detection, limit next step
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
 
-  // no detection expected
-  obs.setDeactivateOnDetection(true); // set this to true, so it deactivates if a detection happens (not expected)
-  c.setTrajectoryLength(8);
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
+	// limit step
+	EXPECT_DOUBLE_EQ(2, c.getNextStep());
 
-  // detection two
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(10.05);
-  obs.process(&c);
-  EXPECT_FALSE(c.isActive());
-  EXPECT_TRUE(c.hasProperty("Detected"));
+	// detection one
+	c.setCurrentStep(0.1);
+	c.setTrajectoryLength(5);
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
+	EXPECT_TRUE(c.hasProperty("Detected"));
+
+	// no detection expected
+	obs.setDeactivateOnDetection(true); // set this to true, so it deactivates if a detection happens (not expected)
+	c.setTrajectoryLength(8);
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
+
+	// detection two
+	c.setCurrentStep(0.1);
+	c.setTrajectoryLength(10.05);
+	obs.process(&c);
+	EXPECT_FALSE(c.isActive());
+	EXPECT_TRUE(c.hasProperty("Detected"));
 }
 
 TEST(ObserverFeature, TimeEvolutionLog) {
-  Observer obs;
-  obs.setDeactivateOnDetection(false);
-  obs.setFlag("Detected", "Detected");
-  // usage of a log scaling for the observer
-  bool log = true;
-  obs.add(new ObserverTimeEvolution(10, 1000, 3, log));
-  Candidate c;
-  // choose a stepsize that is larger then distance to next detection at 10 to check step limitation
-  c.setNextStep(10);
-  // set length before next detection
-  c.setTrajectoryLength(3);
+	Observer obs;
+	obs.setDeactivateOnDetection(false);
+	obs.setFlag("Detected", "Detected");
+	// usage of a log scaling for the observer
+	bool log = true;
+	obs.add(std::shared_ptr<ObserverFeature>(
+			new ObserverTimeEvolution(10, 1000, 3, log)
+		)
+	);
+	Candidate c;
+	// choose a stepsize that is larger then distance to next detection at 10 to check step limitation
+	c.setNextStep(10);
+	// set length before next detection
+	c.setTrajectoryLength(3);
 
-  // Simulate simple detections to guarantee ObserverTimeEvolution.checkDetection is working:
-  // no detection, limit next step
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
+	// Simulate simple detections to guarantee ObserverTimeEvolution.checkDetection is working:
+	// no detection, limit next step
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
 
-  // limit step (should be 10-3=7)
-  EXPECT_DOUBLE_EQ(7, c.getNextStep());
+	// limit step (should be 10-3=7)
+	EXPECT_DOUBLE_EQ(7, c.getNextStep());
 
-  // detection one
-  c.setCurrentStep(0.1);  // set small to be barely over first detection length
-  c.setTrajectoryLength(10);  // set to first detection length
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
-  EXPECT_TRUE(c.hasProperty("Detected"));
+	// detection one
+	c.setCurrentStep(0.1);  // set small to be barely over first detection length
+	c.setTrajectoryLength(10);  // set to first detection length
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
+	EXPECT_TRUE(c.hasProperty("Detected"));
 
-  // no detection expected
-  obs.setDeactivateOnDetection(true); // set this to true, so it deactivates if a detection happens (not expected)
-  c.setTrajectoryLength(80);  // set to something between 10 and 100 (first and second detection)
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
-  obs.setDeactivateOnDetection(false); // reset to false again for future detection
+	// no detection expected
+	obs.setDeactivateOnDetection(true); // set this to true, so it deactivates if a detection happens (not expected)
+	c.setTrajectoryLength(80);  // set to something between 10 and 100 (first and second detection)
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
+	obs.setDeactivateOnDetection(false); // reset to false again for future detection
 
-  // detection two
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(100);
-  obs.process(&c);
-  EXPECT_TRUE(c.isActive());
-  EXPECT_TRUE(c.hasProperty("Detected"));
+	// detection two
+	c.setCurrentStep(0.1);
+	c.setTrajectoryLength(100);
+	obs.process(&c);
+	EXPECT_TRUE(c.isActive());
+	EXPECT_TRUE(c.hasProperty("Detected"));
 
-  // detection two
-  obs.setDeactivateOnDetection(true);  // deactivate here since it is the last detection
-  c.setCurrentStep(0.1);
-  c.setTrajectoryLength(1000.05);
-  obs.process(&c);
-  EXPECT_FALSE(c.isActive());  // not active anymore
-  EXPECT_TRUE(c.hasProperty("Detected"));
+	// detection two
+	obs.setDeactivateOnDetection(true);  // deactivate here since it is the last detection
+	c.setCurrentStep(0.1);
+	c.setTrajectoryLength(1000.05);
+	obs.process(&c);
+	EXPECT_FALSE(c.isActive());  // not active anymore
+	EXPECT_TRUE(c.hasProperty("Detected"));
 }
 
 TEST(ObserverFeature, TimeEvolutionArray) {
-  // here it should be tested if the observer can be constructed with an array
-  std::vector<double> times = {1, 2, 3}; 
-  ObserverTimeEvolution obs(times);
-  EXPECT_FALSE(obs.empty());
-  EXPECT_TRUE(times == obs.getTimes());  // element wise comparison
+	// here it should be tested if the observer can be constructed with an array
+	std::vector<double> times = {1, 2, 3}; 
+	ObserverTimeEvolution obs(times);
+	EXPECT_FALSE(obs.empty());
+	EXPECT_TRUE(times == obs.getTimes());  // element wise comparison
 
-  times.push_back(4);
-  obs.addTime(4);
-  EXPECT_FALSE(obs.empty());
-  EXPECT_TRUE(times == obs.getTimes());
+	times.push_back(4);
+	obs.addTime(4);
+	EXPECT_FALSE(obs.empty());
+	EXPECT_TRUE(times == obs.getTimes());
 
-  // test clear:
-  obs.clear();
-  EXPECT_TRUE(obs.empty());
+	// test clear:
+	obs.clear();
+	EXPECT_TRUE(obs.empty());
 
-  // test addTimeRange for linear ranges
-  times = {5, 6, 7, 8, 9, 10};
-  obs.clear();  // empty detList
-  EXPECT_TRUE(obs.empty());
-  obs.addTimeRange(5, 10, 6, false);
-  EXPECT_FALSE(obs.empty());
-  EXPECT_TRUE(times == obs.getTimes());
+	// test addTimeRange for linear ranges
+	times = {5, 6, 7, 8, 9, 10};
+	obs.clear();  // empty detList
+	EXPECT_TRUE(obs.empty());
+	obs.addTimeRange(5, 10, 6, false);
+	EXPECT_FALSE(obs.empty());
+	EXPECT_TRUE(times == obs.getTimes());
 
-  // test addTimeRange for logarithmic ranges
-  times = {1, 10, 100, 1000};
-  obs.clear();  // empty detList
-  EXPECT_TRUE(obs.empty());
-  obs.addTimeRange(1, 1000, 4, true);
-  EXPECT_FALSE(obs.empty());
-  // should be equal to above times array, but isnt, even though the values are the same
-  for (int i=0; i<times.size(); i++)
-    EXPECT_NEAR(times[i], obs.getTimes()[i], 0.01);
+	// test addTimeRange for logarithmic ranges
+	times = {1, 10, 100, 1000};
+	obs.clear();  // empty detList
+	EXPECT_TRUE(obs.empty());
+	obs.addTimeRange(1, 1000, 4, true);
+	EXPECT_FALSE(obs.empty());
+	// should be equal to above times array, but isnt, even though the values are the same
+	for (int i=0; i<times.size(); i++)
+		EXPECT_NEAR(times[i], obs.getTimes()[i], 0.01);
 
-  // now check if constructDetListIfEmpty is working properly:
-  ObserverTimeEvolution obs2(5, 10, 6, false);
-  times = {5, 6, 7, 8, 9, 10};
-  
-  // check if no array is created while calling getTimes
-  EXPECT_TRUE(obs2.empty());
-  EXPECT_TRUE(times == obs2.getTimes());
-  EXPECT_TRUE(obs2.empty());
+	// now check if constructDetListIfEmpty is working properly:
+	ObserverTimeEvolution obs2(5, 10, 6, false);
+	times = {5, 6, 7, 8, 9, 10};
 
-  // check if array is created when calling addTime without array
-  times.push_back(11);
-  obs2.addTime(11);
-  EXPECT_FALSE(obs2.empty());
-  EXPECT_TRUE(times == obs2.getTimes());
+	// check if no array is created while calling getTimes
+	EXPECT_TRUE(obs2.empty());
+	EXPECT_TRUE(times == obs2.getTimes());
+	EXPECT_TRUE(obs2.empty());
+
+	// check if array is created when calling addTime without array
+	times.push_back(11);
+	obs2.addTime(11);
+	EXPECT_FALSE(obs2.empty());
+	EXPECT_TRUE(times == obs2.getTimes());
 }
 
 //** ========================= Boundaries =================================== */
@@ -588,7 +614,7 @@ TEST(EllipsoidalBoundary, limitStep) {
 }
 
 TEST(CylindricalBoundary, inside) {
-        CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
+		CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
 	Candidate c;
 	c.current.setPosition(Vector3d(6, -3, 0.5));
 	cylinder.process(&c);
@@ -597,7 +623,7 @@ TEST(CylindricalBoundary, inside) {
 }
 
 TEST(CylindricalBoundary, outside) {
-        CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
+		CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
 	Candidate c;
 	c.current.setPosition(Vector3d(6, -3, 1.5));
 	cylinder.process(&c);
@@ -606,7 +632,7 @@ TEST(CylindricalBoundary, outside) {
 }
 
 TEST(CylindricalBoundary, limitStep) {
-        CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
+		CylindricalBoundary cylinder(Vector3d(0, 0, 0), 2, 15);
 	cylinder.setLimitStep(true);
 	cylinder.setMargin(0.5);
 	Candidate c;
@@ -619,7 +645,10 @@ TEST(CylindricalBoundary, limitStep) {
 TEST(RestrictToRegion, RestrictToRegion) {
 
 	ref_ptr<Observer> obs = new Observer();
-	obs->add(new ObserverDetectAll());
+	obs->add(std::shared_ptr<ObserverFeature>(
+			new ObserverDetectAll()
+		)
+	);
 	RestrictToRegion R(obs, new Sphere(Vector3d(0, 0, 0), 10));
 
 	Candidate c;

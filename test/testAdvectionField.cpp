@@ -22,9 +22,18 @@ TEST(testUniformAdvectionField, SimpleTest) {
 TEST(testAdvectionFieldList, SimpleTest) {
 	// Test a list of three advection fields
 	AdvectionFieldList A;
-	A.addField(new UniformAdvectionField(Vector3d(1, 0, 0)));
-	A.addField(new UniformAdvectionField(Vector3d(0, 2, 0)));
-	A.addField(new UniformAdvectionField(Vector3d(0, 0, 3)));
+	A.addField(std::shared_ptr<UniformAdvectionField>( 
+			new UniformAdvectionField(Vector3d(1, 0, 0))
+		)
+	);
+	A.addField(std::shared_ptr<UniformAdvectionField>( 
+			new UniformAdvectionField(Vector3d(0, 2, 0))
+		)
+	);
+	A.addField(std::shared_ptr<UniformAdvectionField>( 
+			new UniformAdvectionField(Vector3d(0, 0, 3))
+		)
+	);
 	Vector3d a = A.getField(Vector3d(0.));
 	double D = A.getDivergence(Vector3d(1, 2, 3));
 	EXPECT_DOUBLE_EQ(a.x, 1);

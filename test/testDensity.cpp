@@ -69,8 +69,8 @@ TEST(testConstantDensity, SimpleTest) {
 TEST(testDensityList, SimpleTest) {
 
 	DensityList MS;
-	MS.addDensity(new ConstantDensity(1,1,2));	//sum 4
-	MS.addDensity(new ConstantDensity(2,3,1));	//sum 6
+	MS.addDensity(std::shared_ptr<Density>( new ConstantDensity(1,1,2)));	//sum 4
+	MS.addDensity(std::shared_ptr<Density>( new ConstantDensity(2,3,1)));	//sum 6
 
 	Vector3d p(50*pc,10*pc,-30*pc);	//random position for testing density
 	EXPECT_DOUBLE_EQ(MS.getHIDensity(p),3);
@@ -240,7 +240,7 @@ TEST(testFerriere, checkValueAtCertainPoints) {
 }
 
 TEST(testGridDensity, SimpleTest) {
-	ref_ptr<Grid1f> grid = new Grid1f(Vector3d(0.), 1, 1, 1, 1.);	
+	ref_ptr<Grid1f> grid = std::shared_ptr<Grid1f>( new Grid1f(Vector3d(0.), 1, 1, 1, 1.));	
 	DensityGrid dens = DensityGrid(grid, true, false, false);
 
 	// check active types
@@ -266,7 +266,7 @@ TEST(testGridDensity, testRetrunValue) {
 	double spacing = 2.0;
 	Vector3d origin(1., 2., 3.);
 
-	ref_ptr<Grid1f> grid = new Grid1f(origin, Nx, Ny, Nz, spacing);
+	ref_ptr<Grid1f> grid = std::shared_ptr<Grid1f>( new Grid1f(origin, Nx, Ny, Nz, spacing));
 
 	// set some values for the grid
 	grid->get(3, 2, 4) = 5;

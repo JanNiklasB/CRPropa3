@@ -37,7 +37,7 @@ TEST(testMagneticDipoleField, SimpleTest) {
 
 #ifdef CRPROPA_HAVE_MUPARSER
 TEST(testRenormalizeMagneticField, simpleTest) {
-	ref_ptr<UniformMagneticField> field = new UniformMagneticField(Vector3d(2*nG, 0, 0));
+	ref_ptr<UniformMagneticField> field = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(2*nG, 0, 0)));
 	RenormalizeMagneticField modField(field, "B^2-1*nG");
 	Vector3d b = modField.getField(Vector3d(5, 5, 5));
 	EXPECT_NEAR(b.getR(), 3*nG, 0.001);
@@ -47,9 +47,9 @@ TEST(testRenormalizeMagneticField, simpleTest) {
 TEST(testMagneticFieldList, SimpleTest) {
 	// Test a list of three magnetic fields
 	MagneticFieldList B;
-	B.addField(new UniformMagneticField(Vector3d(1, 0, 0)));
-	B.addField(new UniformMagneticField(Vector3d(0, 2, 0)));
-	B.addField(new UniformMagneticField(Vector3d(0, 0, 3)));
+	B.addField(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(1, 0, 0))));
+	B.addField(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 2, 0))));
+	B.addField(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 3))));
 	Vector3d b = B.getField(Vector3d(0.));
 	EXPECT_DOUBLE_EQ(b.x, 1);
 	EXPECT_DOUBLE_EQ(b.y, 2);
@@ -58,7 +58,7 @@ TEST(testMagneticFieldList, SimpleTest) {
 
 TEST(testMagneticFieldEvolution, SimpleTest) {
 	// Test if this decorator scales the underlying field as (1+z)^m
-	ref_ptr<UniformMagneticField> B = new UniformMagneticField(Vector3d(1,0,0));
+	ref_ptr<UniformMagneticField> B = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(1,0,0)));
 	double z = 1.2;
 	double m = 3;
 	MagneticFieldEvolution Bz(B, m);
@@ -80,9 +80,10 @@ public:
 };
 
 TEST(testPeriodicMagneticField, Exceptions) {
-	ref_ptr<EchoMagneticField> f = new EchoMagneticField();
-	ref_ptr<PeriodicMagneticField> p = new PeriodicMagneticField(f,
-			Vector3d(10000, 10000, 10000), Vector3d(1000, 1000, 1000), true);
+	ref_ptr<EchoMagneticField> f = std::shared_ptr<EchoMagneticField>(new EchoMagneticField());
+	ref_ptr<PeriodicMagneticField> p = std::shared_ptr<PeriodicMagneticField>(
+		new PeriodicMagneticField(f, Vector3d(10000, 10000, 10000), Vector3d(1000, 1000, 1000), true)
+	);
 
 	// box 0, 0, 0
 	Vector3d v = p->getField(Vector3d(1000, 2000, 3000));
@@ -105,7 +106,7 @@ TEST(testPeriodicMagneticField, Exceptions) {
 }
 
 TEST(testCMZMagneticField, SimpleTest) {
-	ref_ptr<CMZField> field = new CMZField();
+	ref_ptr<CMZField> field = std::shared_ptr<CMZField>(new CMZField());
 
 	// check use-Values
 	EXPECT_FALSE(field->getUseMCField());
@@ -125,7 +126,7 @@ TEST(testCMZMagneticField, SimpleTest) {
 }
 
 TEST(testCMZMagneticField, TestICComponent) {
-	ref_ptr<CMZField> field = new CMZField();
+	ref_ptr<CMZField> field = std::shared_ptr<CMZField>(new CMZField());
 	Vector3d pos(10*pc,15*pc,-5*pc);
 
 	// check IC field at given position
@@ -136,7 +137,7 @@ TEST(testCMZMagneticField, TestICComponent) {
 	EXPECT_NEAR(bVec.z, 10.486*muG, 1E-3*muG);
 }
 TEST(testCMZMagneticField, TestNTFField){
-	ref_ptr<CMZField> field = new CMZField();
+	ref_ptr<CMZField> field = std::shared_ptr<CMZField>(new CMZField());
 	Vector3d pos(10*pc,15*pc,-5*pc);
 
 	// check NFTField at given position
@@ -147,7 +148,7 @@ TEST(testCMZMagneticField, TestNTFField){
 	EXPECT_NEAR(bVec.z, 1.057*muG, 1e-3*muG);
 }
 TEST(testCMZMagneticField, TestRaidoArcField){
-	ref_ptr<CMZField> field = new CMZField();
+	ref_ptr<CMZField> field = std::shared_ptr<CMZField>(new CMZField());
 	Vector3d pos(10*pc,15*pc,-5*pc);
 
 	// check RadioArcField at given position
@@ -159,7 +160,7 @@ TEST(testCMZMagneticField, TestRaidoArcField){
 }
 
 TEST(testCMZMagneticField, TestAzimutalComponent){
-	ref_ptr<CMZField> field = new CMZField();
+	ref_ptr<CMZField> field = std::shared_ptr<CMZField>(new CMZField());
 	Vector3d mid(12*pc, 9*pc, 20*pc);
 	Vector3d pos(9*pc, 10*pc, 25*pc);
 
@@ -183,7 +184,7 @@ TEST(testCMZMagneticField, TestAzimutalComponent){
 }
 
 TEST(testToroidalHaloField, SimpleTest) {
-	ref_ptr<ToroidalHaloField> field = new ToroidalHaloField();
+	ref_ptr<ToroidalHaloField> field = std::shared_ptr<ToroidalHaloField>(new ToroidalHaloField());
 	Vector3d b = field->getField(Vector3d(0.));
 	EXPECT_DOUBLE_EQ(b.x, 0);
 	EXPECT_DOUBLE_EQ(b.y, 0);
@@ -196,7 +197,7 @@ TEST(testToroidalHaloField, SimpleTest) {
 }
 
 TEST(testLogarithmicSpiralField, SimpleTest) {
-	ref_ptr<LogarithmicSpiralField> field = new LogarithmicSpiralField();
+	ref_ptr<LogarithmicSpiralField> field = std::shared_ptr<LogarithmicSpiralField>(new LogarithmicSpiralField());
 	Vector3d b = field->getField(Vector3d(8.5, 0, 0)*kpc);
 	EXPECT_NEAR(b.x, -1., 1E-2);
 	EXPECT_NEAR(b.y, 0, 1E-10);

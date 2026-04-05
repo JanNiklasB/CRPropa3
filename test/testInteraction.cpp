@@ -22,25 +22,25 @@ namespace crpropa {
 // ElectronPairProduction -----------------------------------------------------
 TEST(ElectronPairProduction, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElectronPairProduction epp(cmb);
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	epp.setPhotonField(irb);
-	irb = new IRB_Stecker05();
+	irb = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	epp.setPhotonField(irb);
-	irb = new IRB_Franceschini08();
+	irb = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	epp.setPhotonField(irb);
-	irb = new IRB_Finke10();
+	irb = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	epp.setPhotonField(irb);
-	irb = new IRB_Dominguez11();
+	irb = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	epp.setPhotonField(irb);
-	irb = new IRB_Gilmore12();
+	irb = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	epp.setPhotonField(irb);
-	irb = new IRB_Stecker16_upper();
+	irb = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	epp.setPhotonField(irb);
-	irb = new IRB_Stecker16_lower();
+	irb = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	epp.setPhotonField(irb);
-    irb = new IRB_Finke22();
+    irb = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	epp.setPhotonField(irb);
 }
 
@@ -50,7 +50,7 @@ TEST(ElectronPairProduction, energyDecreasing) {
 	c.setCurrentStep(2 * Mpc);
 	c.current.setId(nucleusId(1, 1)); // proton
 
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElectronPairProduction epp1(cmb);
 	for (int i = 0; i < 80; i++) {
 		double E = pow(10, 15 + i * 0.1) * eV;
@@ -59,7 +59,7 @@ TEST(ElectronPairProduction, energyDecreasing) {
 		EXPECT_LE(c.current.getEnergy(), E);
 	}
 
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	ElectronPairProduction epp2(irb);
 	for (int i = 0; i < 80; i++) {
 		double E = pow(10, 15 + i * 0.1) * eV;
@@ -71,7 +71,7 @@ TEST(ElectronPairProduction, energyDecreasing) {
 
 TEST(ElectronPairProduction, belowEnergyTreshold) {
 	// Test if nothing happens below 1e15 eV.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElectronPairProduction epp(cmb);
 	Candidate c(nucleusId(1, 1), 1E14 * eV);
 	epp.process(&c);
@@ -80,7 +80,7 @@ TEST(ElectronPairProduction, belowEnergyTreshold) {
 
 TEST(ElectronPairProduction, thisIsNotNucleonic) {
 	// Test if non-nuclei are skipped.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElectronPairProduction epp(cmb);
 	Candidate c(11, 1E20 * eV);  // electron
 	epp.process(&c);
@@ -108,7 +108,7 @@ TEST(ElectronPairProduction, valuesCMB) {
 	Candidate c;
 	c.setCurrentStep(1 * Mpc);
 	c.current.setId(nucleusId(1, 1)); // proton
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 
 	ElectronPairProduction epp(cmb);
 	for (int i = 0; i < x.size(); i++) {
@@ -122,7 +122,7 @@ TEST(ElectronPairProduction, valuesCMB) {
 
 TEST(ElectronPairProduction, interactionTag) {
 	
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElectronPairProduction epp(cmb);
 	
 	// test the default interaction tag
@@ -165,7 +165,7 @@ TEST(ElectronPairProduction, valuesIRB) {
 	Candidate c;
 	c.setCurrentStep(1 * Mpc);
 	c.current.setId(nucleusId(1, 1)); // proton
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 
 	ElectronPairProduction epp(irb);
 	for (int i = 0; i < x.size(); i++) {
@@ -324,36 +324,36 @@ TEST(NuclearDecay, interactionTag) {
 // PhotoDisintegration --------------------------------------------------------
 TEST(PhotoDisintegration, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd(cmb);
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	pd.setPhotonField(irb);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	pd.setPhotonField(urb);
-	irb = new IRB_Stecker05();
+	irb = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	pd.setPhotonField(irb);
-	irb = new IRB_Franceschini08();
+	irb = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	pd.setPhotonField(irb);
-	irb = new IRB_Finke10();
+	irb = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	pd.setPhotonField(irb);
-	irb = new IRB_Dominguez11();
+	irb = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	pd.setPhotonField(irb);
-	irb = new IRB_Gilmore12();
+	irb = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	pd.setPhotonField(irb);
-	irb = new IRB_Stecker16_upper();
+	irb = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	pd.setPhotonField(irb);
-	irb = new IRB_Stecker16_lower();
+	irb = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	pd.setPhotonField(irb);
-    irb = new IRB_Finke22();
+    irb = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	pd.setPhotonField(irb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	pd.setPhotonField(urb);
 }
 
 TEST(PhotoDisintegration, carbon) {
 	// Test if a 100 EeV C-12 nucleus photo-disintegrates (at least once) over a distance of 1 Gpc.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd(cmb);
 	Candidate c;
 	int id = nucleusId(12, 6);
@@ -389,7 +389,7 @@ TEST(PhotoDisintegration, carbon) {
 TEST(PhotoDisintegration, iron) {
 	// Test if a 200 EeV Fe-56 nucleus photo-disintegrates (at least once) over a distance of 1 Gpc.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	PhotoDisintegration pd(irb);
 	Candidate c;
 	int id = nucleusId(56, 26);
@@ -428,7 +428,7 @@ TEST(PhotoDisintegration, iron) {
 
 TEST(PhotoDisintegration, thisIsNotNucleonic) {
 	// Test that nothing happens to an electron.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd(cmb);
 	Candidate c;
 	c.setCurrentStep(1 * Mpc);
@@ -441,7 +441,7 @@ TEST(PhotoDisintegration, thisIsNotNucleonic) {
 
 TEST(PhotoDisintegration, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd(cmb);
 	Candidate c;
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -453,9 +453,9 @@ TEST(PhotoDisintegration, limitNextStep) {
 
 TEST(PhotoDisintegration, allIsotopes) {
 	// Test if all isotopes are handled.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd1(cmb);
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	PhotoDisintegration pd2(irb);
 	Candidate c;
 	c.setCurrentStep(10 * Mpc);
@@ -475,7 +475,7 @@ TEST(PhotoDisintegration, allIsotopes) {
 }
 
 TEST(Photodisintegration, updateParticleParentProperties) { // Issue: #204
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoDisintegration pd(cmb);
 
 	Candidate c(nucleusId(56,26), 500 * EeV, Vector3d(1 * Mpc, 0, 0));
@@ -490,7 +490,7 @@ TEST(Photodisintegration, updateParticleParentProperties) { // Issue: #204
 }
 
 TEST(PhotoDisintegration, interactionTag) {
-	PhotoDisintegration pd(new CMB());
+	PhotoDisintegration pd(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(pd.getInteractionTag() == "PD");
@@ -510,18 +510,18 @@ TEST(PhotoDisintegration, interactionTag) {
 // ElasticScattering ----------------------------------------------------------
 TEST(ElasticScattering, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElasticScattering scattering(cmb);
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	scattering.setPhotonField(irb);
-	ref_ptr<PhotonField> urb = new URB_Nitu21();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	scattering.setPhotonField(urb);
 }
 
 TEST(ElasticScattering, secondaries) {
 	// Test the creation of cosmic ray photons.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	ElasticScattering scattering(cmb);
 	Candidate c;
 	int id = nucleusId(12, 6);
@@ -544,36 +544,36 @@ TEST(ElasticScattering, secondaries) {
 // PhotoPionProduction --------------------------------------------------------
 TEST(PhotoPionProduction, allBackgrounds) {
 	// Test if all interaction data files can be loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb);
-	ref_ptr<PhotonField> irb = new IRB_Kneiske04();
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Stecker05();
+	irb = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Franceschini08();
+	irb = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Finke10();
+	irb = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Dominguez11();
+	irb = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Gilmore12();
+	irb = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Stecker16_upper();
+	irb = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	ppp.setPhotonField(irb);
-	irb = new IRB_Stecker16_lower();
+	irb = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	ppp.setPhotonField(irb);
-    irb = new IRB_Finke22();
+    irb = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	ppp.setPhotonField(irb);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	ppp.setPhotonField(urb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	ppp.setPhotonField(urb);
 }
 
 TEST(PhotoPionProduction, proton) {
 	// Test photopion interaction for 100 EeV proton.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb);
 	Candidate c(nucleusId(1, 1), 100 * EeV);
 	c.setCurrentStep(1000 * Mpc);
@@ -592,7 +592,7 @@ TEST(PhotoPionProduction, proton) {
 TEST(PhotoPionProduction, helium) {
 	// Test photo-pion interaction for 400 EeV He nucleus.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb);
 	Candidate c;
 	c.current.setId(nucleusId(4, 2));
@@ -607,7 +607,7 @@ TEST(PhotoPionProduction, helium) {
 
 TEST(PhotoPionProduction, thisIsNotNucleonic) {
 	// Test if nothing happens to an electron.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb);
 	Candidate c;
 	c.current.setId(11); // electron
@@ -620,7 +620,7 @@ TEST(PhotoPionProduction, thisIsNotNucleonic) {
 
 TEST(PhotoPionProduction, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb);
 	Candidate c(nucleusId(1, 1), 200 * EeV);
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -631,7 +631,7 @@ TEST(PhotoPionProduction, limitNextStep) {
 TEST(PhotoPionProduction, secondaries) {
 	// Test photo-pion interaction for 100 EeV proton.
 	// This test can stochastically fail.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	PhotoPionProduction ppp(cmb, true, true, true);
 	Candidate c(nucleusId(1, 1), 100 * EeV);
 	c.setCurrentStep(1000 * Mpc);
@@ -644,7 +644,7 @@ TEST(PhotoPionProduction, sampling) {
 	// Specific test of photon sampling of photo-pion production
 	// by testing the calculated pEpsMax for CMB(), also indirectly
 	// testing epsMinInteraction and logSampling (default).
-	ref_ptr<PhotonField> cmb = new CMB(); //create CMB instance
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>( new CMB()); //create CMB instance
 	double energy = 1.e10; //1e10 GeV
 	bool onProton = true; //proton
 	double z = 0; //no redshift
@@ -657,7 +657,7 @@ TEST(PhotoPionProduction, sampling) {
 }
 
 TEST(PhotoPionProduction, interactionTag) {
-	PhotoPionProduction ppp(new CMB());
+	PhotoPionProduction ppp(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(ppp.getInteractionTag() == "PPP");
@@ -704,37 +704,37 @@ TEST(Redshift, limitRedshiftDecrease) {
 // EMPairProduction -----------------------------------------------------------
 TEST(EMPairProduction, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMPairProduction em(cmb);
-	ref_ptr<PhotonField> ebl = new IRB_Kneiske04();
+	ref_ptr<PhotonField> ebl = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	em.setPhotonField(ebl);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	em.setPhotonField(urb);
-	ebl = new IRB_Stecker05();
+	ebl = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Franceschini08();
+	ebl = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke10();
+	ebl = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Dominguez11();
+	ebl = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Gilmore12();
+	ebl = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_upper();
+	ebl = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_lower();
+	ebl = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke22();
+	ebl = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	em.setPhotonField(ebl);
-	urb = new URB_Fixsen11();
+	urb = std::shared_ptr<URB_Fixsen11>(new URB_Fixsen11());
 	em.setPhotonField(urb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	em.setPhotonField(urb);
 }
 
 TEST(EMPairProduction, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMPairProduction m(cmb);
 	Candidate c(22, 1E17 * eV);
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -744,9 +744,9 @@ TEST(EMPairProduction, limitNextStep) {
 
 TEST(EMPairProduction, secondaries) {
 	// Test if secondaries are correctly produced.
-	ref_ptr<PhotonField> cmb = new CMB();
-	ref_ptr<PhotonField> irb = new IRB_Saldana21();
-	ref_ptr<PhotonField> urb = new URB_Nitu21();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Saldana21>(new IRB_Saldana21());
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	EMPairProduction m(cmb);
 	m.setHaveElectrons(true);
 	m.setThinning(0.);
@@ -790,7 +790,7 @@ TEST(EMPairProduction, secondaries) {
 }
 
 TEST(EMPairProduction, interactionTag) {
-	EMPairProduction m(new CMB());
+	EMPairProduction m(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(m.getInteractionTag() == "EMPP");
@@ -809,37 +809,37 @@ TEST(EMPairProduction, interactionTag) {
 // EMDoublePairProduction -----------------------------------------------------
 TEST(EMDoublePairProduction, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMDoublePairProduction em(cmb);
-	ref_ptr<PhotonField> ebl = new IRB_Kneiske04();
+	ref_ptr<PhotonField> ebl = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	em.setPhotonField(ebl);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	em.setPhotonField(urb);
-	ebl = new IRB_Stecker05();
+	ebl = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Franceschini08();
+	ebl = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke10();
+	ebl = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Dominguez11();
+	ebl = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Gilmore12();
+	ebl = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_upper();
+	ebl = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_lower();
+	ebl = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke22();
+	ebl = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	em.setPhotonField(ebl);
-	urb = new URB_Fixsen11();
+	urb = std::shared_ptr<URB_Fixsen11>(new URB_Fixsen11());
 	em.setPhotonField(urb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	em.setPhotonField(urb);
 }
 
 TEST(EMDoublePairProduction, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMDoublePairProduction m(cmb);
 	Candidate c(22, 1E17 * eV);
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -849,9 +849,9 @@ TEST(EMDoublePairProduction, limitNextStep) {
 
 TEST(EMDoublePairProduction, secondaries) {
 	// Test if secondaries are correctly produced.
-	ref_ptr<PhotonField> cmb = new CMB();
-	ref_ptr<PhotonField> irb = new IRB_Saldana21();
-	ref_ptr<PhotonField> urb = new URB_Nitu21();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Saldana21>(new IRB_Saldana21());
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	EMPairProduction m(cmb);
 	m.setHaveElectrons(true);
 	m.setThinning(0.);
@@ -896,7 +896,7 @@ TEST(EMDoublePairProduction, secondaries) {
 }
 
 TEST(EMDoublePairProduction, interactionTag) {
-	EMDoublePairProduction m(new CMB());
+	EMDoublePairProduction m(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(m.getInteractionTag() == "EMDP");
@@ -915,37 +915,37 @@ TEST(EMDoublePairProduction, interactionTag) {
 // EMTripletPairProduction ----------------------------------------------------
 TEST(EMTripletPairProduction, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMTripletPairProduction em(cmb);
-	ref_ptr<PhotonField> ebl = new IRB_Kneiske04();
+	ref_ptr<PhotonField> ebl = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	em.setPhotonField(ebl);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	em.setPhotonField(urb);
-	ebl = new IRB_Stecker05();
+	ebl = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Franceschini08();
+	ebl = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke10();
+	ebl = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Dominguez11();
+	ebl = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Gilmore12();
+	ebl = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_upper();
+	ebl = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_lower();
+	ebl = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke22();
+	ebl = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	em.setPhotonField(ebl);
-	urb = new URB_Fixsen11();
+	urb = std::shared_ptr<URB_Fixsen11>(new URB_Fixsen11());
 	em.setPhotonField(urb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	em.setPhotonField(urb);
 }
 
 TEST(EMTripletPairProduction, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMTripletPairProduction m(cmb);
 	Candidate c(11, 1E17 * eV);
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -955,9 +955,9 @@ TEST(EMTripletPairProduction, limitNextStep) {
 
 TEST(EMTripletPairProduction, secondaries) {
 	// Test if secondaries are correctly produced.
-	ref_ptr<PhotonField> cmb = new CMB();
-	ref_ptr<PhotonField> irb = new IRB_Saldana21();
-	ref_ptr<PhotonField> urb = new URB_Nitu21();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Saldana21>(new IRB_Saldana21());
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	EMPairProduction m(cmb);
 	m.setHaveElectrons(true);
 	m.setThinning(0.);
@@ -1003,7 +1003,7 @@ TEST(EMTripletPairProduction, secondaries) {
 }
 
 TEST(EMTripletPairProduction, interactionTag) {
-	EMTripletPairProduction m(new CMB());
+	EMTripletPairProduction m(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(m.getInteractionTag() == "EMTP");
@@ -1022,37 +1022,37 @@ TEST(EMTripletPairProduction, interactionTag) {
 // EMInverseComptonScattering -------------------------------------------------
 TEST(EMInverseComptonScattering, allBackgrounds) {
 	// Test if interaction data files are loaded.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMInverseComptonScattering em(cmb);
-	ref_ptr<PhotonField> ebl = new IRB_Kneiske04();
+	ref_ptr<PhotonField> ebl = std::shared_ptr<IRB_Kneiske04>(new IRB_Kneiske04());
 	em.setPhotonField(ebl);
-	ref_ptr<PhotonField> urb = new URB_Protheroe96();
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Protheroe96>(new URB_Protheroe96());
 	em.setPhotonField(urb);
-	ebl = new IRB_Stecker05();
+	ebl = std::shared_ptr<IRB_Stecker05>(new IRB_Stecker05());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Franceschini08();
+	ebl = std::shared_ptr<IRB_Franceschini08>(new IRB_Franceschini08());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke10();
+	ebl = std::shared_ptr<IRB_Finke10>(new IRB_Finke10());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Dominguez11();
+	ebl = std::shared_ptr<IRB_Dominguez11>(new IRB_Dominguez11());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Gilmore12();
+	ebl = std::shared_ptr<IRB_Gilmore12>(new IRB_Gilmore12());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_upper();
+	ebl = std::shared_ptr<IRB_Stecker16_upper>(new IRB_Stecker16_upper());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Stecker16_lower();
+	ebl = std::shared_ptr<IRB_Stecker16_lower>(new IRB_Stecker16_lower());
 	em.setPhotonField(ebl);
-	ebl = new IRB_Finke22();
+	ebl = std::shared_ptr<IRB_Finke22>(new IRB_Finke22());
 	em.setPhotonField(ebl);
-	urb = new URB_Fixsen11();
+	urb = std::shared_ptr<URB_Fixsen11>(new URB_Fixsen11());
 	em.setPhotonField(urb);
-	urb = new URB_Nitu21();
+	urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	em.setPhotonField(urb);
 }
 
 TEST(EMInverseComptonScattering, limitNextStep) {
 	// Test if the interaction limits the next propagation step.
-	ref_ptr<PhotonField> cmb = new CMB();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
 	EMInverseComptonScattering m(cmb);
 	Candidate c(11, 1E17 * eV);
 	c.setNextStep(std::numeric_limits<double>::max());
@@ -1062,9 +1062,9 @@ TEST(EMInverseComptonScattering, limitNextStep) {
 
 TEST(EMInverseComptonScattering, secondaries) {
 	// Test if secondaries are correctly produced.
-	ref_ptr<PhotonField> cmb = new CMB();
-	ref_ptr<PhotonField> irb = new IRB_Saldana21();
-	ref_ptr<PhotonField> urb = new URB_Nitu21();
+	ref_ptr<PhotonField> cmb = std::shared_ptr<CMB>(new CMB());
+	ref_ptr<PhotonField> irb = std::shared_ptr<IRB_Saldana21>(new IRB_Saldana21());
+	ref_ptr<PhotonField> urb = std::shared_ptr<URB_Nitu21>(new URB_Nitu21());
 	EMPairProduction m(cmb);
 	m.setHaveElectrons(true);
 	m.setThinning(0.);
@@ -1110,7 +1110,7 @@ TEST(EMInverseComptonScattering, secondaries) {
 }
 
 TEST(EMInverseComptonScattering, interactionTag) {
-	EMInverseComptonScattering m(new CMB());
+	EMInverseComptonScattering m(std::shared_ptr<CMB>(new CMB()));
 
 	// test default interactionTag
 	EXPECT_TRUE(m.getInteractionTag() == "EMIC");
@@ -1177,7 +1177,7 @@ TEST(SynchrotronRadiation, simpleTestField) {
 
 	// check default values 
 	Vector3d b(0, 0, 1 * muG);
-	ref_ptr<MagneticField> field = new UniformMagneticField(b);
+	ref_ptr<MagneticField> field = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(b));
 	SynchrotronRadiation sync(field);
 
 	EXPECT_EQ(sync.getBrms(), 0);
@@ -1230,7 +1230,7 @@ TEST(SynchrotronRadiation, getSetFunctions) {
 
 	// field 
 	Vector3d b(1,2,3);
-	ref_ptr<MagneticField> field = new UniformMagneticField(b);
+	ref_ptr<MagneticField> field = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(b));
 	sync.setField(field);
 	EXPECT_TRUE(field == sync.getField()); // same pointer
 

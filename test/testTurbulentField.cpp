@@ -97,7 +97,7 @@ TEST(testVectorFieldGrid, turbulence_Exceptions) {
 	size_t n = 64;
 	double spacing = 10 * Mpc / n;
 	double brms = 1;
-	ref_ptr<Grid3f> grid = new Grid3f(Vector3d(0, 0, 0), n, spacing);
+	ref_ptr<Grid3f> grid = std::shared_ptr<Grid3f>(new Grid3f(Vector3d(0, 0, 0), n, spacing));
 
 	// should be fine
 	EXPECT_NO_THROW(initTurbulence(grid, brms, 2 * spacing, 8 * spacing));

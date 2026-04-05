@@ -701,7 +701,7 @@ TEST(Grid3f, Interpolation) {
 
 TEST(VectordGrid, Scale) {
 	// Test scaling a field
-	ref_ptr<Grid3f> grid = new Grid3f(Vector3d(0.), 3, 1);
+	ref_ptr<Grid3f> grid = std::shared_ptr<Grid3f>( new Grid3f(Vector3d(0.), 3, 1));
 	for (int ix = 0; ix < 3; ix++)
 		for (int iy = 0; iy < 3; iy++)
 			for (int iz = 0; iz < 3; iz++)
@@ -875,8 +875,8 @@ TEST(Grid3f, Reflectivity) {
 
 TEST(Grid3f, DumpLoad) {
 	// Dump and load a field grid
-	ref_ptr<Grid3f> grid1 = new Grid3f(Vector3d(0.), 3, 1);
-	ref_ptr<Grid3f> grid2 = new Grid3f(Vector3d(0.), 3, 1);
+	ref_ptr<Grid3f> grid1 = std::shared_ptr<Grid3f>( new Grid3f(Vector3d(0.), 3, 1));
+	ref_ptr<Grid3f> grid2 = std::shared_ptr<Grid3f>( new Grid3f(Vector3d(0.), 3, 1));
 
 	for (int ix = 0; ix < 3; ix++)
 		for (int iy = 0; iy < 3; iy++)
@@ -901,8 +901,8 @@ TEST(Grid3f, DumpLoad) {
 
 TEST(Grid3f, DumpLoadTxt) {
 	// Dump and load a field grid
-	ref_ptr<Grid3f> grid1 = new Grid3f(Vector3d(0.), 3, 1);
-	ref_ptr<Grid3f> grid2 = new Grid3f(Vector3d(0.), 3, 1);
+	ref_ptr<Grid3f> grid1 = std::shared_ptr<Grid3f>( new Grid3f(Vector3d(0.), 3, 1));
+	ref_ptr<Grid3f> grid2 = std::shared_ptr<Grid3f>( new Grid3f(Vector3d(0.), 3, 1));
 
 	for (int ix = 0; ix < 3; ix++)
 		for (int iy = 0; iy < 3; iy++)
@@ -927,7 +927,9 @@ TEST(Grid3f, DumpLoadTxt) {
 
 TEST(Grid1f, DumpLoadTxtGridProperties) {
 	// grid to dump 
-	ref_ptr<Grid1f> grid = new Grid1f(Vector3d(0.5, 1.5, 2.5), 3, 2, 4, Vector3d(0.2, 1.2, 2.2)); 
+	ref_ptr<Grid1f> grid = std::shared_ptr<Grid1f>(
+		new Grid1f(Vector3d(0.5, 1.5, 2.5), 3, 2, 4, Vector3d(0.2, 1.2, 2.2))
+	); 
 	grid -> setInterpolationType(TRICUBIC);
 	grid -> setReflective(true);
 	grid -> setClipVolume(true);
@@ -980,7 +982,9 @@ TEST(Grid1f, DumpLoadTxtGridProperties) {
 
 TEST(Grid3f, DumpLoadTxtGridProperties) {
 	// grid to dump 
-	ref_ptr<Grid3f> grid = new Grid3f(Vector3d(0.5, 1.5, 2.5), 3, 2, 4, Vector3d(0.2, 1.2, 2.2)); 
+	ref_ptr<Grid3f> grid = std::shared_ptr<Grid3f>(
+		new Grid3f(Vector3d(0.5, 1.5, 2.5), 3, 2, 4, Vector3d(0.2, 1.2, 2.2))
+	); 
 	grid -> setInterpolationType(NEAREST_NEIGHBOUR);
 	grid -> setReflective(true);
 	grid -> setClipVolume(true);
