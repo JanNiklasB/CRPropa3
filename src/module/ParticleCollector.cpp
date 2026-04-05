@@ -30,11 +30,7 @@ void ParticleCollector::process(Candidate *c) const {
         }
 }
 
-void ParticleCollector::process(ref_ptr<Candidate> c) const {
-	ParticleCollector::process((Candidate*) c);
-}
-
-void ParticleCollector::reprocess(Module *action) const {
+void ParticleCollector::reprocess(ref_ptr<Module> action) const {
 	for (ParticleCollector::iterator itr = container.begin(); itr != container.end(); ++itr){
 		if (clone)
 			action->process((*(itr->get())).clone(false));

@@ -72,7 +72,7 @@ public:
 	void initPhotonEmission(std::string filename);
 
 	void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate, int channel) const;
+	void performInteraction(ref_ptr<Candidate> candidate, int channel) const;
 
 	/**
 	 Calculates the loss length E dx/dE in [m] physical distance.

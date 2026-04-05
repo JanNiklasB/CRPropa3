@@ -51,7 +51,7 @@ public:
 class Source: public SourceInterface {
 	std::vector<ref_ptr<SourceFeature> > features;
 public:
-	void add(SourceFeature* feature);
+	void add(ref_ptr<SourceFeature> feature);
 	ref_ptr<Candidate> getCandidate() const;
 	std::string getDescription() const;
 };
@@ -72,7 +72,7 @@ public:
 	 @param source		source to be added
 	 @param weight		weight of the source; defaults to 1.
 	 */
-	void add(Source* source, double weight = 1);
+	void add(ref_ptr<Source> source, double weight = 1);
 	ref_ptr<Candidate> getCandidate() const;
 	std::string getDescription() const;
 };
@@ -646,9 +646,9 @@ public:
 	/** Constructor
 	 @param emissionMap		emission map containing probabilities of emission in various directions
 	 */
-	SourceEmissionMap(EmissionMap *emissionMap);
+	SourceEmissionMap(ref_ptr<EmissionMap> emissionMap);
 	void prepareCandidate(Candidate &candidate) const;
-	void setEmissionMap(EmissionMap *emissionMap);
+	void setEmissionMap(ref_ptr<EmissionMap> emissionMap);
 	void setDescription();
 };
 

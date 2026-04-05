@@ -53,8 +53,8 @@ protected:
 
 public:
 	AbstractCondition();
-	void onReject(Module *rejectAction);
-	void onAccept(Module *acceptAction);
+	void onReject(ref_ptr<Module> rejectAction);
+	void onAccept(ref_ptr<Module> acceptAction);
 	void setMakeRejectedInactive(bool makeInactive);
 	void setMakeAcceptedInactive(bool makeInactive);
 	void setRejectFlag(std::string key, std::string value);

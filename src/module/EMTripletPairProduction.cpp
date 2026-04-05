@@ -101,7 +101,7 @@ void EMTripletPairProduction::initCumulativeRate(std::string filename) {
 	infile.close();
 }
 
-void EMTripletPairProduction::performInteraction(Candidate *candidate) const {
+void EMTripletPairProduction::performInteraction(ref_ptr<Candidate> candidate) const {
 	int id = candidate->current.getId();
 	if  (abs(id) != 11)
 		return;

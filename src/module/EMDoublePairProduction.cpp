@@ -59,7 +59,7 @@ void EMDoublePairProduction::initRate(std::string filename) {
 }
 
 
-void EMDoublePairProduction::performInteraction(Candidate *candidate) const {
+void EMDoublePairProduction::performInteraction(ref_ptr<Candidate> candidate) const {
 	// the photon is lost after the interaction
 	candidate->setActive(false);
 

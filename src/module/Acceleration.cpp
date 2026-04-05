@@ -6,35 +6,35 @@
 namespace crpropa {
 
 AbstractAccelerationModule::AbstractAccelerationModule(double _stepLength)
-	: crpropa::Module(), stepLength(_stepLength) {}
+	: Module(), stepLength(_stepLength) {}
 
 
-void AbstractAccelerationModule::add(StepLengthModifier *modifier) {
+void AbstractAccelerationModule::add(ref_ptr<StepLengthModifier> modifier) {
 	modifiers.push_back(modifier);
 }
 
 
 void AbstractAccelerationModule::scatter(
-	crpropa::Candidate *candidate,
-	const crpropa::Vector3d &scatter_center_velocity) const {
+	ref_ptr<Candidate> candidate,
+	const Vector3d &scatter_center_velocity) const {
 	// particle momentum in lab frame
 	const double E = candidate->current.getEnergy();
-	const crpropa::Vector3d p = candidate->current.getMomentum();
+	const Vector3d p = candidate->current.getMomentum();
 
 	// transform to rest frame of scatter center (p: prime)
-	const double beta = scatter_center_velocity.getR() / crpropa::c_light;
+	const double beta = scatter_center_velocity.getR() / c_light;
 	const double gamma = 1. / sqrt(1 - beta * beta);
 	const double Ep = gamma * (E - scatter_center_velocity.dot(p));
-	const crpropa::Vector3d pp = (p - scatter_center_velocity* E /
-		(crpropa::c_light * crpropa::c_light)) * gamma;
+	const Vector3d pp = (p - scatter_center_velocity* E /
+		(c_light * c_light)) * gamma;
 
 	// scatter into random direction
-	const crpropa::Vector3d pp_new = crpropa::Random::instance().randVector() * pp.getR();
+	const Vector3d pp_new = Random::instance().randVector() * pp.getR();
 
 	// transform back
 	const double E_new = gamma * (Ep + scatter_center_velocity.dot(pp_new));
-	const crpropa::Vector3d p_new = (pp_new + scatter_center_velocity * Ep /
-		(crpropa::c_light * crpropa::c_light)) * gamma;
+	const Vector3d p_new = (pp_new + scatter_center_velocity * Ep /
+		(c_light * c_light)) * gamma;
 
 	// update candidate properties
 	candidate->current.setEnergy(E_new);
@@ -42,7 +42,7 @@ void AbstractAccelerationModule::scatter(
 }
 
 
-void AbstractAccelerationModule::process(crpropa::Candidate *candidate) const {
+void AbstractAccelerationModule::process(Candidate *candidate) const {
 	double currentStepLength = stepLength;
 	for (auto m : modifiers) {
 		currentStepLength = m->modify(currentStepLength, candidate);
@@ -50,7 +50,7 @@ void AbstractAccelerationModule::process(crpropa::Candidate *candidate) const {
 
 	double step = candidate->getCurrentStep();
 	while (step > 0) {
-		double randDistance = -1. * log(crpropa::Random::instance().rand()) * currentStepLength;
+		double randDistance = -1. * log(Random::instance().rand()) * currentStepLength;
 
 		if (step < randDistance) {
 			candidate->limitNextStep(0.1 * currentStepLength);
@@ -73,16 +73,16 @@ SecondOrderFermi::SecondOrderFermi(double scatterVelocity, double stepLength,
 	// have a discretized table of beamed pitch angles
 	for (unsigned int i =0; i < sizeOfPitchangleTable; i++) {
 		angle[i] = i * M_PI / (sizeOfPitchangleTable-1);
-		angleCDF[i] = (angle[i] +scatterVelocity / crpropa::c_light * sin(angle[i])) / M_PI;
+		angleCDF[i] = (angle[i] +scatterVelocity / c_light * sin(angle[i])) / M_PI;
 	}
 }
 
 
-crpropa::Vector3d SecondOrderFermi::scatterCenterVelocity(crpropa::Candidate *candidate) const
+Vector3d SecondOrderFermi::scatterCenterVelocity(Candidate *candidate) const
 {
-	size_t idx = crpropa::closestIndex(crpropa::Random::instance().rand(), angleCDF);
-	crpropa::Vector3d rv = crpropa::Random::instance().randVector();
-	crpropa::Vector3d rotationAxis = candidate->current.getDirection().cross(rv);
+	size_t idx = closestIndex(Random::instance().rand(), angleCDF);
+	Vector3d rv = Random::instance().randVector();
+	Vector3d rotationAxis = candidate->current.getDirection().cross(rv);
 
 	rv = candidate->current.getDirection().getRotated(rotationAxis, M_PI - angle[idx]);
 	return rv * scatterVelocity;
@@ -102,7 +102,7 @@ double DirectedFlowOfScatterCenters::modify(double steplength, Candidate* candid
 
 
 DirectedFlowScattering::DirectedFlowScattering(
-	crpropa::Vector3d scatterCenterVelocity, double stepLength)
+	Vector3d scatterCenterVelocity, double stepLength)
 	: __scatterVelocity(scatterCenterVelocity),
 	  AbstractAccelerationModule(stepLength) {
 
@@ -113,8 +113,8 @@ DirectedFlowScattering::DirectedFlowScattering(
 }
 
 
-crpropa::Vector3d DirectedFlowScattering::scatterCenterVelocity(
-	crpropa::Candidate *candidate) const { // does not depend on candidate here.
+Vector3d DirectedFlowScattering::scatterCenterVelocity(
+	Candidate *candidate) const { // does not depend on candidate here.
 	return __scatterVelocity;
 }
 

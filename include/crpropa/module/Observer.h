@@ -32,7 +32,10 @@ protected:
 	std::string description;
 public:
 	virtual DetectionState checkDetection(Candidate *candidate) const;
-	virtual void onDetection(Candidate *candidate) const;
+	inline DetectionState checkDetection(ref_ptr<Candidate> candidate) const{
+		return checkDetection(candidate.get());
+	}
+	virtual void onDetection(ref_ptr<Candidate> candidate) const;
 	virtual std::string getDescription() const;
 };
 
@@ -56,12 +59,12 @@ public:
 	/** Add a feature to the observer
 	 @param feature		observer feature to be added to the Observer object
 	 */
-	void add(ObserverFeature *feature);
+	void add(ref_ptr<ObserverFeature> feature);
 	/** Perform some specific actions upon detection of candidate
 	 @param action		module that performs a given action when candidate is detected
 	 @param clone		if true, clone candidate
 	 */
-	void onDetection(Module *action, bool clone = false);
+	void onDetection(ref_ptr<Module> action, bool clone = false);
 	void process(Candidate *candidate) const;
 	std::string getDescription() const;
 	void setFlag(std::string key, std::string value);
@@ -94,7 +97,7 @@ public:
 	/** Constructor
 	 @param surface		object with some specific geometric (see Geometry.h)
 	*/
-	ObserverSurface(Surface* surface);
+	ObserverSurface(ref_ptr<Surface> surface);
 	DetectionState checkDetection(Candidate *candidate) const;
 	std::string getDescription() const;
 };

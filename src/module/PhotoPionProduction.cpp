@@ -203,7 +203,7 @@ void PhotoPionProduction::process(Candidate *candidate) const {
 	} while (step > 0);
 }
 
-void PhotoPionProduction::performInteraction(Candidate *candidate, bool onProton) const {
+void PhotoPionProduction::performInteraction(ref_ptr<Candidate> candidate, bool onProton) const {
 	int id = candidate->current.getId();
 	int A = massNumber(id);
 	int Z = chargeNumber(id);

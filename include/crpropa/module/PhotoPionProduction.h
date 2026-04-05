@@ -160,7 +160,7 @@ public:
 	 */
 	double nucleiModification(int A, int X) const;
 	void process(Candidate *candidate) const;
-	void performInteraction(Candidate *candidate, bool onProton) const;
+	void performInteraction(ref_ptr<Candidate> candidate, bool onProton) const;
 
 	/**
 	 Calculates the loss length E dx/dE in [m].

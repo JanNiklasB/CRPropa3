@@ -58,11 +58,11 @@ void AbstractCondition::setMakeAcceptedInactive(bool deactivate) {
 	makeAcceptedInactive = deactivate;
 }
 
-void AbstractCondition::onReject(Module *action) {
+void AbstractCondition::onReject(ref_ptr<Module> action) {
 	rejectAction = action;
 }
 
-void AbstractCondition::onAccept(Module *action) {
+void AbstractCondition::onAccept(ref_ptr<Module> action) {
 	acceptAction = action;
 }
 

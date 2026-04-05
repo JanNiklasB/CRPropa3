@@ -4,7 +4,7 @@
 
 namespace crpropa {
 
-RestrictToRegion::RestrictToRegion(Module* _module, Surface* _surface) : module(_module), surface(_surface) { 
+RestrictToRegion::RestrictToRegion(ref_ptr<Module> _module, ref_ptr<Surface> _surface) : module(_module), surface(_surface) { 
 };
 
 void RestrictToRegion::process(Candidate *candidate) const {

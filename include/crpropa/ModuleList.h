@@ -30,13 +30,12 @@ public:
 	virtual ~ModuleList();
 	void setShowProgress(bool show = true); ///< activate a progress bar
 
-	void add(Module* module);
+	void add(ref_ptr<Module> module);
 	void remove(std::size_t i);
 	std::size_t size() const;
 	ref_ptr<Module> operator[](const std::size_t i);
 
 	void process(Candidate* candidate) const; ///< call process in all modules
-	void process(ref_ptr<Candidate> candidate) const; ///< call process in all modules
 
 	void run(Candidate* candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
 	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
@@ -54,13 +53,13 @@ public:
 	iterator end();
 	const_iterator end() const;
 
-	void setInterruptAction(Output* action);
-	void dumpCandidate(Candidate* cand) const;
+	void setInterruptAction(ref_ptr<Output> action);
+	void dumpCandidate(ref_ptr<Candidate> cand) const;
 
 private:
 	module_list_t modules;
 	bool showProgress;
-	Output* interruptAction;
+	ref_ptr<Output> interruptAction;
 	bool haveInterruptAction = false;
 	std::vector<int> notFinished; // list with not finished numbers of candidates
 };
@@ -74,7 +73,7 @@ private:
 	ref_ptr<ModuleList> mlist;
 public:
 
-	ModuleListRunner(ModuleList *mlist);
+	ModuleListRunner(ref_ptr<ModuleList> mlist);
 	void process(Candidate *candidate) const; ///< call run of wrapped ModuleList
 	std::string getDescription() const;
 };

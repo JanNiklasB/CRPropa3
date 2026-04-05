@@ -23,7 +23,7 @@ PerformanceModule::~PerformanceModule() {
 	}
 }
 
-void PerformanceModule::add(Module *module) {
+void PerformanceModule::add(ref_ptr<Module> module) {
 	_module_info info;
 	info.module = module;
 	info.time = 0;
@@ -99,11 +99,11 @@ string ParticleFilter::getDescription() const {
 }
 
 // ----------------------------------------------------------------------------
-EmissionMapFiller::EmissionMapFiller(EmissionMap *emissionMap) : emissionMap(emissionMap) {
+EmissionMapFiller::EmissionMapFiller(ref_ptr<EmissionMap> emissionMap) : emissionMap(emissionMap) {
 
 }
 
-void EmissionMapFiller::setEmissionMap(EmissionMap *emissionMap) {
+void EmissionMapFiller::setEmissionMap(ref_ptr<EmissionMap> emissionMap) {
 	this->emissionMap = emissionMap;
 }
 

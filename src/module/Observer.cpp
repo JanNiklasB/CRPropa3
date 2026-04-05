@@ -15,11 +15,11 @@ Observer::Observer() :
 		makeInactive(true), clone(false) {
 }
 
-void Observer::add(ObserverFeature *feature) {
+void Observer::add(ref_ptr<ObserverFeature> feature) {
 	features.push_back(feature);
 }
 
-void Observer::onDetection(Module *action, bool clone_) {
+void Observer::onDetection(ref_ptr<Module> action, bool clone_) {
 	detectionAction = action;
 	clone = clone_;
 }
@@ -82,7 +82,7 @@ DetectionState ObserverFeature::checkDetection(Candidate *candidate) const {
 	return NOTHING;
 }
 
-void ObserverFeature::onDetection(Candidate *candidate) const {
+void ObserverFeature::onDetection(ref_ptr<Candidate> candidate) const {
 }
 
 std::string ObserverFeature::getDescription() const {
@@ -389,7 +389,7 @@ std::string ObserverTimeEvolution::getDescription() const {
 }
 
 // ObserverSurface--------------------------------------------------------------
-ObserverSurface::ObserverSurface(Surface* _surface) : surface(_surface) { }
+ObserverSurface::ObserverSurface(ref_ptr<Surface> _surface) : surface(_surface) { }
 
 DetectionState ObserverSurface::checkDetection(Candidate *candidate) const
 {

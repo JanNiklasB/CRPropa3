@@ -19,23 +19,22 @@ class ref_ptr {
 	public:
 	typedef T element_type;
 
-	ref_ptr(){}
-	ref_ptr(T* ptr) : _ptr(ptr) {}
+	ref_ptr() : _ptr(0), _shared_ptr(0) {}
+	ref_ptr(T* ptr) : _ptr(ptr), _shared_ptr(0), _is_shared(false) {}
 	ref_ptr(const ref_ptr& rp) {
-		if(rp._is_shared)
-			_shared_ptr = rp._shared_ptr;
-		else
-			_ptr = rp._ptr;
+		_shared_ptr = rp._shared_ptr;
+		_is_shared = rp._is_shared;
+		_ptr = rp._ptr;
 	}
 	template<class Other> ref_ptr(const ref_ptr<Other>& rp) {
-		if(rp._is_shared)
-			_shared_ptr = rp._shared_ptr;
-		else
-			_ptr = rp._ptr;
-	}
-	template<class Other> ref_ptr(const std::shared_ptr<Other>& rp) {
 		_shared_ptr = rp._shared_ptr;
+		_is_shared = rp._is_shared;
+		_ptr = rp._ptr;
+	}
+	template<class Other> ref_ptr(const std::shared_ptr<Other>& shared_ptr) {
+		_shared_ptr = shared_ptr;
 		_is_shared = true;
+		_ptr = 0;
 	}
 
 	~ref_ptr() {
@@ -57,26 +56,6 @@ class ref_ptr {
 	inline ref_ptr& operator =(long int ptr) {
 		_shared_ptr = ptr;
 		_ptr = ptr;
-		return *this;
-	}
-	/**
-	 * User need to check if newly assigned pointer is valid.
-	 * In case of a std::shared_ptr this function would do nothing
-	 */
-	inline ref_ptr& operator =(T* ptr) {
-		if (_ptr == ptr)
-			return *this;
-		_ptr = ptr;
-		return *this;
-	}
-	/**
-	 * User need to check if newly assigned pointer is valid.
-	 * In case of a normal pointer this function would do nothing
-	 */
-	inline ref_ptr& operator =(std::shared_ptr<T> shared_ptr) {
-		if (_shared_ptr == shared_ptr)
-			return *this;
-		_shared_ptr = shared_ptr;
 		return *this;
 	}
 

@@ -42,18 +42,18 @@ class AbstractAccelerationModule : public Module {
 	/// The parent's constructor need to be called on initialization!
 	AbstractAccelerationModule(double _stepLength = 1. * parsec);
 	// add a step length modifier to the model
-	void add(StepLengthModifier *modifier);
+	void add(ref_ptr<StepLengthModifier> modifier);
 	// update the candidate
 	void process(Candidate *candidate) const;
 
 	/// Returns the velocity vector of the scatter centers in the rest frame of
 	/// the candidate. Needs to be implemented in inheriting classes.
-	virtual Vector3d scatterCenterVelocity(Candidate *candidate) const = 0;
+	virtual Vector3d scatterCenterVelocity(ref_ptr<Candidate> candidate) const = 0;
 
 	/// Scatter the candidate with a center with given scatter center
 	/// velocity into a random direction. Assumes that the
 	/// candidate is ultra-relativistic (m = 0).
-	void scatter(Candidate *candidate,
+	void scatter(ref_ptr<Candidate> candidate,
 	             const Vector3d &scatter_center_velocity) const;
 };
 

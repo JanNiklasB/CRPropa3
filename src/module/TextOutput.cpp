@@ -292,7 +292,7 @@ void TextOutput::process(Candidate *c) const {
 
 }
 
-void TextOutput::load(const std::string &filename, ParticleCollector *collector){
+void TextOutput::load(const std::string &filename, ref_ptr<ParticleCollector> collector){
 
 	std::string line;
 	std::istream *in;

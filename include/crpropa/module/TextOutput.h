@@ -69,7 +69,7 @@ public:
 	 @param filename	string containing the name of the file to be loaded
 	 @param collector	object of type ParticleCollector that will store the information
 	 */
-	static void load(const std::string &filename, ParticleCollector *collector);
+	static void load(const std::string &filename, ref_ptr<ParticleCollector> collector);
 	std::string getDescription() const;
 
 	void dumpIndexList(std::vector<int> indicies);
