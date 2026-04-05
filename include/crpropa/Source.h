@@ -23,6 +23,7 @@ class SourceFeature {
 protected:
 	std::string description;
 public:
+	virtual ~SourceFeature() = default;
 	virtual void prepareParticle(ParticleState& particle) const {};
 	virtual void prepareCandidate(Candidate& candidate) const;
 	std::string getDescription() const;
@@ -35,6 +36,7 @@ public:
  */
 class SourceInterface  {
 public:
+	virtual ~SourceInterface() = default;
 	virtual ref_ptr<Candidate> getCandidate() const = 0;
 	virtual std::string getDescription() const = 0;
 };

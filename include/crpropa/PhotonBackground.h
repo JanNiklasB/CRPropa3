@@ -23,6 +23,7 @@ public:
 		this->fieldName = "AbstractPhotonField";
 		this->isRedshiftDependent = false;
 	}
+	virtual ~PhotonField() = default; 
 
 	/**
 	 returns comoving photon density [1/m^3].

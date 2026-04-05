@@ -18,6 +18,7 @@ namespace crpropa {
 /// @brief Modifies the steplength of an acceleration module.
 class StepLengthModifier  {
   public:
+	virtual ~StepLengthModifier() = default;
 	/// Returns an update of the steplength
 	/// @param steplength 	Modifies step length, e.g., based on scattering 
 	///						model.	

@@ -31,6 +31,7 @@ class ObserverFeature {
 protected:
 	std::string description;
 public:
+	virtual ~ObserverFeature() = default;
 	virtual DetectionState checkDetection(Candidate *candidate) const;
 	inline DetectionState checkDetection(ref_ptr<Candidate> candidate) const{
 		return checkDetection(candidate.get());
