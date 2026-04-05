@@ -412,7 +412,7 @@ TEST(SourceList, luminosity) {
 	source1->add(std::shared_ptr<SourceEnergy>(new SourceEnergy(100)));
 	sourceList.add(source1, 80);
 
-	ref_ptr<Source> source2 = std::shared_ptr<Source;>(new Source);
+	ref_ptr<Source> source2 = std::shared_ptr<Source>(new Source());
 	source2->add(std::shared_ptr<SourceEnergy>(new SourceEnergy(0)));
 	sourceList.add(source2, 20);
 

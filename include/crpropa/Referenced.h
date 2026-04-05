@@ -121,6 +121,7 @@ class ref_ptr {
 
 	template<class Other> void assign(const ref_ptr<Other>& rp) {
 		_shared_ptr = rp._shared_ptr;
+		_is_shared = rp._is_shared;
 		_ptr = rp._ptr;
 	}
 
