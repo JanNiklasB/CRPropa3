@@ -52,10 +52,6 @@
 %ignore operator crpropa::Grid< double >*;
 %ignore crpropa::TextOutput::load;
 
-%feature("ref")   crpropa::Referenced "$this->addReference();"
-%feature("unref") crpropa::Referenced "$this->removeReference();"
-
-
 %include "crpropa/Logging.h"
 
 /* ignore public references and replace with attributes for Vector3d and Vector3f*/

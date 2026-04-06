@@ -60,10 +60,18 @@ public:
 	/** Default observer constructor
 	 */
 	Observer();
+	
 	/** Add a feature to the observer
 	 @param feature		observer feature to be added to the Observer object
 	 */
 	void add(ref_ptr<ObserverFeature> feature);
+	/** Add a feature to the observer
+	 @param feature		observer feature to be added to the Observer object
+	 */
+	inline void add(ObserverFeature *feature){
+		add(ref_ptr<ObserverFeature>(feature));
+	}
+	
 	/** Perform some specific actions upon detection of candidate
 	 @param action		module that performs a given action when candidate is detected
 	 @param clone		if true, clone candidate
@@ -72,6 +80,7 @@ public:
 	inline void onDetection(Module *action, bool clone = false){
 		onDetection(ref_ptr<Module>(action), clone);
 	}
+	
 	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 	void setFlag(std::string key, std::string value);
