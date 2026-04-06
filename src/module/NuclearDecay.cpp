@@ -68,7 +68,7 @@ void NuclearDecay::setLimit(double l) {
 	limit = l;
 }
 
-void NuclearDecay::process(Candidate *candidate) const {
+void NuclearDecay::process(ref_ptr<Candidate> candidate) const {
 	// the loop should be processed at least once for limiting the next step
 	double step = candidate->getCurrentStep();
 	double z = candidate->getRedshift();

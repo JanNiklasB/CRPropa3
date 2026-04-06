@@ -134,6 +134,7 @@ public:
 	 Trajectory length and redshift are copied from the parent.
 	 */
 	void addSecondary(ref_ptr<Candidate> c);
+	inline void addSecondary(Candidate *c){ addSecondary(ref_ptr<Candidate>(c)); }
 	/**
 	 Add a new candidate to the list of secondaries.
 	 @param id			particle ID of the secondary

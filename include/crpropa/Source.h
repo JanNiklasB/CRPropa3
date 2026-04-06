@@ -54,6 +54,9 @@ class Source: public SourceInterface {
 	std::vector<ref_ptr<SourceFeature> > features;
 public:
 	void add(ref_ptr<SourceFeature> feature);
+	inline void add(SourceFeature *feature){
+		add(ref_ptr<SourceFeature>(feature));
+	}
 	ref_ptr<Candidate> getCandidate() const;
 	std::string getDescription() const;
 };
@@ -75,6 +78,9 @@ public:
 	 @param weight		weight of the source; defaults to 1.
 	 */
 	void add(ref_ptr<Source> source, double weight = 1);
+	inline void add(Source *source, double weight = 1){
+		add(ref_ptr<Source>(source), weight);
+	}
 	ref_ptr<Candidate> getCandidate() const;
 	std::string getDescription() const;
 };
@@ -534,6 +540,7 @@ public:
 	 @param densityGrid 	3D grid containing the density of sources in each cell
 	 */
 	SourceDensityGrid(ref_ptr<Grid1f> densityGrid);
+	SourceDensityGrid(Grid1f *densityGrid);
 	void prepareParticle(ParticleState &particle) const;
 	void setDescription();
 };
@@ -550,6 +557,7 @@ public:
 	 @param densityGrid 	1D grid containing the density of sources in each cell, Ny and Nz must be 1
 	 */
 	SourceDensityGrid1D(ref_ptr<Grid1f> densityGrid);
+	SourceDensityGrid1D(Grid1f *densityGrid);
 	void prepareParticle(ParticleState &particle) const;
 	void setDescription();
 };
@@ -649,8 +657,12 @@ public:
 	 @param emissionMap		emission map containing probabilities of emission in various directions
 	 */
 	SourceEmissionMap(ref_ptr<EmissionMap> emissionMap);
+	SourceEmissionMap(EmissionMap *emissionMap);
 	void prepareCandidate(Candidate &candidate) const;
 	void setEmissionMap(ref_ptr<EmissionMap> emissionMap);
+	inline void setEmissionMap(EmissionMap *emissionMap){
+		setEmissionMap(ref_ptr<EmissionMap>(emissionMap));
+	}
 	void setDescription();
 };
 
@@ -881,6 +893,15 @@ public:
 	@param z:	the position will be sampled in the range [-z, z]. Non symmetric values can be set with setZrange.
 	*/
 	SourceMassDistribution(ref_ptr<Density> density, double maxDensity = 0, double x = 20 * kpc, double y = 20 * kpc, double z = 4 * kpc);
+	/** Constructor
+	@param density: CRPropa mass distribution 
+	@param maxDensity:	maximal density in the region where the position should be sampled
+	@param x:	the position will be sampled in the range [-x, x]. Non symmetric values can be set with setXrange.
+	@param y:	the position will be sampled in the range [-y, y]. Non symmetric values can be set with setYrange.
+	@param z:	the position will be sampled in the range [-z, z]. Non symmetric values can be set with setZrange.
+	*/
+	SourceMassDistribution(Density *density, double maxDensity = 0, double x = 20 * kpc, double y = 20 * kpc, double z = 4 * kpc);
+
 
 	void prepareParticle(ParticleState &particle) const;
 

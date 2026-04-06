@@ -74,7 +74,21 @@ PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
 	bs.assign(cash_karp_bs, cash_karp_bs + 6);
 }
 
-void PropagationCK::process(Candidate *candidate) const {
+PropagationCK::PropagationCK(MagneticField *field, double tolerance,
+		double minStep, double maxStep) :
+		minStep(0) {
+	setField(field);
+	setTolerance(tolerance);
+	setMaximumStep(maxStep);
+	setMinimumStep(minStep);
+
+	// load Cash-Karp coefficients
+	a.assign(cash_karp_a, cash_karp_a + 36);
+	b.assign(cash_karp_b, cash_karp_b + 6);
+	bs.assign(cash_karp_bs, cash_karp_bs + 6);
+}
+
+void PropagationCK::process(ref_ptr<Candidate> candidate) const {
 	// save the new previous particle state
 	ParticleState &current = candidate->current;
 	candidate->previous = current;

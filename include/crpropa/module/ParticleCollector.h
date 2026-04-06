@@ -32,8 +32,11 @@ public:
 	ParticleCollector(const std::size_t nBuffer, const bool clone, const bool recursive);
 	~ParticleCollector();
 
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	void reprocess(ref_ptr<Module> action) const;
+	inline void reprocess(Module* action) const{
+		reprocess(ref_ptr<Module>(action));
+	}
 	void dump(const std::string &filename) const;
 	void load(const std::string &filename);
 
@@ -59,6 +62,10 @@ public:
 	Procedure: takes the initial state of the particle, re-runs the ModuleList for that particle and captures trajectory
 	*/
 	void getTrajectory(ModuleList *mlist, std::size_t i, Module *output) const;
+	/**
+	 Retrieves the trajectory of a detected particle
+	Procedure: takes the initial state of the particle, re-runs the ModuleList for that particle and captures trajectory
+	*/
 	void getTrajectory(ref_ptr<ModuleList> mlist, std::size_t i, ref_ptr<Module> output) const;
 };
 /** @}*/

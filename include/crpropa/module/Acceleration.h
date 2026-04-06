@@ -25,7 +25,10 @@ class StepLengthModifier  {
 	/// @param candidate 	Additional candidate properties are usually 
 	///						included in the calculation of the updated
 	///						step length.
-	virtual double modify(double steplength, Candidate *candidate) = 0;
+	virtual double modify(double steplength, ref_ptr<Candidate> candidate) = 0;
+	inline double modify(double steplength, Candidate *candidate){
+		return modify(steplength, ref_ptr<Candidate>(candidate));
+	}
 };
 
 
@@ -44,18 +47,34 @@ class AbstractAccelerationModule : public Module {
 	AbstractAccelerationModule(double _stepLength = 1. * parsec);
 	// add a step length modifier to the model
 	void add(ref_ptr<StepLengthModifier> modifier);
+	// add a step length modifier to the model
+	inline void add(StepLengthModifier *modifier){
+		add(ref_ptr<StepLengthModifier>(modifier));
+	}
 	// update the candidate
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 
 	/// Returns the velocity vector of the scatter centers in the rest frame of
 	/// the candidate. Needs to be implemented in inheriting classes.
 	virtual Vector3d scatterCenterVelocity(ref_ptr<Candidate> candidate) const = 0;
+	/// Returns the velocity vector of the scatter centers in the rest frame of
+	/// the candidate. Needs to be implemented in inheriting classes.
+	inline Vector3d scatterCenterVelocity(Candidate *candidate) const{
+		return scatterCenterVelocity(ref_ptr<Candidate>(candidate));
+	}
 
 	/// Scatter the candidate with a center with given scatter center
 	/// velocity into a random direction. Assumes that the
 	/// candidate is ultra-relativistic (m = 0).
 	void scatter(ref_ptr<Candidate> candidate,
 	             const Vector3d &scatter_center_velocity) const;
+	/// Scatter the candidate with a center with given scatter center
+	/// velocity into a random direction. Assumes that the
+	/// candidate is ultra-relativistic (m = 0).
+	inline void scatter(Candidate *candidate,
+	             const Vector3d &scatter_center_velocity) const{
+		scatter(ref_ptr<Candidate>(candidate), scatter_center_velocity);
+	}
 };
 
 
@@ -73,11 +92,10 @@ class SecondOrderFermi : public AbstractAccelerationModule {
 	@param stepLength				average mean free path
 	@param sizeOfPitchangleTable	number of precalculated pitch angles
 	*/
-	SecondOrderFermi(double scatterVelocity = .1 * crpropa::c_light,
-	                 double stepLength = 1. * crpropa::parsec,
+	SecondOrderFermi(double scatterVelocity = .1 * c_light,
+	                 double stepLength = 1. * parsec,
 	                 unsigned int sizeOfPitchangleTable = 10000);
-	virtual crpropa::Vector3d
-	scatterCenterVelocity(crpropa::Candidate *candidate) const;
+	virtual Vector3d scatterCenterVelocity(ref_ptr<Candidate> candidate) const;
 };
 
 
@@ -89,17 +107,16 @@ class SecondOrderFermi : public AbstractAccelerationModule {
 ///    the shock acceleration in CRPropa leading to this module.
 class DirectedFlowScattering : public AbstractAccelerationModule {
   private:
-	crpropa::Vector3d __scatterVelocity;
+	Vector3d __scatterVelocity;
 
   public:
   /** Constructor
    * @param scatterCenterVelocity	velocity of scattering centers
    * @param stepLength				average mean free path
   */
-	DirectedFlowScattering(crpropa::Vector3d scatterCenterVelocity,
+	DirectedFlowScattering(Vector3d scatterCenterVelocity,
 	                       double stepLength = 1. * parsec);
-	virtual crpropa::Vector3d
-	scatterCenterVelocity(crpropa::Candidate *candidate) const;
+	virtual Vector3d scatterCenterVelocity(ref_ptr<Candidate> candidate) const;
 };
 
 
@@ -116,7 +133,7 @@ class DirectedFlowOfScatterCenters : public StepLengthModifier {
    * @param scatterCenterVelocity	velocity of scattering centers
   */
 	DirectedFlowOfScatterCenters(const Vector3d &scatterCenterVelocity);
-	double modify(double steplength, Candidate *candidate);
+	double modify(double steplength, ref_ptr<Candidate> candidate);
 };
 
 
@@ -155,7 +172,7 @@ class QuasiLinearTheory : public StepLengthModifier {
 	QuasiLinearTheory(double referenecEnergy = 1. * EeV,
 	                  double turbulenceIndex = 5. / 3,
 	                  double minimumRigidity = 0);
-	double modify(double steplength, Candidate *candidate);
+	double modify(double steplength, ref_ptr<Candidate> candidate);
 };
 
 
@@ -186,12 +203,25 @@ class ParticleSplitting : public Module {
 	                            property used for counting. Useful if
 	                            multiple splitting modules are present.
 	*/
-	ParticleSplitting(Surface *surface, int crossingThreshold = 50,
+	ParticleSplitting(ref_ptr<Surface> surface, int crossingThreshold = 50,
 	                  int numberSplits = 5, double minWeight = 0.01,
 	                  std::string counterid = "ParticleSplittingCounter");
+	/** Constructor
+	@param surface              The surface to monitor
+	@param crossingThreshold   Number of crossings after which a particle is split
+	@param numberSplits           Number of particles the candidate is split into
+	@param minWeight           Minimum weight to consider. Particles with
+	                         	a lower weight are not split again.
+	@param counterid            An unique string to identify the particle
+	                            property used for counting. Useful if
+	                            multiple splitting modules are present.
+	*/
+	ParticleSplitting(Surface *surface, int crossingThreshold = 50,
+	                  int numberSplits = 5, double minWeight = 0.01,
+	                  std::string counterid = "ParticleSplittingCounter");				
 
 	// update the candidate
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 };
 
 

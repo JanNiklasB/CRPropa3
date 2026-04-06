@@ -35,12 +35,21 @@ public:
 	 @param advectionField 	The advection field used for the adiabatic energy change
 	 */
 	AdiabaticCooling(ref_ptr<AdvectionField> advectionField);
+	/** Default constructor.
+	 @param advectionField 	The advection field used for the adiabatic energy change
+	 */
+	AdiabaticCooling(AdvectionField *advectionField);
 	/** Constructor
 	 @param advectionField 	The advection field used for the adiabatic energy change
 	 @param limit 			Maximum relative energy change allowed
 	 */
 	AdiabaticCooling(ref_ptr<AdvectionField> advectionField, double limit);
-	void process(Candidate *c) const;
+	/** Constructor
+	 @param advectionField 	The advection field used for the adiabatic energy change
+	 @param limit 			Maximum relative energy change allowed
+	 */
+	AdiabaticCooling(AdvectionField *advectionField, double limit);
+	void process(ref_ptr<Candidate> c) const;
 
 	void setLimit(double l);
 

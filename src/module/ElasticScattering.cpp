@@ -23,6 +23,10 @@ ElasticScattering::ElasticScattering(ref_ptr<PhotonField> f) {
 	setPhotonField(f);
 }
 
+ElasticScattering::ElasticScattering(PhotonField *f) {
+	setPhotonField(f);
+}
+
 void ElasticScattering::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -79,7 +83,7 @@ void ElasticScattering::initCDF(std::string filename) {
 	infile.close();
 }
 
-void ElasticScattering::process(Candidate *candidate) const {
+void ElasticScattering::process(ref_ptr<Candidate> candidate) const {
 	int id = candidate->current.getId();
 	double z = candidate->getRedshift();
 

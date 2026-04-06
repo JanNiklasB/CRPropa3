@@ -18,6 +18,13 @@ EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> phot
 	setThinning(thinning);
 }
 
+EMInverseComptonScattering::EMInverseComptonScattering(PhotonField *photonField, bool havePhotons, double thinning, double limit) {
+	setPhotonField(photonField);
+	setHavePhotons(havePhotons);
+	setLimit(limit);
+	setThinning(thinning);
+}
+
 void EMInverseComptonScattering::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -203,7 +210,7 @@ void EMInverseComptonScattering::performInteraction(ref_ptr<Candidate> candidate
 	candidate->current.setEnergy(Enew / (1 + z));
 }
 
-void EMInverseComptonScattering::process(Candidate *candidate) const {
+void EMInverseComptonScattering::process(ref_ptr<Candidate> candidate) const {
 	// check if electron / positron
 	int id = candidate->current.getId();
 	if (abs(id) != 11)

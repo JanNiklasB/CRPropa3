@@ -23,7 +23,9 @@ private:
 	ref_ptr<Module> module;
 public:
 	RestrictToRegion(ref_ptr<Module> _module, ref_ptr<Surface> _surface);
-	void process(Candidate *candidate) const;
+	RestrictToRegion(Module *_module, Surface *_surface);
+
+	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 

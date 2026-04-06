@@ -22,8 +22,8 @@ AbstractCondition::AbstractCondition() :
 				"Rejected"), rejectFlagValue( typeid(*this).name() ) {
 }
 
-void AbstractCondition::reject(Candidate *candidate) const {
-	if (!candidate)
+void AbstractCondition::reject(ref_ptr<Candidate> candidate) const {
+	if (!candidate.valid())
 		return;
 
 	if (rejectAction.valid())
@@ -36,8 +36,8 @@ void AbstractCondition::reject(Candidate *candidate) const {
 		candidate->setActive(false);
 }
 
-void AbstractCondition::accept(Candidate *candidate) const {
-	if (!candidate)
+void AbstractCondition::accept(ref_ptr<Candidate> candidate) const {
+	if (!candidate.valid())
 		return;
 
 	if (acceptAction.valid())

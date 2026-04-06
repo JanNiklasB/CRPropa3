@@ -6,6 +6,10 @@ void DensityList::addDensity(ref_ptr<Density> dens) {
 	DensityList.push_back(dens);
 }
 
+void DensityList::addDensity(Density *dens) {
+	DensityList.push_back(dens);
+}
+
 double DensityList::getDensity(const Vector3d &position) const {
 	double n = 0.;
 	for (int i = 0; i < DensityList.size(); i++)
@@ -54,6 +58,11 @@ std::string DensityList::getDescription() {
 // ----------- DensityGrid -----------------------------------------------------------------
 
 DensityGrid::DensityGrid(ref_ptr<Grid1f> grid, bool isForHI, bool isForHII, bool isForH2) : 
+	grid(grid), isForHI(isForHI), isForHII(isForHII), isForH2(isForH2) {
+		checkAndWarn();
+	}
+
+DensityGrid::DensityGrid(Grid1f *grid, bool isForHI, bool isForHII, bool isForH2) : 
 	grid(grid), isForHI(isForHI), isForHII(isForHII), isForH2(isForH2) {
 		checkAndWarn();
 	}

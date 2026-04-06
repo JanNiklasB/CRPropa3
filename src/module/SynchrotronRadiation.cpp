@@ -19,6 +19,17 @@ SynchrotronRadiation::SynchrotronRadiation(ref_ptr<MagneticField> field, bool ha
 	setThinning(thinning);
 }
 
+SynchrotronRadiation::SynchrotronRadiation(MagneticField *field, bool havePhotons, double thinning, int nSamples, double limit) {
+	setField(field);
+	setBrms(0);
+	initSpectrum();
+	setHavePhotons(havePhotons);
+	setLimit(limit);
+	setSecondaryThreshold(1e6 * eV);
+	setMaximumSamples(nSamples);
+	setThinning(thinning);
+}
+
 SynchrotronRadiation::SynchrotronRadiation(double Brms, bool havePhotons, double thinning, int nSamples, double limit) {
 	setBrms(Brms);
 	initSpectrum();
@@ -110,7 +121,7 @@ void SynchrotronRadiation::initSpectrum() {
 	infile.close();
 }
 
-void SynchrotronRadiation::process(Candidate *candidate) const {
+void SynchrotronRadiation::process(ref_ptr<Candidate> candidate) const {
 	double charge = fabs(candidate->current.getCharge());
 	if (charge == 0)
 		return; // only charged particles

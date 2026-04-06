@@ -680,6 +680,20 @@ SourceDensityGrid::SourceDensityGrid(ref_ptr<Grid1f> grid) :
 	setDescription();
 }
 
+SourceDensityGrid::SourceDensityGrid(Grid1f *grid) :
+		grid(grid) {
+	float sum = 0;
+	for (int ix = 0; ix < grid->getNx(); ix++) {
+		for (int iy = 0; iy < grid->getNy(); iy++) {
+			for (int iz = 0; iz < grid->getNz(); iz++) {
+				sum += grid->get(ix, iy, iz);
+				grid->get(ix, iy, iz) = sum;
+			}
+		}
+	}
+	setDescription();
+}
+
 void SourceDensityGrid::prepareParticle(ParticleState& particle) const {
 	Random &random = Random::instance();
 
@@ -702,6 +716,21 @@ void SourceDensityGrid::setDescription() {
 
 // ----------------------------------------------------------------------------
 SourceDensityGrid1D::SourceDensityGrid1D(ref_ptr<Grid1f> grid) :
+		grid(grid) {
+	if (grid->getNy() != 1)
+		throw std::runtime_error("SourceDensityGrid1D: Ny != 1");
+	if (grid->getNz() != 1)
+		throw std::runtime_error("SourceDensityGrid1D: Nz != 1");
+
+	float sum = 0;
+	for (int ix = 0; ix < grid->getNx(); ix++) {
+		sum += grid->get(ix, 0, 0);
+		grid->get(ix, 0, 0) = sum;
+	}
+	setDescription();
+}
+
+SourceDensityGrid1D::SourceDensityGrid1D(Grid1f *grid) :
 		grid(grid) {
 	if (grid->getNy() != 1)
 		throw std::runtime_error("SourceDensityGrid1D: Ny != 1");
@@ -825,8 +854,12 @@ SourceEmissionMap::SourceEmissionMap(ref_ptr<EmissionMap> emissionMap) : emissio
 	setDescription();
 }
 
+SourceEmissionMap::SourceEmissionMap(EmissionMap *emissionMap) : emissionMap(emissionMap) {
+	setDescription();
+}
+
 void SourceEmissionMap::prepareCandidate(Candidate &candidate) const {
-	if (emissionMap) {
+	if (emissionMap.valid()) {
 		bool accept = emissionMap->checkDirection(candidate.source);
 		candidate.setActive(accept);
 	}
@@ -1059,6 +1092,9 @@ void SourceTag::setTag(std::string tag) {
 // ----------------------------------------------------------------------------
 
 SourceMassDistribution::SourceMassDistribution(ref_ptr<Density> density, double max, double x, double y, double z) : 
+	density(density), maxDensity(max), xMin(-x), xMax(x), yMin(-y), yMax(y), zMin(-z), zMax(z) {}
+
+SourceMassDistribution::SourceMassDistribution(Density *density, double max, double x, double y, double z) : 
 	density(density), maxDensity(max), xMin(-x), xMax(x), yMin(-y), yMax(y), zMin(-z), zMax(z) {}
 
 void SourceMassDistribution::setMaximalDensity(double maxDensity) {

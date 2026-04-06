@@ -222,7 +222,7 @@ ref_ptr<Candidate> Candidate::clone(bool recursive) const {
 		cloned->secondaries.reserve(secondaries.size());
 		for (size_t i = 0; i < secondaries.size(); i++) {
 			ref_ptr<Candidate> s = secondaries[i]->clone(recursive);
-			s->parent = cloned;
+			s->parent = cloned.get();
 			cloned->secondaries.push_back(s);
 		}
 	}

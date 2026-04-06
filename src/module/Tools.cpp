@@ -30,7 +30,7 @@ void PerformanceModule::add(ref_ptr<Module> module) {
 	modules.push_back(info);
 }
 
-void PerformanceModule::process(Candidate *candidate) const {
+void PerformanceModule::process(ref_ptr<Candidate> candidate) const {
 	vector<double> times(modules.size());
 	for (size_t i = 0; i < modules.size(); i++) {
 		_module_info &m = modules[i];
@@ -81,7 +81,7 @@ std::set<int> &ParticleFilter::getIds() {
 	return ids;
 }
 
-void ParticleFilter::process(Candidate* candidate) const {
+void ParticleFilter::process(ref_ptr<Candidate> candidate) const {
 	if (ids.find(candidate->current.getId()) == ids.end())
 		reject(candidate);
 	else
@@ -103,12 +103,16 @@ EmissionMapFiller::EmissionMapFiller(ref_ptr<EmissionMap> emissionMap) : emissio
 
 }
 
+EmissionMapFiller::EmissionMapFiller(EmissionMap *emissionMap) : emissionMap(emissionMap) {
+
+}
+
 void EmissionMapFiller::setEmissionMap(ref_ptr<EmissionMap> emissionMap) {
 	this->emissionMap = emissionMap;
 }
 
-void EmissionMapFiller::process(Candidate* candidate) const {
-	if (emissionMap) {
+void EmissionMapFiller::process(ref_ptr<Candidate> candidate) const {
+	if (emissionMap.valid()) {
 		#pragma omp critical(EmissionMap)
 		{
 			emissionMap->fillMap(candidate->source);

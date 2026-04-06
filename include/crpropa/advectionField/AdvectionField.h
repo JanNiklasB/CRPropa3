@@ -37,6 +37,9 @@ class AdvectionFieldList: public AdvectionField {
 	std::vector<ref_ptr<AdvectionField> > fields;
 public:
 	void addField(ref_ptr<AdvectionField> field);
+	inline void addField(AdvectionField *field){
+		addField(ref_ptr<AdvectionField>(field));
+	}
 	Vector3d getField(const Vector3d &position, const double &time=0) const;
 	double getDivergence(const Vector3d &position, const double &time=0) const;
 };

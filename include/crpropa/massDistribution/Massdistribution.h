@@ -26,6 +26,10 @@ public:
 	 @param density density to add
 	*/
 	void addDensity(ref_ptr<Density> density);
+	/** Add new density to list.
+	 @param density density to add
+	*/
+	void addDensity(Density *density);
 
 	/** Get density at a given position.
 	 @param position position in Galactic coordinates with Earth at (-8.5 kpc, 0, 0)
@@ -72,7 +76,8 @@ private:
 
 public:
 	DensityGrid(ref_ptr<Grid1f> grid, bool isForHI = false, bool isForHII = false, bool isForH2 = false);
-	
+	DensityGrid(Grid1f *grid, bool isForHI = false, bool isForHII = false, bool isForH2 = false);
+
 	/** Get HI density at a given position.
 	 @param position position in Galactic coordinates with Earth at (-8.5 kpc, 0, 0)
 	 @returns Density of HI at given position in particles/m^3, sum up all HI densities from added densities
@@ -127,6 +132,9 @@ public:
 	 @param grid (Grid1f) new grid for the density. 
 	*/
 	void setGrid(ref_ptr<Grid1f> grid);
+	inline void setGrid(Grid1f *grid){
+		setGrid(ref_ptr<Grid1f>(grid));
+	}
 
 	std::string getDescription();
 };

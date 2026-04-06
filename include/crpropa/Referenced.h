@@ -59,9 +59,9 @@ class ref_ptr {
 		return *this;
 	}
 
-	operator T*() const {
-		return get();
-	}
+	// operator T*() const {
+	// 	return get();
+	// }
 
 	T& operator*() const {
 		if (_is_shared)

@@ -47,6 +47,9 @@ public:
 	QuimbyMagneticFieldAdapter(crpropa::ref_ptr<crpropa::MagneticField> field) : field(field) {
 
 	}
+	QuimbyMagneticFieldAdapter(crpropa::MagneticField *field) : field(field) {
+
+	}
 
 	bool getField(const quimby::Vector3f &position, quimby::Vector3f &b) const {
 		crpropa::Vector3d r = crpropa::Vector3d(position.x, position.y, position.z) * crpropa::kpc;

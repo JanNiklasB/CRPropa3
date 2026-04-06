@@ -163,7 +163,7 @@ void TextOutput::printHeader() const {
 	}
 }
 
-void TextOutput::process(Candidate *c) const {
+void TextOutput::process(ref_ptr<Candidate> c) const {
 	if (fields.none() && properties.empty())
 		return;
 

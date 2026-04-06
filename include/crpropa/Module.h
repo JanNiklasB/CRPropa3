@@ -23,9 +23,9 @@ public:
 	}
 	virtual std::string getDescription() const;
 	void setDescription(const std::string &description);
-	virtual void process(Candidate *candidate) const = 0;
-	inline void process(ref_ptr<Candidate> candidate) const {
-		process(candidate.get());
+	virtual void process(ref_ptr<Candidate> candidate) const = 0;
+	inline void process(Candidate *candidate) const {
+		process(ref_ptr<Candidate>(candidate));
 	}
 };
 
@@ -41,20 +41,26 @@ protected:
 	std::string rejectFlagKey, rejectFlagValue;
 	std::string acceptFlagKey, acceptFlagValue;
 
-	void reject(Candidate *candidate) const;
-	inline void reject(ref_ptr<Candidate> candidate) const {
-		reject(candidate.get());
+	void reject(ref_ptr<Candidate> candidate) const;
+	inline void reject(Candidate *candidate) const{
+		reject(ref_ptr<Candidate>(candidate));
 	}
 
-	void accept(Candidate *candidate) const;
-	inline void accept(ref_ptr<Candidate> candidate) const {
-		accept(candidate.get());
+	void accept(ref_ptr<Candidate> candidate) const;
+	inline void accept(Candidate *candidate) const{
+		accept(ref_ptr<Candidate>(candidate));
 	}
 
 public:
 	AbstractCondition();
 	void onReject(ref_ptr<Module> rejectAction);
+	inline void onReject(Module *rejectAction){
+		onReject(ref_ptr<Module>(rejectAction));
+	}
 	void onAccept(ref_ptr<Module> acceptAction);
+	inline void onAccept(Module *accpetAction){
+		onAccept(ref_ptr<Module>(acceptAction));
+	}
 	void setMakeRejectedInactive(bool makeInactive);
 	void setMakeAcceptedInactive(bool makeInactive);
 	void setRejectFlag(std::string key, std::string value);

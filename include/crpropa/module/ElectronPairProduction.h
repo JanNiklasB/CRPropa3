@@ -40,9 +40,21 @@ public:
 	 */
 	ElectronPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons =
 			false, double limit = 0.1);
+	/**
+	 * @brief Constructor for the Electron Pair Production
+	 * 
+	 * @param photonField 	target photon field
+	 * @param haveElectrons If true, secondary electrons will be added to the simulation
+	 * @param limit 		step size limit as fraction of mean free path
+	 */
+	ElectronPairProduction(PhotonField *photonField, bool haveElectrons =
+			false, double limit = 0.1);
 
 	// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
+	inline void setPhotonField(PhotonField *photonField){
+		setPhotonField(ref_ptr<PhotonField>(photonField));
+	}
 
 	// decide if secondary electrons are added to the simulation
 	void setHaveElectrons(bool haveElectrons);
@@ -60,7 +72,7 @@ public:
 	
 	void initRate(std::string filename);
 	void initSpectrum(std::string filename);
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 
 	/**
 	 Calculates the energy loss length 1/beta = -E dx/dE in [m]

@@ -155,7 +155,7 @@ class MagneticLens
 			double rigidityMax);
 
 	// Stores the individual lenses
-	std::vector<LensPart*> _lensParts;
+	std::vector<ref_ptr<LensPart>> _lensParts;
 	ref_ptr<Pixelization> _pixelization;
 	// Checks Matrix, raises Errors if not ok - also generate
 	// _pixelization if called first time
@@ -198,7 +198,7 @@ public:
 	{
 		if (_pixelization)
 			delete _pixelization;
-		for (std::vector<LensPart*>::iterator iter = _lensParts.begin();
+		for (std::vector<ref_ptr<LensPart>>::iterator iter = _lensParts.begin();
 				iter != _lensParts.end(); iter++)
 		{
 			delete (*iter);
@@ -262,10 +262,10 @@ public:
 	}
 
 	/// Returns iterator to the lens part with rigidity Joule
-	LensPart* getLensPart(double rigidity) const;
+	ref_ptr<LensPart> getLensPart(double rigidity) const;
 
 	/// Returns all lens parts
-	const std::vector<LensPart*>& getLensParts() const
+	const std::vector<ref_ptr<LensPart>>& getLensParts() const
 	{
 		return _lensParts;
 	}

@@ -49,11 +49,21 @@ public:
 	 @param limit			step size limit as fraction of mean free path
 	 */
 	PhotoDisintegration(ref_ptr<PhotonField> photonField, bool havePhotons = false, double limit = 0.1);
+	/** Constructor.
+	 @param photonField		target photon field
+	 @param havePhotons		if true, add secondary photons as candidates
+	 @param limit			step size limit as fraction of mean free path
+	 */
+	PhotoDisintegration(PhotonField* photonField, bool havePhotons = false, double limit = 0.1);
 
-	// set the target photon field
+	/// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
+	/// set the target photon field
+	inline void setPhotonField(PhotonField *photonField){
+		setPhotonField(ref_ptr<PhotonField>(photonField));
+	}
 
-	// decide if secondary photons are added to the simulation
+	/// decide if secondary photons are added to the simulation
 	void setHavePhotons(bool havePhotons);
 
 	/** Limit the propagation step to a fraction of the mean free path
@@ -71,8 +81,11 @@ public:
 	void initBranching(std::string filename);
 	void initPhotonEmission(std::string filename);
 
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	void performInteraction(ref_ptr<Candidate> candidate, int channel) const;
+	inline void performInteraction(Candidate *candidate, int channel) const{
+		performInteraction(ref_ptr<Candidate>(candidate), channel);
+	}
 
 	/**
 	 Calculates the loss length E dx/dE in [m] physical distance.

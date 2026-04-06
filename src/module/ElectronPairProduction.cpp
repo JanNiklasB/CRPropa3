@@ -17,6 +17,13 @@ ElectronPairProduction::ElectronPairProduction(ref_ptr<PhotonField> photonField,
 	setPhotonField(photonField);
 }
 
+ElectronPairProduction::ElectronPairProduction(PhotonField *photonField,
+		bool haveElectrons, double limit) {
+	this->haveElectrons = haveElectrons;
+	this->limit = limit;
+	setPhotonField(photonField);
+}
+
 void ElectronPairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -103,7 +110,7 @@ double ElectronPairProduction::lossLength(int id, double lf, double z) const {
 	return 1. / rate;
 }
 
-void ElectronPairProduction::process(Candidate *c) const {
+void ElectronPairProduction::process(ref_ptr<Candidate> c) const {
 	int id = c->current.getId();
 	if (not (isNucleus(id)))
 		return; // only nuclei

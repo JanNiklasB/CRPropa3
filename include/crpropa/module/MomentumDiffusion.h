@@ -44,7 +44,7 @@ public:
 	*/
 	ConstantMomentumDiffusion(double Dpp, double limit);
 
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	double calculateAScalar(double p) const;
 	double calculateBScalar() const;
 

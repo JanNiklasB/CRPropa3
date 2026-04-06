@@ -18,7 +18,7 @@ namespace crpropa {
  */
 class ShellOutput: public Module {
 public:
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -28,7 +28,7 @@ public:
  */
 class ShellOutput1D: public Module {
 public:
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -39,7 +39,7 @@ public:
 class ShellPropertyOutput: public Module {
 public:
 	typedef std::unordered_map<std::string, Variant> PropertyMap;
-	void process(Candidate *candidate) const;
+	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 /** @}*/

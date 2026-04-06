@@ -59,12 +59,29 @@ public:
 	/**
 	 * Constructor
 	 * @param field magnetic field reference pointer
+	 * @param extends length, width, and height of the base cube 
+	*/
+	PeriodicMagneticField(MagneticField *field,
+			const Vector3d &extends);
+	/**
+	 * Constructor
+	 * @param field magnetic field reference pointer
 	 * @param extends length, width, and height of the base cube
 	 * @param origin defines the reference position 
 	 * @param reflective for periodic or reflective behavior  
 	*/
 	PeriodicMagneticField(ref_ptr<MagneticField> field, const Vector3d &extends,
 			const Vector3d &origin, bool reflective);
+	/**
+	 * Constructor
+	 * @param field magnetic field reference pointer
+	 * @param extends length, width, and height of the base cube
+	 * @param origin defines the reference position 
+	 * @param reflective for periodic or reflective behavior  
+	*/
+	PeriodicMagneticField(MagneticField *field, const Vector3d &extends,
+			const Vector3d &origin, bool reflective);
+	
 	Vector3d &getOrigin();
 	void setOrigin(const Vector3d &origin);
 	Vector3d &getExtends();
@@ -82,6 +99,9 @@ class MagneticFieldList: public MagneticField {
 	std::vector<ref_ptr<MagneticField> > fields;
 public:
 	void addField(ref_ptr<MagneticField> field);
+	inline void addField(MagneticField *field){
+		addField(ref_ptr<MagneticField>(field));
+	}
 	Vector3d getField(const Vector3d &position) const;
 };
 
@@ -99,6 +119,12 @@ public:
 	 * @param m cosmic evolution parameter 
 	*/
 	MagneticFieldEvolution(ref_ptr<MagneticField> field, double m);
+	/**
+	 * Constructor
+	 * @param field magnetic field reference pointer
+	 * @param m cosmic evolution parameter 
+	*/
+	MagneticFieldEvolution(MagneticField *field, double m);
 	Vector3d getField(const Vector3d &position, double z = 0) const;
 };
 
@@ -161,6 +187,7 @@ public:
 	 * 						e.g., "gauss". 
 	*/
 	RenormalizeMagneticField(ref_ptr<MagneticField> field, std::string expression);
+	RenormalizeMagneticField(MagneticField *field, std::string expression);
 	~RenormalizeMagneticField() { delete p;	}
 	Vector3d getField(const Vector3d &position);
 };

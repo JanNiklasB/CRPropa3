@@ -17,6 +17,13 @@ EMTripletPairProduction::EMTripletPairProduction(ref_ptr<PhotonField> photonFiel
 	setThinning(thinning);
 }
 
+EMTripletPairProduction::EMTripletPairProduction(PhotonField *photonField, bool haveElectrons, double thinning, double limit) {
+	setPhotonField(photonField);
+	setHaveElectrons(haveElectrons);
+	setLimit(limit);
+	setThinning(thinning);
+}
+
 void EMTripletPairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -143,7 +150,7 @@ void EMTripletPairProduction::performInteraction(ref_ptr<Candidate> candidate) c
 	candidate->current.setEnergy((E - 2 * Epp) / (1. + z));
 }
 
-void EMTripletPairProduction::process(Candidate *candidate) const {
+void EMTripletPairProduction::process(ref_ptr<Candidate> candidate) const {
 	// check if electron / positron
 	int id = candidate->current.getId();
 	if (abs(id) != 11)

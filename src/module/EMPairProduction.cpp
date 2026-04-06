@@ -19,6 +19,13 @@ EMPairProduction::EMPairProduction(ref_ptr<PhotonField> photonField, bool haveEl
 	setHaveElectrons(haveElectrons);
 }
 
+EMPairProduction::EMPairProduction(PhotonField *photonField, bool haveElectrons, double thinning, double limit) {
+	setPhotonField(photonField);
+	setThinning(thinning);
+	setLimit(limit);
+	setHaveElectrons(haveElectrons);
+}
+
 void EMPairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -236,7 +243,7 @@ void EMPairProduction::performInteraction(ref_ptr<Candidate> candidate) const {
 	}
 }
 
-void EMPairProduction::process(Candidate *candidate) const {
+void EMPairProduction::process(ref_ptr<Candidate> candidate) const {
 	// check if photon
 	if (candidate->current.getId() != 22)
 		return;

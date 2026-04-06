@@ -15,6 +15,13 @@ EMDoublePairProduction::EMDoublePairProduction(ref_ptr<PhotonField> photonField,
 	setThinning(thinning);
 }
 
+EMDoublePairProduction::EMDoublePairProduction(PhotonField *photonField, bool haveElectrons, double thinning, double limit) {
+	setPhotonField(photonField);
+	setHaveElectrons(haveElectrons);
+	setLimit(limit);
+	setThinning(thinning);
+}
+
 void EMDoublePairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -88,7 +95,7 @@ void EMDoublePairProduction::performInteraction(ref_ptr<Candidate> candidate) co
 		}
 }
 
-void EMDoublePairProduction::process(Candidate *candidate) const {
+void EMDoublePairProduction::process(ref_ptr<Candidate> candidate) const {
 	// check if photon
 	if (candidate->current.getId() != 22)
 		return;

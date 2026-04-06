@@ -32,11 +32,14 @@ protected:
 	std::string description;
 public:
 	virtual ~ObserverFeature() = default;
-	virtual DetectionState checkDetection(Candidate *candidate) const;
-	inline DetectionState checkDetection(ref_ptr<Candidate> candidate) const{
-		return checkDetection(candidate.get());
+	virtual DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
+	inline DetectionState checkDetection(Candidate* candidate) const{
+		return checkDetection(ref_ptr<Candidate>(candidate));
 	}
 	virtual void onDetection(ref_ptr<Candidate> candidate) const;
+	inline void onDetection(Candidate *candidate) const{
+		onDetection(ref_ptr<Candidate>(candidate));
+	}
 	virtual std::string getDescription() const;
 };
 
@@ -66,7 +69,10 @@ public:
 	 @param clone		if true, clone candidate
 	 */
 	void onDetection(ref_ptr<Module> action, bool clone = false);
-	void process(Candidate *candidate) const;
+	inline void onDetection(Module *action, bool clone = false){
+		onDetection(ref_ptr<Module>(action), clone);
+	}
+	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 	void setFlag(std::string key, std::string value);
 	/** Determine whether candidate should be deactivated on detection
@@ -82,7 +88,7 @@ public:
  */
 class ObserverDetectAll: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -99,7 +105,11 @@ public:
 	 @param surface		object with some specific geometric (see Geometry.h)
 	*/
 	ObserverSurface(ref_ptr<Surface> surface);
-	DetectionState checkDetection(Candidate *candidate) const;
+	/** Constructor
+	 @param surface		object with some specific geometric (see Geometry.h)
+	*/
+	ObserverSurface(Surface *surface);
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -120,7 +130,7 @@ public:
 	 @param stepSize	observer will keep track of particles at every step with this size
 	*/
 	ObserverTracking(Vector3d center, double radius, double stepSize = 0);
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -133,7 +143,7 @@ public:
  */
 class Observer1D: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -159,7 +169,7 @@ public:
 	 @param zmax	upper bound of redshift interval
 	 */
 	ObserverRedshiftWindow(double zmin = 0, double zmax = 0.1);
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -170,7 +180,7 @@ public:
  */
 class ObserverInactiveVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -181,7 +191,7 @@ public:
  */
 class ObserverNucleusVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -192,7 +202,7 @@ public:
  */
 class ObserverNeutrinoVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -203,7 +213,7 @@ public:
  */
 class ObserverPhotonVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -214,7 +224,7 @@ public:
  */
 class ObserverElectronVeto: public ObserverFeature {
 public:
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -233,7 +243,7 @@ public:
 	 @param id		id of the particle following the PDG numbering scheme
 	 */
 	ObserverParticleIdVeto(int id);
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
 
@@ -309,7 +319,7 @@ public:
 	 Checks whether to make a detection at the current step of candidate or not.
 	 This function is called in Observer.process with the simulated Candidate.
 	 */
-	DetectionState checkDetection(Candidate *candidate) const;
+	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	/** Function
 	 @param enableConstruction	if true, constructs detList from range of min, max, numb
 	 when calling addTime

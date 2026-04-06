@@ -20,7 +20,7 @@ ParticleCollector::ParticleCollector(const std::size_t nBuffer, const bool clone
 	container.reserve(nBuffer);
 }
 
-void ParticleCollector::process(Candidate *c) const {
+void ParticleCollector::process(ref_ptr<Candidate> c) const {
 #pragma omp critical(ModifyContainer)
         {
 		if(clone)
@@ -97,18 +97,18 @@ ParticleCollector::const_iterator ParticleCollector::end() const {
 	return container.end();
 }
 
-void ParticleCollector::getTrajectory(ModuleList* mlist, std::size_t i, Module *output) const {
+void ParticleCollector::getTrajectory(ref_ptr<ModuleList> mlist, std::size_t i, ref_ptr<Module> output) const {
 	ref_ptr<Candidate> c_tmp = container[i]->clone();
-
+	
 	c_tmp->restart();
-
+	
 	mlist->add(output);
 	mlist->run(c_tmp);
 	mlist->remove(mlist->size()-1);
 }
 
-void ParticleCollector::getTrajectory(ref_ptr<ModuleList> mlist, std::size_t i, ref_ptr<Module> output) const {
-	ParticleCollector::getTrajectory((ModuleList*) mlist, i, (Module*) output);
+void ParticleCollector::getTrajectory(ModuleList* mlist, std::size_t i, Module *output) const {
+	ParticleCollector::getTrajectory(ref_ptr<ModuleList>(mlist), i, ref_ptr<Module>(output));
 }
 
 } // namespace crpropa

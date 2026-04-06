@@ -74,6 +74,10 @@ class SimpleGridTurbulence : public GridTurbulence {
 
 	static void initTurbulence(ref_ptr<Grid3f> grid, double Brms, double lMin,
 	                           double lMax, double alpha, int seed);
+	static inline void initTurbulence(Grid3f *grid, double Brms, double lMin,
+	                           double lMax, double alpha, int seed){
+		initTurbulence(ref_ptr<Grid3f>(grid), Brms, lMin, lMax, alpha, seed);
+	}
 };
 
 // Compatibility with old functions from GridTurbulence:
@@ -107,6 +111,21 @@ inline void initTurbulence(ref_ptr<Grid3f> grid, double Brms, double lMin,
 	       "Replace it with a more appropriate turbulent field model instance.";
 	SimpleGridTurbulence::initTurbulence(grid, Brms, lMin, lMax, alpha, seed);
 }
+/**
+ Create a random initialization of a turbulent field.
+ @param grid	grid on which the turbulence is calculated
+ @param lMin	Minimum wavelength of the turbulence
+ @param lMax	Maximum wavelength of the turbulence
+ @param alpha	Power law index of <B^2(k)> ~ k^alpha (alpha = -11/3 corresponds
+ to a Kolmogorov spectrum)
+ @param Brms	RMS field strength
+ @param seed	Random seed
+ */
+inline void initTurbulence(Grid3f *grid, double Brms, double lMin,
+                           double lMax, double alpha = -11 / 3., int seed = 0) {
+	initTurbulence(ref_ptr<Grid3f>(grid), Brms, lMin, lMax, alpha, seed);
+}
+
 
 /** @}*/
 } // namespace crpropa

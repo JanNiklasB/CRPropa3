@@ -32,10 +32,17 @@ public:
 	 @param photonField		target photon field
 	 */
 	ElasticScattering(ref_ptr<PhotonField> photonField);
+	/** Constructor
+	 @param photonField		target photon field
+	 */
+	ElasticScattering(PhotonField *photonField);
 	void initRate(std::string filename);
 	void initCDF(std::string filename);
 	void setPhotonField(ref_ptr<PhotonField> photonField);
-	void process(Candidate *candidate) const;
+	inline void setPhotonField(PhotonField *photonField){
+		setPhotonField(ref_ptr<PhotonField>(photonField));
+	}
+	void process(ref_ptr<Candidate> candidate) const;
 	
 	std::string getInteractionTag() const;
 	void setInteractionTag(std::string tag);

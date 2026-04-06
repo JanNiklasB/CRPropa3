@@ -23,6 +23,12 @@ PhotoDisintegration::PhotoDisintegration(ref_ptr<PhotonField> f, bool havePhoton
 	this->limit = limit;
 }
 
+PhotoDisintegration::PhotoDisintegration(PhotonField *f, bool havePhotons, double limit) {
+	setPhotonField(f);
+	this->havePhotons = havePhotons;
+	this->limit = limit;
+}
+
 void PhotoDisintegration::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();
@@ -145,7 +151,7 @@ void PhotoDisintegration::initPhotonEmission(std::string filename) {
 	infile.close();
 }
 
-void PhotoDisintegration::process(Candidate *candidate) const {
+void PhotoDisintegration::process(ref_ptr<Candidate> candidate) const {
 	// execute the loop at least once for limiting the next step
 	double step = candidate->getCurrentStep();
 	do {

@@ -42,7 +42,7 @@ void AbstractAccelerationModule::scatter(
 }
 
 
-void AbstractAccelerationModule::process(Candidate *candidate) const {
+void AbstractAccelerationModule::process(ref_ptr<Candidate> candidate) const {
 	double currentStepLength = stepLength;
 	for (auto m : modifiers) {
 		currentStepLength = m->modify(currentStepLength, candidate);
@@ -78,7 +78,7 @@ SecondOrderFermi::SecondOrderFermi(double scatterVelocity, double stepLength,
 }
 
 
-Vector3d SecondOrderFermi::scatterCenterVelocity(Candidate *candidate) const
+Vector3d SecondOrderFermi::scatterCenterVelocity(ref_ptr<Candidate> candidate) const
 {
 	size_t idx = closestIndex(Random::instance().rand(), angleCDF);
 	Vector3d rv = Random::instance().randVector();
@@ -94,7 +94,7 @@ DirectedFlowOfScatterCenters::DirectedFlowOfScatterCenters(
 	: __scatterVelocity(scatterCenterVelocity) {}
 
 
-double DirectedFlowOfScatterCenters::modify(double steplength, Candidate* candidate)
+double DirectedFlowOfScatterCenters::modify(double steplength, ref_ptr<Candidate> candidate)
 {
 	double directionModifier = (-1. * __scatterVelocity.dot(candidate->current.getDirection()) + c_light) / c_light;
 	return steplength / directionModifier;
@@ -114,7 +114,7 @@ DirectedFlowScattering::DirectedFlowScattering(
 
 
 Vector3d DirectedFlowScattering::scatterCenterVelocity(
-	Candidate *candidate) const { // does not depend on candidate here.
+	ref_ptr<Candidate> candidate) const { // does not depend on candidate here.
 	return __scatterVelocity;
 }
 
@@ -126,7 +126,7 @@ QuasiLinearTheory::QuasiLinearTheory(double referenecEnergy,
 	  __minimumRigidity(minimumRigidity) {}
 
 
-double QuasiLinearTheory::modify(double steplength, Candidate* candidate)
+double QuasiLinearTheory::modify(double steplength, ref_ptr<Candidate> candidate)
 {
 	if (candidate->current.getRigidity() < __minimumRigidity)
 	{
@@ -144,9 +144,14 @@ double QuasiLinearTheory::modify(double steplength, Candidate* candidate)
 ParticleSplitting::ParticleSplitting(Surface *surface, int	crossingThreshold, 
 	int numberSplits, double minWeight, std::string counterid)
 	: surface(surface), crossingThreshold(crossingThreshold),
-	  numberSplits(numberSplits), minWeight(minWeight), counterid(counterid){};
+	  numberSplits(numberSplits), minWeight(minWeight), counterid(counterid){}
 
-void ParticleSplitting::process(Candidate *candidate) const {
+ParticleSplitting::ParticleSplitting(ref_ptr<Surface> surface, int	crossingThreshold, 
+	int numberSplits, double minWeight, std::string counterid)
+	: surface(surface), crossingThreshold(crossingThreshold),
+	  numberSplits(numberSplits), minWeight(minWeight), counterid(counterid){}
+
+void ParticleSplitting::process(ref_ptr<Candidate> candidate) const {
 	const double currentDistance =
 		surface->distance(candidate->current.getPosition());
 	const double previousDistance =
@@ -173,7 +178,7 @@ void ParticleSplitting::process(Candidate *candidate) const {
 		// No recursive split as the weights of the secondaries created
 		// before the split are not affected
 		ref_ptr<Candidate> new_candidate = candidate->clone(false);
-		new_candidate->parent = candidate;
+		new_candidate->parent = candidate.get();
 		uint64_t snr = Candidate::getNextSerialNumber();
 		Candidate::setNextSerialNumber(snr + 1);
 		new_candidate->setSerialNumber(snr);

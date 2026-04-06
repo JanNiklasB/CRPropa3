@@ -29,7 +29,20 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setEpsilon(epsilon);
   	setScale(1.);
   	setAlpha(1./3.);
-	}
+}
+
+DiffusionSDE::DiffusionSDE(MagneticField *magneticField, double tolerance,
+				 double minStep, double maxStep, double epsilon) :
+	minStep(0)
+{
+  	setMagneticField(magneticField);
+  	setMaximumStep(maxStep);
+  	setMinimumStep(minStep);
+  	setTolerance(tolerance);
+  	setEpsilon(epsilon);
+  	setScale(1.);
+  	setAlpha(1./3.);
+}
 
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
   	minStep(0)
@@ -42,9 +55,22 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setEpsilon(epsilon);
 	setScale(1.);
 	setAlpha(1./3.);
-  	}
+}
 
-void DiffusionSDE::process(Candidate *candidate) const {
+DiffusionSDE::DiffusionSDE(MagneticField *magneticField, AdvectionField *advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
+  	minStep(0)
+{
+	setMagneticField(magneticField);
+	setAdvectionField(advectionField);
+	setMaximumStep(maxStep);
+	setMinimumStep(minStep);
+	setTolerance(tolerance);
+	setEpsilon(epsilon);
+	setScale(1.);
+	setAlpha(1./3.);
+}
+
+void DiffusionSDE::process(ref_ptr<Candidate> candidate) const {
 
     // save the new previous particle state
 
@@ -64,7 +90,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		Vector3d Pos = current.getPosition();
 
 		Vector3d LinProp(0.);
-		if (advectionField){
+		if (advectionField.valid()){
 			driftStep(Pos, LinProp, h, time);
 		}
 
@@ -135,7 +161,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	  	Vector3d dir = current.getDirection();
 		Vector3d Pos = current.getPosition();
 		Vector3d LinProp(0.);
-		if (advectionField){
+		if (advectionField.valid()){
 			driftStep(Pos, LinProp, h, time);
 			current.setPosition(Pos + LinProp);
 	 		candidate->setCurrentStep(h*c_light);
@@ -165,7 +191,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
     // Calculate the advection step
 	Vector3d LinProp(0.);
-	if (advectionField){
+	if (advectionField.valid()){
 		driftStep(PosIn, LinProp, h, time);
 	}
 

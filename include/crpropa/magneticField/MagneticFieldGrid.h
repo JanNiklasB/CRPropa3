@@ -24,7 +24,15 @@ public:
 	 @param grid Grid3f storing the magnetic field vectors
 	*/
 	MagneticFieldGrid(ref_ptr<Grid3f> grid);
+	/**
+	 *Constructor
+	 @param grid Grid3f storing the magnetic field vectors
+	*/
+	MagneticFieldGrid(Grid3f* grid);
 	void setGrid(ref_ptr<Grid3f> grid);
+	inline void setGrid(Grid3f *grid){
+		setGrid(ref_ptr<Grid3f>(grid));
+	}
 	ref_ptr<Grid3f> getGrid();
 	Vector3d getField(const Vector3d &position) const;
 };
@@ -50,8 +58,21 @@ public:
 	 				B^new_i = B^old_i * scale 
 	*/
 	ModulatedMagneticFieldGrid(ref_ptr<Grid3f> grid, ref_ptr<Grid1f> modGrid);
+	/**
+	 *Constructor
+	 @param grid 	Grid3f storing the magnetic field vectors
+	 @param modGrid Grid1f used to scale the magnetic field strength
+	 				B^new_i = B^old_i * scale 
+	*/
+	ModulatedMagneticFieldGrid(Grid3f *grid, Grid1f *modGrid);
 	void setGrid(ref_ptr<Grid3f> grid);
+	inline void setGrid(Grid3f* grid){
+		setGrid(ref_ptr<Grid3f>(grid));
+	}
 	void setModulationGrid(ref_ptr<Grid1f> modGrid);
+	inline void setModulationGrid(Grid1f *modGrid){
+		setModulationGrid(ref_ptr<Grid1f>(modGrid));
+	}
 	ref_ptr<Grid3f> getGrid();
 	ref_ptr<Grid1f> getModulationGrid();
 	void setReflective(bool gridReflective, bool modGridReflective);
