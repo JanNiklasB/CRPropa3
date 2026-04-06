@@ -75,6 +75,11 @@ class ref_ptr {
 		else
 			return _ptr;
 	}
+
+	bool operator==(const ref_ptr& rp) const {
+		return get()==rp.get();
+	}
+
 	T* get() const {
 		if (_is_shared)
 			return _shared_ptr.get();
