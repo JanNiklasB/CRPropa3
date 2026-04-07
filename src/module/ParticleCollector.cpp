@@ -33,9 +33,9 @@ void ParticleCollector::process(ref_ptr<Candidate> c) const {
 void ParticleCollector::reprocess(ref_ptr<Module> action) const {
 	for (ParticleCollector::iterator itr = container.begin(); itr != container.end(); ++itr){
 		if (clone)
-			action->process((*(itr->get())).clone(false));
+			action->process((*(itr))->clone(false));
 		else
-        	        action->process(itr->get());
+			action->process(*itr);
 	}
 }
 

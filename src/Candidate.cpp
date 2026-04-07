@@ -146,7 +146,7 @@ bool Candidate::hasProperty(const std::string &name) const {
 }
 
 void Candidate::addSecondary(ref_ptr<Candidate> c) {
-	secondaries.push_back(c.get());
+	secondaries.push_back(c);
 }
 
 void Candidate::addSecondary(int id, double energy, double w, std::string tagOrigin) {

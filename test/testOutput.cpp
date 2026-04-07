@@ -247,7 +247,7 @@ TEST(ParticleCollector, getTrajectory) {
 
 	for (ParticleCollector::iterator itr = trajectory->begin();
 		 itr != trajectory->end(); ++itr) {
-		pos = (*(itr->get())).current.getPosition();
+		pos = (*itr)->current.getPosition();
 		pos_x[i] = pos.getX();
 		++i;
 	}
