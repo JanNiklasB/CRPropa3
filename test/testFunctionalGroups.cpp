@@ -17,23 +17,17 @@ TEST(testFunctionalGroups, gyroradius) {
 	p.setPosition(Vector3d(0, 0, 0));
 	p.setDirection(Vector3d(0, 0, 1));
 
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>( new Candidate(p));
-	ref_ptr<PropagationCK> propa = std::shared_ptr<PropagationCK>(
-		new PropagationCK(
-			std::shared_ptr<MagneticField>(new UniformMagneticField(Vector3d(field, 0, 0)))
-		)
-	);
-	ref_ptr<ParticleCollector> collector = std::shared_ptr<ParticleCollector>(
-		new ParticleCollector()
-	);
+	ref_ptr<Candidate> c = new Candidate(p);
+	ref_ptr<PropagationCK> propa = new PropagationCK(new UniformMagneticField(Vector3d(field, 0, 0)));
+	ref_ptr<ParticleCollector> collector = new ParticleCollector();
 	collector->setClone(true);
-	ref_ptr<ModuleList> sim = std::shared_ptr<ModuleList>( new ModuleList());
+	ref_ptr<ModuleList> sim = new ModuleList();
 
 	Vector3d pos;
 	double max_y = 0;
 
 	sim->add(propa);
-	sim->add(std::shared_ptr<Module>(new MaximumTrajectoryLength(10*Mpc)));
+	sim->add(new MaximumTrajectoryLength(10*Mpc));
 	sim->add(collector);
 
 	sim->run(c);

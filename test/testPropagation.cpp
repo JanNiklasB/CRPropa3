@@ -38,7 +38,7 @@ TEST(testSimplePropagation, step) {
 
 
 TEST(testPropagationCK, zeroField) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 0))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 0)));
 
 	double minStep = 0.1 * kpc;
 	propa.setMinimumStep(minStep);
@@ -60,11 +60,11 @@ TEST(testPropagationCK, zeroField) {
 #ifndef CRPROPA_TESTS_SKIP_EXCEPTIONS
 TEST(testPropagationCK, exceptions) {
 	// minStep should be smaller than maxStep
-	EXPECT_THROW(PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))), 0.42, 10 , 0), std::runtime_error);
+	EXPECT_THROW(PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)), 0.42, 10 , 0), std::runtime_error);
 	// Too large tolerance: tolerance should be between 0 and 1
-	EXPECT_THROW(PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))), 42., 10 * kpc , 20 * kpc), std::runtime_error);
+	EXPECT_THROW(PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)), 42., 10 * kpc , 20 * kpc), std::runtime_error);
 
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	// set maximum step, so that it can be tested what happens if a larger minStep is set.
 	propa.setMaximumStep(1 * Mpc);
@@ -83,7 +83,7 @@ TEST(testPropagationCK, exceptions) {
 
 TEST(testPropagationCK, constructor) {
 	// Test construction and parameters
-	ref_ptr<MagneticField> bField = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
+	ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(0, 0, 1 * nG));
 
 	double minStep = 1.;
 	double maxStep = 100.;
@@ -100,7 +100,7 @@ TEST(testPropagationCK, constructor) {
 	minStep = 10.;
 	maxStep = 10.;
 	propa.setTolerance(0.0001);
-	bField = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG)));
+	bField = new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG));
 
 	propa.setTolerance(tolerance);
 	propa.setMinimumStep(minStep);
@@ -120,7 +120,7 @@ TEST(testPropagationCK, constructor) {
 
 // Test if the step size is reduced correctly if the error is too large with respect to the tolerance: r > 1
 TEST(testPropagationCK, reduceStep) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 100 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 100 * nG)));
 
 	double minStep = 0.1 * kpc;
 	double maxStep = 1 * Gpc;
@@ -148,7 +148,7 @@ TEST(testPropagationCK, reduceStep) {
 
 // Test if the step size is increased correctly if the error is small with respect to the tolerance: r < 1
 TEST(testPropagationCK, increaseStep) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	double minStep = 0.001 * pc;
 	double maxStep = 3.125 * pc;
@@ -176,7 +176,7 @@ TEST(testPropagationCK, increaseStep) {
 
 
 TEST(testPropagationCK, proton) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	double minStep = 0.1 * kpc;
 	propa.setMinimumStep(minStep);
@@ -198,7 +198,7 @@ TEST(testPropagationCK, proton) {
 
 // Test the numerical results for parallel magnetic field lines along the z-axis
 TEST(testPropagationCK, gyration) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	double step = 10. * Mpc;  // gyroradius is 108.1 Mpc
 	propa.setMaximumStep(step);
@@ -250,7 +250,7 @@ TEST(testPropagationCK, gyration) {
 
 
 TEST(testPropagationCK, neutron) {
-	PropagationCK propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationCK propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 	propa.setMinimumStep(1 * kpc);
 	propa.setMaximumStep(42 * Mpc);
 
@@ -271,7 +271,7 @@ TEST(testPropagationCK, neutron) {
 
 
 TEST(testPropagationBP, zeroField) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 0))), 1 * kpc);
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 0)), 1 * kpc);
 
 	double minStep = 0.1 * kpc;
 	propa.setMinimumStep(minStep);
@@ -294,11 +294,11 @@ TEST(testPropagationBP, zeroField) {
 #ifndef CRPROPA_TESTS_SKIP_EXCEPTIONS
 TEST(testPropagationBP, exceptions) {
 	// minStep should be smaller than maxStep
-	EXPECT_THROW(PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))), 0.42, 10 , 0), std::runtime_error);
+	EXPECT_THROW(PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)), 0.42, 10 , 0), std::runtime_error);
 	// Too large tolerance: tolerance should be between 0 and 1
-	EXPECT_THROW(PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))), 42., 10 * kpc , 20 * kpc), std::runtime_error);
+	EXPECT_THROW(PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)), 42., 10 * kpc , 20 * kpc), std::runtime_error);
 
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	// set maximum step, so that it can be tested what happens if a larger minStep is set.
 	propa.setMaximumStep(1 * Mpc);
@@ -318,7 +318,7 @@ TEST(testPropagationBP, exceptions) {
 
 TEST(testPropagationBP, constructor) {
 	// Test construction and parameters
-	ref_ptr<MagneticField> bField = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
+	ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(0, 0, 1 * nG));
 
 	double minStep = 1.;
 	double maxStep = 100.;
@@ -335,7 +335,7 @@ TEST(testPropagationBP, constructor) {
 	minStep = 10.;
 	maxStep = 10.;
 	propa.setTolerance(0.0001);
-	bField = std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG)));
+	bField = new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG));
 
 	propa.setTolerance(tolerance);
 	propa.setMinimumStep(minStep);
@@ -360,7 +360,7 @@ TEST(testPropagationBP, constructor) {
 
 // Test if the step size is reduced correctly if the error is too large with respect to the tolerance: r > 1
 TEST(testPropagationBP, reduceStep) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 100 * nG))), 1 * kpc);
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 100 * nG)), 1 * kpc);
 
 	double minStep = 0.1 * kpc;
 	double maxStep = 1 * Gpc;
@@ -388,7 +388,7 @@ TEST(testPropagationBP, reduceStep) {
 
 // Test if the step size is increased correctly if the error is small with respect to the tolerance: r < 1
 TEST(testPropagationBP, increaseStep) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))), 1 * kpc);
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)), 1 * kpc);
 
 	double minStep = 0.001 * pc;
 	double maxStep = 3.125 * pc;
@@ -416,7 +416,7 @@ TEST(testPropagationBP, increaseStep) {
 
 
 TEST(testPropagationBP, proton) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	double step = 0.01 * kpc;
 	propa.setMinimumStep(step);
@@ -440,7 +440,7 @@ TEST(testPropagationBP, proton) {
 
 // Test the numerical results for parallel magnetic field lines along the z-axis
 TEST(testPropagationBP, gyration) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	double step = 10. * Mpc;  // gyroradius is 108.1 Mpc
 	propa.setMaximumStep(step);
@@ -488,7 +488,7 @@ TEST(testPropagationBP, gyration) {
 TEST(testPropagationBP, fixedStepOptimization) {
 	// particle 1 with fixed step sizes
 	double fixed_step = pc;
-	PropagationBP propa1(std::shared_ptr<PlaneWaveTurbulence>(new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1)), fixed_step);
+	PropagationBP propa1(new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1), fixed_step);
 	ParticleState p1;
 	p1.setId(nucleusId(1, 1));
 	p1.setEnergy(100 * EeV);
@@ -504,7 +504,7 @@ TEST(testPropagationBP, fixedStepOptimization) {
 	// particle 2 with different min and max steps. The tolerance is chosen such that particle 2 will be
 	// propagated with the same step as particle 1, however not using the optimization for fixed step sizes
 	double tolerance = 1;
-	PropagationBP propa2(std::shared_ptr<PlaneWaveTurbulence>(new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1)), tolerance, fixed_step, 1.1*fixed_step);
+	PropagationBP propa2(new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1), tolerance, fixed_step, 1.1*fixed_step);
 	ParticleState p2;
 	p2.setId(nucleusId(1, 1));
 	p2.setEnergy(100 * EeV);
@@ -527,7 +527,7 @@ TEST(testPropagationBP, fixedStepOptimization) {
 
 
 TEST(testPropagationBP, neutron) {
-	PropagationBP propa(std::shared_ptr<UniformMagneticField>(new UniformMagneticField(Vector3d(0, 0, 1 * nG))));
+	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	propa.setMinimumStep(1 * kpc);
 	propa.setMaximumStep(1 * kpc);

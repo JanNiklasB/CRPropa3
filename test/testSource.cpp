@@ -119,7 +119,7 @@ TEST(SourceDensityGrid, withInRange) {
 	Vector3d origin(0, 0, 0);
 	int cells = 10;
 	double spacing = 1;
-	auto grid = std::shared_ptr<Grid1f>(new Grid1f(origin, cells, spacing));
+	auto grid = new Grid1f(origin, cells, spacing);
 	for (int ix = 0; ix < cells; ix++)
 		for (int iy = 0; iy < cells; iy++)
 			for (int iz = 0; iz < cells; iz++)
@@ -145,7 +145,7 @@ TEST(SourceDensityGrid, OneAllowedCell) {
 	Vector3d origin(0, 0, 0);
 	int cells = 2;
 	double spacing = 2;
-	auto grid = std::shared_ptr<Grid1f>(new Grid1f(origin, cells, spacing));
+	auto grid = new Grid1f(origin, cells, spacing);
 	
 	// set all but one cells to 0
 	for (int ix = 0; ix < cells; ix++)
@@ -185,7 +185,7 @@ TEST(SourceDensityGrid1D, withInRange) {
 	Vector3d origin(0, 0, 0);
 	int nCells = 10;
 	double spacing = 1.;
-	auto grid = std::shared_ptr<Grid1f>(new Grid1f(origin, nCells, 1, 1, spacing));
+	auto grid = new Grid1f(origin, nCells, 1, 1, spacing);
 
 	// set some values
 	for (int i = 0; i < 10; i++) {
@@ -207,7 +207,7 @@ TEST(SourceDensityGrid1D, OneAllowedCell) {
 	Vector3d origin(0, 0, 0);
 	int nCells = 10;
 	double spacing = 1.;
-	auto grid = std::shared_ptr<Grid1f>(new Grid1f(origin, nCells, 1, 1, spacing));
+	auto grid = new Grid1f(origin, nCells, 1, 1, spacing);
 
 	// set some values
 	for (int i = 0; i < 10; i++) {
@@ -347,11 +347,11 @@ TEST(SourceRedshiftEvolution, testInRange) {
 
 TEST(Source, allPropertiesUsed) {
 	Source source;
-	source.add(std::shared_ptr<SourcePosition>(new SourcePosition(Vector3d(10, 0, 0) * Mpc)));
-	source.add(std::shared_ptr<SourceIsotropicEmission>(new SourceIsotropicEmission()));
-	source.add(std::shared_ptr<SourcePowerLawSpectrum>(new SourcePowerLawSpectrum(5 * EeV, 100 * EeV, -2)));
-	source.add(std::shared_ptr<SourceParticleType>(new SourceParticleType(nucleusId(8, 4))));
-	source.add(std::shared_ptr<SourceRedshift>(new SourceRedshift(2)));
+	source.add(new SourcePosition(Vector3d(10, 0, 0) * Mpc));
+	source.add(new SourceIsotropicEmission());
+	source.add(new SourcePowerLawSpectrum(5 * EeV, 100 * EeV, -2));
+	source.add(new SourceParticleType(nucleusId(8, 4)));
+	source.add(new SourceRedshift(2));
 
 	Candidate c = *source.getCandidate();
 
@@ -387,8 +387,8 @@ TEST(Source, allPropertiesUsed) {
 TEST(SourceList, simpleTest) {
 	// test if source list works with one source
 	SourceList sourceList;
-	ref_ptr<Source> source = std::shared_ptr<Source>(new Source());
-	source->add(std::shared_ptr<SourcePosition>(new SourcePosition(Vector3d(10, 0, 0))));
+	ref_ptr<Source> source = new Source;
+	source->add(new SourcePosition(Vector3d(10, 0, 0)));
 	sourceList.add(source);
 
 	ref_ptr<Candidate> c = sourceList.getCandidate();
@@ -408,12 +408,12 @@ TEST(SourceList, luminosity) {
 	// test if the sources are dialed according to their luminosities
 	SourceList sourceList;
 
-	ref_ptr<Source> source1 = std::shared_ptr<Source>(new Source());
-	source1->add(std::shared_ptr<SourceEnergy>(new SourceEnergy(100)));
+	ref_ptr<Source> source1 = new Source;
+	source1->add(new SourceEnergy(100));
 	sourceList.add(source1, 80);
 
-	ref_ptr<Source> source2 = std::shared_ptr<Source>(new Source());
-	source2->add(std::shared_ptr<SourceEnergy>(new SourceEnergy(0)));
+	ref_ptr<Source> source2 = new Source;
+	source2->add(new SourceEnergy(0));
 	sourceList.add(source2, 20);
 
 	double meanE = 0;

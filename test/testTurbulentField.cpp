@@ -36,7 +36,7 @@ TEST(testTurbulenceSpectrum, correlationLength) {
 	double lBo = 100;
 	auto spectrum = TurbulenceSpectrum(1*muG, lMin, lMax, lBo);
 	auto Lc = spectrum.getCorrelationLength();
-    EXPECT_NEAR(Lc, 0.498*lBo, 0.001*lBo);
+	EXPECT_NEAR(Lc, 0.498*lBo, 0.001*lBo);
 }
 
 #ifdef CRPROPA_HAVE_FFTW3F
@@ -46,7 +46,7 @@ TEST(testSimpleGridTurbulence, oldFunctionForCrrelationLength) { //TODO: remove 
 	double lMax = 1*Gpc;
 	double alpha = -11/3.;
 	auto Lc = turbulentCorrelationLength(lMin, lMax, alpha);
-    EXPECT_NEAR(Lc, lMax/5, 1*Mpc);
+	EXPECT_NEAR(Lc, lMax/5, 1*Mpc);
 }
 
 TEST(testVectorFieldGrid, Turbulence_bmean_brms) {
@@ -59,7 +59,7 @@ TEST(testVectorFieldGrid, Turbulence_bmean_brms) {
 
 	auto spectrum = SimpleTurbulenceSpectrum(Brms, lMin, lMax);
 	auto gp = GridProperties(Vector3d(0, 0, 0), n, spacing);
-    auto tf = SimpleGridTurbulence(spectrum, gp);
+	auto tf = SimpleGridTurbulence(spectrum, gp);
 	auto grid = tf.getGrid();
 
 	double precision = 1e-7;
@@ -82,10 +82,10 @@ TEST(testVectorFieldGrid, Turbulence_seed) {
 	auto spectrum = SimpleTurbulenceSpectrum(Brms, lMin, lMax);
 
 	auto gp1 = GridProperties(Vector3d(0, 0, 0), n, spacing);
-    auto tf1 = SimpleGridTurbulence(spectrum, gp1,  seed);
+	auto tf1 = SimpleGridTurbulence(spectrum, gp1,  seed);
 
 	auto gp2 = GridProperties(Vector3d(0, 0, 0), n, spacing);
-    auto tf2 = SimpleGridTurbulence(spectrum, gp2, seed);
+	auto tf2 = SimpleGridTurbulence(spectrum, gp2, seed);
 
 	Vector3d pos(22 * Mpc);
 	EXPECT_FLOAT_EQ(tf1.getField(pos).x, tf2.getField(pos).x);
@@ -97,7 +97,7 @@ TEST(testVectorFieldGrid, turbulence_Exceptions) {
 	size_t n = 64;
 	double spacing = 10 * Mpc / n;
 	double brms = 1;
-	ref_ptr<Grid3f> grid = std::shared_ptr<Grid3f>(new Grid3f(Vector3d(0, 0, 0), n, spacing));
+	ref_ptr<Grid3f> grid = new Grid3f(Vector3d(0, 0, 0), n, spacing);
 
 	// should be fine
 	EXPECT_NO_THROW(initTurbulence(grid, brms, 2 * spacing, 8 * spacing));
@@ -126,10 +126,10 @@ TEST(testGridTurbulence, Turbulence_seed) {
 	auto spectrum = TurbulenceSpectrum(Brms, lMin, lMax, lBo);
 
 	auto gp1 = GridProperties(Vector3d(0, 0, 0), n, spacing);
-    auto tf1 = GridTurbulence(spectrum, gp1, seed);
+	auto tf1 = GridTurbulence(spectrum, gp1, seed);
 
 	auto gp2 = GridProperties(Vector3d(0, 0, 0), n, spacing);
-    auto tf2 = GridTurbulence(spectrum, gp2, seed);
+	auto tf2 = GridTurbulence(spectrum, gp2, seed);
 
 	Vector3d pos(22 * Mpc);
 	EXPECT_FLOAT_EQ(tf1.getField(pos).x, tf2.getField(pos).x);

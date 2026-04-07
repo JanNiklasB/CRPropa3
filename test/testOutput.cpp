@@ -1,7 +1,7 @@
 /** Unit tests for Output modules of CRPropa
-    Output
-    TextOutput
-    ParticleCollector
+	Output
+	TextOutput
+	ParticleCollector
  */
 
 #include "CRPropa.h"
@@ -19,12 +19,12 @@
 // https://stackoverflow.com/a/10062016/6819103
 template <typename T, size_t size>
 ::testing::AssertionResult ArraysMatch(const T (&expected)[size],
-                                       const T (&actual)[size]) {
+									   const T (&actual)[size]) {
 	for (size_t i(0); i < size; ++i) {
 		if (expected[i] != actual[i]) {
 			return ::testing::AssertionFailure()
-			       << "array[" << i << "] (" << actual[i] << ") != expected["
-			       << i << "] (" << expected[i] << ")";
+				   << "array[" << i << "] (" << actual[i] << ") != expected["
+				   << i << "] (" << expected[i] << ")";
 		}
 	}
 
@@ -74,7 +74,7 @@ TEST(TextOutput, printHeader_Trajectory3D) {
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")),
-	          "#\tD\tID\tE\tX\tY\tZ\tPx\tPy\tPz");
+			  "#\tD\tID\tE\tX\tY\tZ\tPx\tPy\tPz");
 }
 
 TEST(TextOutput, printHeader_Event3D) {
@@ -86,8 +86,8 @@ TEST(TextOutput, printHeader_Event3D) {
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(
-	    captured.substr(0, captured.find("\n")),
-	    "#\tD\tID\tE\tX\tY\tZ\tPx\tPy\tPz\tID0\tE0\tX0\tY0\tZ0\tP0x\tP0y\tP0z");
+		captured.substr(0, captured.find("\n")),
+		"#\tD\tID\tE\tX\tY\tZ\tPx\tPy\tPz\tID0\tE0\tX0\tY0\tZ0\tP0x\tP0y\tP0z");
 }
 
 TEST(TextOutput, printHeader_Custom) {
@@ -105,7 +105,7 @@ TEST(TextOutput, printHeader_Custom) {
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")),
-	          "#\ttime\tSN\tID\tE\tSN0\tID0\tE0\tSN1\ttag");
+			  "#\ttime\tSN\tID\tE\tSN0\tID0\tE0\tSN1\ttag");
 }
 
 TEST(TextOutput, printProperty) {
@@ -134,15 +134,15 @@ TEST(TextOutput, printHeader_Version) {
 	size_t version_pos = captured.find("# CRPropa version: ") + 19;
 
 	EXPECT_EQ(captured.substr(version_pos,
-	                          captured.find("\n", version_pos) - version_pos),
-	          g_GIT_DESC);
+							  captured.find("\n", version_pos) - version_pos),
+			  g_GIT_DESC);
 }
 
 #ifndef CRPROPA_TESTS_SKIP_EXCEPTIONS
 TEST(TextOutput, failOnIllegalOutputFile) {
 	EXPECT_THROW(
-	    TextOutput output("THIS_FOLDER_MUST_NOT_EXISTS_12345+/FILE.txt"),
-	    std::runtime_error);
+		TextOutput output("THIS_FOLDER_MUST_NOT_EXISTS_12345+/FILE.txt"),
+		std::runtime_error);
 }
 #endif
 
@@ -153,14 +153,14 @@ TEST(HDF5Output, failOnIllegalOutputFile) {
 	// disable default error output of HDF5
 	H5Eset_auto2(H5E_DEFAULT, NULL, NULL);
 	EXPECT_THROW(out.open("THIS_FOLDER_MUST_NOT_EXISTS_12345+/FILE.h5"),
-	             std::runtime_error);
+				 std::runtime_error);
 }
 #endif
 #endif
 
 //-- ParticleCollector
 TEST(ParticleCollector, size) {
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate());
+	ref_ptr<Candidate> c = new Candidate();
 	ParticleCollector output;
 
 	for (int it = 0; it < 5; ++it, output.process(c))
@@ -170,7 +170,7 @@ TEST(ParticleCollector, size) {
 }
 
 TEST(ParticleCollector, fetchItem) {
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1 * EeV));
+	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1 * EeV);
 	ParticleCollector output;
 
 	output.process(c);
@@ -179,7 +179,7 @@ TEST(ParticleCollector, fetchItem) {
 }
 
 TEST(ParticleCollector, reprocess) {
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1 * EeV));
+	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1 * EeV);
 	ParticleCollector collector;
 	ParticleCollector output;
 
@@ -190,7 +190,7 @@ TEST(ParticleCollector, reprocess) {
 }
 
 TEST(ParticleCollector, dumpload) {
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(nucleusId(1, 1), 1.234 * EeV));
+	ref_ptr<Candidate> c = new Candidate(nucleusId(1, 1), 1.234 * EeV);
 	c->current.setPosition(Vector3d(1, 2, 3));
 	c->current.setDirection(Vector3d(-1, -1, -1));
 	c->setTrajectoryLength(1 * Mpc);
@@ -224,17 +224,17 @@ TEST(ParticleCollector, getTrajectory) {
 	ParticleState p;
 	p.setPosition(Vector3d(10, 0, 0));
 	p.setDirection(Vector3d(-1, 0, 0));
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(p));
+	ref_ptr<Candidate> c = new Candidate(p);
 
-	ref_ptr<ParticleCollector> output = std::shared_ptr<ParticleCollector>(new ParticleCollector());
-	ref_ptr<ParticleCollector> trajectory = std::shared_ptr<ParticleCollector>(new ParticleCollector());
+	ref_ptr<ParticleCollector> output = new ParticleCollector();
+	ref_ptr<ParticleCollector> trajectory = new ParticleCollector();
 	trajectory->setClone(true);
 
-	ref_ptr<ModuleList> sim = std::shared_ptr<ModuleList>(new ModuleList());
-	sim->add(std::shared_ptr<SimplePropagation>(new SimplePropagation(1, 1)));
+	ref_ptr<ModuleList> sim = new ModuleList();
+	sim->add(new SimplePropagation(1, 1));
 
-	ref_ptr<Observer> obs = std::shared_ptr<Observer>(new Observer());
-	obs->add(std::shared_ptr<Observer1D>(new Observer1D()));
+	ref_ptr<Observer> obs = new Observer();
+	obs->add(new Observer1D());
 	obs->onDetection(output);
 	sim->add(obs);
 
@@ -246,7 +246,7 @@ TEST(ParticleCollector, getTrajectory) {
 	int i = 0;
 
 	for (ParticleCollector::iterator itr = trajectory->begin();
-	     itr != trajectory->end(); ++itr) {
+		 itr != trajectory->end(); ++itr) {
 		pos = (*(itr->get())).current.getPosition();
 		pos_x[i] = pos.getX();
 		++i;
@@ -257,15 +257,15 @@ TEST(ParticleCollector, getTrajectory) {
 
 TEST(ParticleCollector, runModuleList) {
 	ModuleList modules;
-	modules.add(std::shared_ptr<SimplePropagation>(new SimplePropagation()));
-	modules.add(std::shared_ptr<MaximumTrajectoryLength>(new MaximumTrajectoryLength(1 * Mpc)));
+	modules.add(new SimplePropagation());
+	modules.add(new MaximumTrajectoryLength(1 * Mpc));
 
 	ParticleState p;
 	p.setPosition(Vector3d(10, 0, 0));
 	p.setDirection(Vector3d(-1, 0, 0));
-	ref_ptr<Candidate> c = std::shared_ptr<Candidate>(new Candidate(p));
+	ref_ptr<Candidate> c = new Candidate(p);
 
-	ref_ptr<ParticleCollector> collector = std::shared_ptr<ParticleCollector>(new ParticleCollector());
+	ref_ptr<ParticleCollector> collector = new ParticleCollector();
 
 	collector->process(c);
 

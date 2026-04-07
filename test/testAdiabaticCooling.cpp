@@ -14,11 +14,7 @@ namespace crpropa {
 TEST (AdiabaticCooling, UniformField) {
 	// Test in a uniform advection Field
 
-	AdiabaticCooling AC(
-		std::shared_ptr<UniformAdvectionField>(
-			new UniformAdvectionField(Vector3d(1,0,0))
-		)
-	);
+	AdiabaticCooling AC(new UniformAdvectionField(Vector3d(1,0,0)));
 	Candidate c(nucleusId(1,1), 1e13*eV);
 	c.setCurrentStep(10*kpc);
 	c.setNextStep(10*kpc);
@@ -30,12 +26,7 @@ TEST (AdiabaticCooling, UniformField) {
 	EXPECT_DOUBLE_EQ(c.getNextStep(), 10*kpc);
 
 	double limit = 0.2;
-	AdiabaticCooling AC2(
-		std::shared_ptr<UniformAdvectionField>(
-			new UniformAdvectionField(Vector3d(1,0,0))
-		), 
-		limit
-	);
+	AdiabaticCooling AC2(new UniformAdvectionField(Vector3d(1,0,0)), limit);
 	
 	EXPECT_DOUBLE_EQ(AC2.getLimit(), limit);
 
@@ -46,11 +37,7 @@ TEST (AdiabaticCooling, UniformField) {
 TEST (AdiabaticCooling, ConstantSphericalField) {
 	// Constant velocity vector
 	
-	AdiabaticCooling AC(
-		std::shared_ptr<ConstantSphericalAdvectionField>(
-			new ConstantSphericalAdvectionField(Vector3d(0,0,0), 1)
-		)
-	);
+	AdiabaticCooling AC(new ConstantSphericalAdvectionField(Vector3d(0,0,0), 1));
 	Candidate c(nucleusId(1,1), 10);
 	c.current.setPosition(Vector3d(1,0,0));
 	c.setCurrentStep(c_light);
