@@ -224,7 +224,7 @@ void EmissionMap::save(const std::string &filename) {
 	}
 }
 
-void EmissionMap::merge(const EmissionMap *other) {
+void EmissionMap::merge(ref_ptr<const EmissionMap> other) {
 	if (other == 0)
 		return;
 	map_t::const_iterator i = other->getMaps().begin();
@@ -250,7 +250,7 @@ void EmissionMap::merge(const EmissionMap *other) {
 void EmissionMap::merge(const std::string &filename) {
 	EmissionMap em;
 	em.load(filename);
-	merge(&em);
+	merge(em);
 }
 
 void EmissionMap::load(const std::string &filename) {

@@ -1141,7 +1141,7 @@ TEST(EmissionMap, merge) {
 	em2.fillMap(1, 50 * EeV, Vector3d(0.0, 1.0, 0.0));
 	em2.fillMap(2, 50 * EeV, Vector3d(0.0, 1.0, 0.0));
 
-	em1.merge(&em2);
+	em1.merge(em2);
 
 	EXPECT_EQ(em1.getMaps().size(), 2);
 

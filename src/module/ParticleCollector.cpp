@@ -40,13 +40,13 @@ void ParticleCollector::reprocess(ref_ptr<Module> action) const {
 }
 
 void ParticleCollector::dump(const std::string &filename) const {
-	TextOutput output(filename.c_str(), Output::Everything);
-	reprocess(&output);
+	TextOutput output(filename, Output::Everything);
+	reprocess(output);
 	output.close();
 }
 
 void ParticleCollector::load(const std::string &filename){
-	TextOutput::load(filename.c_str(), this);
+	TextOutput::load(filename, *this);
 }
 
 ParticleCollector::~ParticleCollector() {
