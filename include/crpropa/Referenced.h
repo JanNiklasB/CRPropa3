@@ -19,9 +19,9 @@ class ref_ptr {
 	public:
 	typedef T element_type;
 
-	ref_ptr() : _shared_ptr(0) {}
+	ref_ptr() {}
 	ref_ptr(T& obj) {
-		_shared_ptr = std::make_shared<T>(obj);
+		_raw_ptr = &obj;
 	}
 	ref_ptr(T* ptr) {
 		_shared_ptr = std::shared_ptr<T>(ptr);
@@ -38,6 +38,7 @@ class ref_ptr {
 
 	~ref_ptr() {
 		_shared_ptr = 0;
+		_raw_ptr = 0;  // do not delete, it is expected to be managed by user
 	}
 
 	ref_ptr& operator =(const ref_ptr& rp) {
@@ -52,6 +53,7 @@ class ref_ptr {
 
 	inline ref_ptr& operator =(long int ptr) {
 		_shared_ptr = ptr;
+		_raw_ptr = ptr;
 		return *this;
 	}
 
@@ -60,9 +62,11 @@ class ref_ptr {
 	// }
 
 	T& operator*() const {
+		if (_raw_ptr) return *_raw_ptr;
 		return *_shared_ptr;
 	}
 	T* operator->() const {
+		if (_raw_ptr) return _raw_ptr;
 		return _shared_ptr.get();
 	}
 
@@ -71,30 +75,41 @@ class ref_ptr {
 	}
 
 	T* get() const {
+		if (_raw_ptr) return _raw_ptr;
 		return _shared_ptr.get();
 	}
 
-	std::shared_ptr<T> get_shared() const {
-		return _shared_ptr;
-	}
-
 	bool valid() const {
+		if (_raw_ptr) return true;
 		return _shared_ptr != 0;
 	}
 
+	void release() {
+		_shared_ptr.reset();
+		_raw_ptr = 0;  // do not delete, it is expected to be managed by user
+	}
+
 	void swap(ref_ptr& rp) {
-		_shared_ptr.swap(rp._shared_ptr);
+		if (_raw_ptr){
+			T* tmp = _raw_ptr;
+			_raw_ptr = rp._raw_ptr;
+			rp._raw_ptr = tmp;
+		} else {
+			_shared_ptr.swap(rp._shared_ptr);
+		}
 	}
 
 	private:
 
 	template<class Other> void assign(const ref_ptr<Other>& rp) {
 		_shared_ptr = rp._shared_ptr;
+		_raw_ptr = rp._raw_ptr;
 	}
 
 	template<class Other> friend class ref_ptr;
 
 	std::shared_ptr<T> _shared_ptr = 0;
+	T* _raw_ptr = 0;
 };
 
 template<class T> inline
