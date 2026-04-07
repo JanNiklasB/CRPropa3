@@ -85,8 +85,6 @@ TEST(testCandidateSplitting, CheckSplits) {
 	EXPECT_DOUBLE_EQ(c.getWeight(), weight);
 	EXPECT_DOUBLE_EQ(c.getNextSerialNumber(), serial + 4);
 	c.previous.setEnergy(8);
-	// c.secondaries.clear();
-	printf("test\n");
 }
 
 } //namespace crpropa

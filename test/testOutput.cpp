@@ -184,7 +184,7 @@ TEST(ParticleCollector, reprocess) {
 	ParticleCollector output;
 
 	collector.process(c);
-	collector.reprocess(&output);
+	collector.reprocess(output);
 
 	EXPECT_EQ(output[0], c);
 }
