@@ -226,159 +226,159 @@ class testCandidatePropertymap(unittest.TestCase):
 
 
 class testKeywordArguments(unittest.TestCase):
-  def testExceptionOnNonExistingArguemnt(self):
-	with self.assertRaises(Exception, msg="This is likely due to a swig bug. Please try to disable the builtin option by compiling crpropa with cmake .. -DENABLE_SWIG_BUILTIN=OFF"):
-	  p = crp.PhotoDisintegration(nonExistingKeywordArguemntShouldRaiseException=True)
-  def testDisablingOfKwargs(self):
-	with self.assertRaises(Exception, msg="This is likely due to a swig bug. Please try to disable the builtin option by compiling crpropa with cmake .. -DENABLE_SWIG_BUILTIN=OFF"):
-	  p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
-  # swig currently does not support kwargs in overloaded functions - we should
-  # thus disable them.
-  #def testKeywordArgument(self):
-  #  p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
-  #  self.assertTrue('IRB_Dominguez11' in p.getDescription())
+	def testExceptionOnNonExistingArguemnt(self):
+		with self.assertRaises(Exception, msg="This is likely due to a swig bug. Please try to disable the builtin option by compiling crpropa with cmake .. -DENABLE_SWIG_BUILTIN=OFF"):
+			p = crp.PhotoDisintegration(nonExistingKeywordArguemntShouldRaiseException=True)
+	def testDisablingOfKwargs(self):
+		with self.assertRaises(Exception, msg="This is likely due to a swig bug. Please try to disable the builtin option by compiling crpropa with cmake .. -DENABLE_SWIG_BUILTIN=OFF"):
+			p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
+	# swig currently does not support kwargs in overloaded functions - we should
+	# thus disable them.
+	#def testKeywordArgument(self):
+		# p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
+		# self.assertTrue('IRB_Dominguez11' in p.getDescription())
 
 
 class testVector3(unittest.TestCase):
-  def testPublicReferenceAccess(self):
-	v = crp.Vector3d(1., 2., 3.)
-	self.assertEqual(v.x, 1.)
-	self.assertEqual(v.y, 2.)
-	self.assertEqual(v.z, 3.)
-	v.x = 23.
-	self.assertEqual(v.x, 23.)
+	def testPublicReferenceAccess(self):
+		v = crp.Vector3d(1., 2., 3.)
+		self.assertEqual(v.x, 1.)
+		self.assertEqual(v.y, 2.)
+		self.assertEqual(v.z, 3.)
+		v.x = 23.
+		self.assertEqual(v.x, 23.)
 
 	# this test fails in some systems
 	def testArrayInterface(self):
-	  # this test fails for some combinations of Python version and system
-	  v = crp.Vector3d(1., 2., 3.)
-	  self.assertEqual(2., np.mean(v) )
-	  x = np.ones(3)
-	  self.assertEqual(6., sum(v * x) )
+		# this test fails for some combinations of Python version and system
+		v = crp.Vector3d(1., 2., 3.)
+		self.assertEqual(2., np.mean(v) )
+		x = np.ones(3)
+		self.assertEqual(6., sum(v * x) )
 
-  def testRepr(self):
-	v = crp.Vector3d(1., 2., 3.)
-	if sys.version_info >= (3, 3):
-	  import unittest.mock
-	  import io
-	  with unittest.mock.patch('sys.stdout', new = io.StringIO()) as fake_out:
-		print(v)
-	else:
-	  import StringIO
-	  fake_out = StringIO.StringIO()
-	  sys.stdout = fake_out
-	  print(v)
-	  sys.stdout = sys.__stdout__
-	self.assertEqual(fake_out.getvalue().rstrip(), v.getDescription())
+	def testRepr(self):
+		v = crp.Vector3d(1., 2., 3.)
+		if sys.version_info >= (3, 3):
+			import unittest.mock
+			import io
+			with unittest.mock.patch('sys.stdout', new = io.StringIO()) as fake_out:
+				print(v)
+		else:
+			import StringIO
+			fake_out = StringIO.StringIO()
+			sys.stdout = fake_out
+			print(v)
+			sys.stdout = sys.__stdout__
+		self.assertEqual(fake_out.getvalue().rstrip(), v.getDescription())
 
-  def testOutOfBound(self):
-	v = crp.Vector3d(1., 2., 3.)
-	self.assertRaises(IndexError, v.__getitem__, 3)
-	self.assertRaises(IndexError, v.__setitem__, 3, 10)
+	def testOutOfBound(self):
+		v = crp.Vector3d(1., 2., 3.)
+		self.assertRaises(IndexError, v.__getitem__, 3)
+		self.assertRaises(IndexError, v.__setitem__, 3, 10)
 
-  """ 
-  # This test is currently disabled because it fails on some systems.
-  def testVector3dToArray(self): 
-	  v = crp.Vector3d(1., 2., 3.)
-	  a = np.array([v])
-	  self.assertEqual(a.shape, (1, 3))
-	  self.assertEqual(a.dtype, float)
-	  self.assertEqual(a[0, 0], 1.)
-	  self.assertEqual(a[0, 1], 2.)
-	  self.assertEqual(a[0, 2], 3.)
-	
-  def testVector3fToArray(self): 
-	  v = crp.Vector3f(1., 2., 3.)
-	  a = np.array([v])
-	  self.assertEqual(a.shape, (1, 3))
-	  self.assertEqual(a.dtype, np.float32)
-	  self.assertEqual(a[0, 0], 1.)
-	  self.assertEqual(a[0, 1], 2.)
-	  self.assertEqual(a[0, 2], 3.)
+	""" 
+	# This test is currently disabled because it fails on some systems.
+	def testVector3dToArray(self): 
+		v = crp.Vector3d(1., 2., 3.)
+		a = np.array([v])
+		self.assertEqual(a.shape, (1, 3))
+		self.assertEqual(a.dtype, float)
+		self.assertEqual(a[0, 0], 1.)
+		self.assertEqual(a[0, 1], 2.)
+		self.assertEqual(a[0, 2], 3.)
+		
+	def testVector3fToArray(self): 
+		v = crp.Vector3f(1., 2., 3.)
+		a = np.array([v])
+		self.assertEqual(a.shape, (1, 3))
+		self.assertEqual(a.dtype, np.float32)
+		self.assertEqual(a[0, 0], 1.)
+		self.assertEqual(a[0, 1], 2.)
+		self.assertEqual(a[0, 2], 3.)
 	"""
-  
-  def testVector3dConstructorDouble(self):
-  
-	for dtype in [float, np.float32, int, np.int32]:
-	  a = np.arange(3, dtype=dtype) + 1
-	  v = crp.Vector3d(a)
-	  self.assertEqual(v.x, 1.)
-	  self.assertEqual(v.y, 2.)
-	  self.assertEqual(v.z, 3.)
-	  self.assertEqual(v[0], 1.)
-	  self.assertEqual(v[1], 2.)
-	  self.assertEqual(v[2], 3.)
+
+	def testVector3dConstructorDouble(self):
+
+		for dtype in [float, np.float32, int, np.int32]:
+			a = np.arange(3, dtype=dtype) + 1
+			v = crp.Vector3d(a)
+			self.assertEqual(v.x, 1.)
+			self.assertEqual(v.y, 2.)
+			self.assertEqual(v.z, 3.)
+			self.assertEqual(v[0], 1.)
+			self.assertEqual(v[1], 2.)
+			self.assertEqual(v[2], 3.)
 	  
  
 	 
 class testParticleCollector(unittest.TestCase):
-  def testParticleCollectorIterator(self):
-	collector = crp.ParticleCollector()
-	lengths = [1*crp.pc, 10*crp.pc, 100*crp.pc]
-	for l in lengths:
+	def testParticleCollectorIterator(self):
+		collector = crp.ParticleCollector()
+		lengths = [1*crp.pc, 10*crp.pc, 100*crp.pc]
+		for l in lengths:
+			c = crp.Candidate()
+			c.setTrajectoryLength(l)
+			collector.process(c)
+
+		self.assertEqual(len(collector), len(lengths))
+
+		for c, l in zip(collector, lengths):
+			self.assertEqual(c.getTrajectoryLength(), l)
+
+	def testParticleCollectorAsModuleListInput(self):
+		sim = crp.ModuleList()
+		sim.add(crp.MaximumTrajectoryLength(3.14))
+		sim.add(crp.SimplePropagation(0.001, 0.001))
+		collector = crp.ParticleCollector()
+		c1 = crp.Candidate()
+		c2 = crp.Candidate()
+		collector.process(c1)
+		collector.process(c2)
+		sim.run(collector.getContainer())
+		for c in collector:
+			self.assertAlmostEqual(
+				c.getTrajectoryLength(), 3.14, places=2)
+
+	def testParticleCollectorAsModuleListOutput(self):
+		sim = crp.ModuleList()
+		sim.add(crp.MaximumTrajectoryLength(3.14))
+		sim.add(crp.SimplePropagation(0.001, 0.001))
+		collector = crp.ParticleCollector()
+		sim.add(collector)
 		c = crp.Candidate()
-		c.setTrajectoryLength(l)
-		collector.process(c)
-
-	self.assertEqual(len(collector), len(lengths))
-
-	for c, l in zip(collector, lengths):
-		self.assertEqual(c.getTrajectoryLength(), l)
-
-  def testParticleCollectorAsModuleListInput(self):
-	sim = crp.ModuleList()
-	sim.add(crp.MaximumTrajectoryLength(3.14))
-	sim.add(crp.SimplePropagation(0.001, 0.001))
-	collector = crp.ParticleCollector()
-	c1 = crp.Candidate()
-	c2 = crp.Candidate()
-	collector.process(c1)
-	collector.process(c2)
-	sim.run(collector.getContainer())
-	for c in collector:
+		sim.run(c)
 		self.assertAlmostEqual(
-			c.getTrajectoryLength(), 3.14, places=2)
-
-  def testParticleCollectorAsModuleListOutput(self):
-	sim = crp.ModuleList()
-	sim.add(crp.MaximumTrajectoryLength(3.14))
-	sim.add(crp.SimplePropagation(0.001, 0.001))
-	collector = crp.ParticleCollector()
-	sim.add(collector)
-	c = crp.Candidate()
-	sim.run(c)
-	self.assertAlmostEqual(
-		collector[0].getTrajectoryLength(),
-		3.14, places=2)
+			collector[0].getTrajectoryLength(),
+			3.14, places=2)
 
 class testGrid(unittest.TestCase):
-  def testGridPropertiesConstructor(self):
-	N = 32
-	gp = crp.GridProperties(crp.Vector3d(0), N, 0.1)
-	grid = crp.Grid1f(gp)
-	self.assertEqual(grid.getNx(), 32)
+	def testGridPropertiesConstructor(self):
+		N = 32
+		gp = crp.GridProperties(crp.Vector3d(0), N, 0.1)
+		grid = crp.Grid1f(gp)
+		self.assertEqual(grid.getNx(), 32)
 
 if hasattr(crp, 'GridTurbulence'):
 	class testTurbulentField(unittest.TestCase):
-	  #check problems brought up in https://github.com/CRPropa/CRPropa3/issues/322
-	  def testTurbulenceSpectrum(self):
-		spectrum = crp.TurbulenceSpectrum(1., 1., 10.)
-		self.assertEqual(spectrum.getBrms(), 1.)
-		self.assertEqual(spectrum.getLmin(), 1.)
-		self.assertEqual(spectrum.getLmax(), 10.)
-		self.assertEqual(spectrum.getLbendover(), 1.)
-		self.assertEqual(spectrum.getSindex(), 5./3.)
-		self.assertEqual(spectrum.getQindex(), 4.)
+		#check problems brought up in https://github.com/CRPropa/CRPropa3/issues/322
+		def testTurbulenceSpectrum(self):
+			spectrum = crp.TurbulenceSpectrum(1., 1., 10.)
+			self.assertEqual(spectrum.getBrms(), 1.)
+			self.assertEqual(spectrum.getLmin(), 1.)
+			self.assertEqual(spectrum.getLmax(), 10.)
+			self.assertEqual(spectrum.getLbendover(), 1.)
+			self.assertEqual(spectrum.getSindex(), 5./3.)
+			self.assertEqual(spectrum.getQindex(), 4.)
 
-	  def testGridTurbulence(self):
-		N = 64
-		boxSize = 1*crp.Mpc
-		l_bo = boxSize/8
-		spacing = boxSize / N
-		tf = crp.GridTurbulence(
-			crp.TurbulenceSpectrum(1.0, 2*spacing, boxSize, l_bo),
-			crp.GridProperties(crp.Vector3d(0), N, spacing)
-		)
+		def testGridTurbulence(self):
+			N = 64
+			boxSize = 1*crp.Mpc
+			l_bo = boxSize/8
+			spacing = boxSize / N
+			tf = crp.GridTurbulence(
+				crp.TurbulenceSpectrum(1.0, 2*spacing, boxSize, l_bo),
+				crp.GridProperties(crp.Vector3d(0), N, spacing)
+			)
 
 if __name__ == '__main__':
 	unittest.main()
