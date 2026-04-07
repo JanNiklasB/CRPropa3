@@ -79,7 +79,7 @@ public:
 */
 class Deactivation: public AbstractCondition {
 	public: 
-		void process(Candidate *cand) const { reject(cand); }
+		void process(ref_ptr<Candidate> cand) const { reject(cand); }
 };
 
 

@@ -22,24 +22,29 @@ class ref_ptr {
 	ref_ptr() {}
 	ref_ptr(T& obj) {
 		_raw_ptr = &obj;
+		_shared_ptr = 0;
 	}
 	ref_ptr(T* ptr) {
 		_shared_ptr = std::shared_ptr<T>(ptr);
+		_raw_ptr = 0;
 	}
 	ref_ptr(const ref_ptr& rp) {
 		_shared_ptr = rp._shared_ptr;
+		_raw_ptr = rp._raw_ptr;
 	}
 	template<class Other> ref_ptr(const ref_ptr<Other>& rp) {
 		_shared_ptr = rp._shared_ptr;
+		_raw_ptr = rp._raw_ptr;
 	}
 	template<class Other> ref_ptr(const std::shared_ptr<Other>& shared_ptr) {
 		_shared_ptr = shared_ptr;
+		_raw_ptr = 0;
 	}
 
-	~ref_ptr() {
-		_shared_ptr = 0;
-		_raw_ptr = 0;  // do not delete, it is expected to be managed by user
-	}
+	// ~ref_ptr() {
+	// 	_shared_ptr = 0;
+	// 	_raw_ptr = 0;  // do not delete, it is expected to be managed by user
+	// }
 
 	ref_ptr& operator =(const ref_ptr& rp) {
 		assign(rp);
