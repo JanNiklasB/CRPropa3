@@ -23,12 +23,6 @@ PhotoDisintegration::PhotoDisintegration(ref_ptr<PhotonField> f, bool havePhoton
 	this->limit = limit;
 }
 
-PhotoDisintegration::PhotoDisintegration(PhotonField *f, bool havePhotons, double limit) {
-	setPhotonField(f);
-	this->havePhotons = havePhotons;
-	this->limit = limit;
-}
-
 void PhotoDisintegration::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();

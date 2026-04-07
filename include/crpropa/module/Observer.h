@@ -33,13 +33,7 @@ protected:
 public:
 	virtual ~ObserverFeature() = default;
 	virtual DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
-	inline DetectionState checkDetection(Candidate* candidate) const{
-		return checkDetection(ref_ptr<Candidate>(candidate));
-	}
 	virtual void onDetection(ref_ptr<Candidate> candidate) const;
-	inline void onDetection(Candidate *candidate) const{
-		onDetection(ref_ptr<Candidate>(candidate));
-	}
 	virtual std::string getDescription() const;
 };
 
@@ -65,21 +59,12 @@ public:
 	 @param feature		observer feature to be added to the Observer object
 	 */
 	void add(ref_ptr<ObserverFeature> feature);
-	/** Add a feature to the observer
-	 @param feature		observer feature to be added to the Observer object
-	 */
-	inline void add(ObserverFeature *feature){
-		add(ref_ptr<ObserverFeature>(feature));
-	}
 	
 	/** Perform some specific actions upon detection of candidate
 	 @param action		module that performs a given action when candidate is detected
 	 @param clone		if true, clone candidate
 	 */
 	void onDetection(ref_ptr<Module> action, bool clone = false);
-	inline void onDetection(Module *action, bool clone = false){
-		onDetection(ref_ptr<Module>(action), clone);
-	}
 	
 	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
@@ -114,10 +99,6 @@ public:
 	 @param surface		object with some specific geometric (see Geometry.h)
 	*/
 	ObserverSurface(ref_ptr<Surface> surface);
-	/** Constructor
-	 @param surface		object with some specific geometric (see Geometry.h)
-	*/
-	ObserverSurface(Surface *surface);
 	DetectionState checkDetection(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };

@@ -23,10 +23,6 @@ ElasticScattering::ElasticScattering(ref_ptr<PhotonField> f) {
 	setPhotonField(f);
 }
 
-ElasticScattering::ElasticScattering(PhotonField *f) {
-	setPhotonField(f);
-}
-
 void ElasticScattering::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();

@@ -17,13 +17,6 @@ ElectronPairProduction::ElectronPairProduction(ref_ptr<PhotonField> photonField,
 	setPhotonField(photonField);
 }
 
-ElectronPairProduction::ElectronPairProduction(PhotonField *photonField,
-		bool haveElectrons, double limit) {
-	this->haveElectrons = haveElectrons;
-	this->limit = limit;
-	setPhotonField(photonField);
-}
-
 void ElectronPairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();

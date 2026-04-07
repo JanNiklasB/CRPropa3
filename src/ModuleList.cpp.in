@@ -86,10 +86,6 @@ void ModuleList::run(ref_ptr<Candidate> candidate, bool recursive, bool secondar
 		dumpCandidate(candidate);
 }
 
-void ModuleList::run(Candidate *candidate, bool recursive, bool secondariesFirst) {
-	run(ref_ptr<Candidate>(candidate), recursive, secondariesFirst);
-}
-
 void ModuleList::run(ref_ptr<const candidate_vector_t> candidates, bool recursive, bool secondariesFirst) {
 	size_t count = candidates->size();
 
@@ -144,10 +140,6 @@ void ModuleList::run(ref_ptr<const candidate_vector_t> candidates, bool recursiv
 		std::sort(notFinished.begin(), notFinished.end());
 		interruptAction->dumpIndexList(notFinished);
 	}
-}
-
-void ModuleList::run(const candidate_vector_t *candidates, bool recursive, bool secondariesFirst) {
-	run(ref_ptr<const candidate_vector_t>(candidates), recursive, secondariesFirst);
 }
 
 void ModuleList::run(ref_ptr<SourceInterface> source, size_t count, bool recursive, bool secondariesFirst) {
@@ -215,11 +207,6 @@ void ModuleList::run(ref_ptr<SourceInterface> source, size_t count, bool recursi
 	}
 }
 
-void ModuleList::run(SourceInterface *source, size_t count, bool recursive, bool secondariesFirst) {
-	run(ref_ptr<SourceInterface>(source), count, recursive, secondariesFirst);
-}
-
-
 ModuleList::iterator ModuleList::begin() {
 	return modules.begin();
 }
@@ -271,9 +258,6 @@ void ModuleList::dumpCandidate(ref_ptr<Candidate> cand) const {
 }
 
 ModuleListRunner::ModuleListRunner(ref_ptr<ModuleList> mlist) : mlist(mlist) {
-}
-
-ModuleListRunner::ModuleListRunner(ModuleList *mlist) : mlist(mlist) {
 }
 
 void ModuleListRunner::process(ref_ptr<Candidate> candidate) const {

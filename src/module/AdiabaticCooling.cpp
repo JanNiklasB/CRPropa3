@@ -7,17 +7,7 @@ AdiabaticCooling::AdiabaticCooling(ref_ptr<AdvectionField> advectionField) :
 	setLimit(0.1);
 }
 
-AdiabaticCooling::AdiabaticCooling(AdvectionField *advectionField) :
-	advectionField(advectionField) {
-	setLimit(0.1);
-}
-
 AdiabaticCooling::AdiabaticCooling(ref_ptr<AdvectionField> advectionField, double limit) :
-	advectionField(advectionField) {
-	setLimit(limit);
-}
-
-AdiabaticCooling::AdiabaticCooling(AdvectionField *advectionField, double limit) :
 	advectionField(advectionField) {
 	setLimit(limit);
 }

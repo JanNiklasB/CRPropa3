@@ -38,10 +38,6 @@ class HelicalGridTurbulence : public SimpleGridTurbulence {
 
 	static void initTurbulence(ref_ptr<Grid3f> grid, double Brms, double lMin,
 								double lMax, double alpha, int seed, double H);
-	static inline void initTurbulence(Grid3f *grid, double Brms, double lMin,
-	                           double lMax, double alpha, int seed, double H){
-		initTurbulence(ref_ptr<Grid3f>(grid), Brms, lMin, lMax, alpha, seed, H);
-	}
 };
 
 // Compatibility with old functions from GridTurbulence:
@@ -65,23 +61,6 @@ void initHelicalTurbulence(ref_ptr<Grid3f> grid, double Brms, double lMin,
 		"Replace it with a more appropriate turbulent field model instance.";
 	HelicalGridTurbulence::initTurbulence(grid, Brms, lMin, lMax, alpha, seed, H);
 }
-/**
- Create a random initialization of a turbulent field including helicity
- @param grid	grid on which the turbulence is calculated
- @param Brms	RMS field strength
- @param lMin	Minimum wavelength of the turbulence
- @param lMax	Maximum wavelength of the turbulence
- @param alpha	Power law index of <B^2(k)> ~ k^alpha (alpha = -11/3 corresponds
- to a Kolmogorov spectrum)
- @param seed	Random seed
- @param H		Helicity
-*/
-inline void initHelicalTurbulence(Grid3f *grid, double Brms, double lMin,
-						double lMax, double alpha = -11 / 3., int seed = 0,
-						double H = 0) {
-	initHelicalTurbulence(ref_ptr<Grid3f>(grid), Brms, lMin, lMax, alpha, H);
-}
-
 
 /** @}*/
 } // namespace crpropa

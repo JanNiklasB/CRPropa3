@@ -31,33 +31,7 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setAlpha(1./3.);
 }
 
-DiffusionSDE::DiffusionSDE(MagneticField *magneticField, double tolerance,
-				 double minStep, double maxStep, double epsilon) :
-	minStep(0)
-{
-  	setMagneticField(magneticField);
-  	setMaximumStep(maxStep);
-  	setMinimumStep(minStep);
-  	setTolerance(tolerance);
-  	setEpsilon(epsilon);
-  	setScale(1.);
-  	setAlpha(1./3.);
-}
-
 DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
-  	minStep(0)
-{
-	setMagneticField(magneticField);
-	setAdvectionField(advectionField);
-	setMaximumStep(maxStep);
-	setMinimumStep(minStep);
-	setTolerance(tolerance);
-	setEpsilon(epsilon);
-	setScale(1.);
-	setAlpha(1./3.);
-}
-
-DiffusionSDE::DiffusionSDE(MagneticField *magneticField, AdvectionField *advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
   	minStep(0)
 {
 	setMagneticField(magneticField);

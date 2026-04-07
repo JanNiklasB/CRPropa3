@@ -8,19 +8,7 @@ PeriodicMagneticField::PeriodicMagneticField(ref_ptr<MagneticField> field,
 
 }
 
-PeriodicMagneticField::PeriodicMagneticField(MagneticField *field,
-		const Vector3d &extends) :
-		field(field), extends(extends), origin(0, 0, 0), reflective(false) {
-
-}
-
 PeriodicMagneticField::PeriodicMagneticField(ref_ptr<MagneticField> field,
-		const Vector3d &extends, const Vector3d &origin, bool reflective) :
-		field(field), extends(extends), origin(origin), reflective(reflective) {
-
-}
-
-PeriodicMagneticField::PeriodicMagneticField(MagneticField *field,
 		const Vector3d &extends, const Vector3d &origin, bool reflective) :
 		field(field), extends(extends), origin(origin), reflective(reflective) {
 
@@ -85,11 +73,6 @@ MagneticFieldEvolution::MagneticFieldEvolution(ref_ptr<MagneticField> field,
 	field(field), m(m) {
 }
 
-MagneticFieldEvolution::MagneticFieldEvolution(MagneticField *field,
-	double m) :
-	field(field), m(m) {
-}
-
 Vector3d MagneticFieldEvolution::getField(const Vector3d &position,
 	double z) const {
 	return field->getField(position) * pow(1+z, m);
@@ -107,19 +90,6 @@ Vector3d MagneticDipoleField::getField(const Vector3d &position) const {
 
 #ifdef CRPROPA_HAVE_MUPARSER
 RenormalizeMagneticField::RenormalizeMagneticField(ref_ptr<MagneticField> field,
-		std::string expression) :
-		field(field), expression(expression) {
-
-	p =  new mu::Parser();
-	p->DefineVar("B", &Bmag);
-	p->DefineConst("tesla", tesla);
-	p->DefineConst("gauss", gauss);
-	p->DefineConst("muG", muG);
-	p->DefineConst("nG", nG);
-	p->SetExpr(expression);
-}
-
-RenormalizeMagneticField::RenormalizeMagneticField(MagneticField *field,
 		std::string expression) :
 		field(field), expression(expression) {
 

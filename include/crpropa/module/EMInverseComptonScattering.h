@@ -49,19 +49,9 @@ public:
 	 @param limit			step size limit as fraction of mean free path
 	 */
 	EMInverseComptonScattering(ref_ptr<PhotonField> photonField, bool havePhotons = false, double thinning = 0, double limit = 0.1);
-	/** Constructor
-	 @param photonField		target photon field
-	 @param havePhotons		if true, add secondary photons as candidates
-	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
-	 @param limit			step size limit as fraction of mean free path
-	 */
-	EMInverseComptonScattering(PhotonField *photonField, bool havePhotons = false, double thinning = 0, double limit = 0.1);
 
 	// set the target photon field 
 	void setPhotonField(ref_ptr<PhotonField> photonField);
-	inline void setPhotonField(PhotonField *photonField){
-		setPhotonField(ref_ptr<PhotonField>(photonField));
-	}
 
 	// decide if secondary photons are added to the simulation
 	void setHavePhotons(bool havePhotons);
@@ -87,9 +77,6 @@ public:
 
 	void process(ref_ptr<Candidate> candidate) const;
 	void performInteraction(ref_ptr<Candidate> candidate) const;
-	inline void performInteraction(Candidate *candidate) const{
-		performInteraction(ref_ptr<Candidate>(candidate));
-	}
 };
 /** @}*/
 

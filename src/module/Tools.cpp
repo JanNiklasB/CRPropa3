@@ -103,10 +103,6 @@ EmissionMapFiller::EmissionMapFiller(ref_ptr<EmissionMap> emissionMap) : emissio
 
 }
 
-EmissionMapFiller::EmissionMapFiller(EmissionMap *emissionMap) : emissionMap(emissionMap) {
-
-}
-
 void EmissionMapFiller::setEmissionMap(ref_ptr<EmissionMap> emissionMap) {
 	this->emissionMap = emissionMap;
 }

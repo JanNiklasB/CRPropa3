@@ -7,9 +7,6 @@ namespace crpropa {
 RestrictToRegion::RestrictToRegion(ref_ptr<Module> _module, ref_ptr<Surface> _surface) : module(_module), surface(_surface) { 
 };
 
-RestrictToRegion::RestrictToRegion(Module *_module, Surface *_surface) : module(_module), surface(_surface) { 
-};
-
 void RestrictToRegion::process(ref_ptr<Candidate> candidate) const {
 	if (surface->distance(candidate->current.getPosition()) <= 0) {
 		module->process(candidate);

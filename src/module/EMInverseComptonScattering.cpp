@@ -18,13 +18,6 @@ EMInverseComptonScattering::EMInverseComptonScattering(ref_ptr<PhotonField> phot
 	setThinning(thinning);
 }
 
-EMInverseComptonScattering::EMInverseComptonScattering(PhotonField *photonField, bool havePhotons, double thinning, double limit) {
-	setPhotonField(photonField);
-	setHavePhotons(havePhotons);
-	setLimit(limit);
-	setThinning(thinning);
-}
-
 void EMInverseComptonScattering::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();

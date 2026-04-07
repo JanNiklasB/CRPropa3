@@ -64,11 +64,6 @@ public:
 	 * @param fixedStep 
 	 */
 	PropagationBP(ref_ptr<MagneticField> field = NULL, double fixedStep = 1. * kpc);
-	/** Default constructor for the Boris push. It is constructed with a fixed step size.
-	 * @param field
-	 * @param fixedStep 
-	 */
-	PropagationBP(MagneticField *field, double fixedStep = 1. * kpc);
 
 	/** Constructor for the adaptive Boris push.
 	 * @param field
@@ -77,13 +72,6 @@ public:
 	 * @param maxStep	   maxStep/c_light is the maximum integration time step. 
 	 */
     PropagationBP(ref_ptr<MagneticField> field, double tolerance, double minStep, double maxStep);
-	/** Constructor for the adaptive Boris push.
-	 * @param field
-	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
-	 * @param minStep	   minStep/c_light is the minimum integration time step
-	 * @param maxStep	   maxStep/c_light is the maximum integration time step. 
-	 */
-    PropagationBP(MagneticField *field, double tolerance, double minStep, double maxStep);
 
 	/** Propagates the particle. Is called once per iteration.
 	 * @param candidate	 The Candidate is a passive object, that holds the information about the state of the cosmic ray and the simulation itself. */
@@ -133,12 +121,6 @@ public:
 	 * @param field	 specific magnetic field 
 	 */
 	void setField(ref_ptr<MagneticField> field);
-	/** Set a specific magnetic field
-	 * @param field	 specific magnetic field 
-	 */
-	inline void setField(MagneticField *field){
-		setField(ref_ptr<MagneticField>(field));
-	}
 	/** Set a specific tolerance for the step size adaption
 	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep. 
 	 */

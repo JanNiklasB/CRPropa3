@@ -390,8 +390,6 @@ std::string ObserverTimeEvolution::getDescription() const {
 // ObserverSurface--------------------------------------------------------------
 ObserverSurface::ObserverSurface(ref_ptr<Surface> _surface) : surface(_surface) { }
 
-ObserverSurface::ObserverSurface(Surface* _surface) : surface(_surface) { }
-
 DetectionState ObserverSurface::checkDetection(ref_ptr<Candidate> candidate) const
 {
 		double currentDistance = surface->distance(candidate->current.getPosition());

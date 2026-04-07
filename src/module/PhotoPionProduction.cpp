@@ -25,16 +25,6 @@ PhotoPionProduction::PhotoPionProduction(ref_ptr<PhotonField> field, bool photon
 	setPhotonField(field);
 }
 
-PhotoPionProduction::PhotoPionProduction(PhotonField *field, bool photons, bool neutrinos, bool electrons, bool antiNucleons, double l, bool redshift) {
-	havePhotons = photons;
-	haveNeutrinos = neutrinos;
-	haveElectrons = electrons;
-	haveAntiNucleons = antiNucleons;
-	haveRedshiftDependence = redshift;
-	limit = l;
-	setPhotonField(field);
-}
-
 void PhotoPionProduction::setPhotonField(ref_ptr<PhotonField> field) {
 	photonField = field;
 	std::string fname = photonField->getFieldName();

@@ -93,26 +93,12 @@ public:
 	 * @param grid	scalar grid containing random +1/-1 values, 100 parsec grid spacing
 	 */
 	void setStriatedGrid(ref_ptr<Grid1f> grid);
-	/**
-	 * Set a striated grid and activate the striated field component
-	 * @param grid	scalar grid containing random +1/-1 values, 100 parsec grid spacing
-	 */
-	inline void setStriatedGrid(Grid1f *grid){
-		setStriatedGrid(ref_ptr<Grid1f>(grid));
-	}
 
 	/**
 	 * Set a turbulent grid and activate the turbulent field component
 	 * @param grid	vector grid containing a random field of Brms = 1
 	 */
 	void setTurbulentGrid(ref_ptr<Grid3f> grid);
-	/**
-	 * Set a turbulent grid and activate the turbulent field component
-	 * @param grid	vector grid containing a random field of Brms = 1
-	 */
-	inline void setTurbulentGrid(Grid3f *grid){
-		setTurbulentGrid(ref_ptr<Grid3f>(grid));
-	}
 
 	ref_ptr<Grid1f> getStriatedGrid();
 	ref_ptr<Grid3f> getTurbulentGrid();

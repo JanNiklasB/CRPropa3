@@ -34,9 +34,6 @@ public:
 
 	void process(ref_ptr<Candidate> candidate) const;
 	void reprocess(ref_ptr<Module> action) const;
-	inline void reprocess(Module* action) const{
-		reprocess(ref_ptr<Module>(action));
-	}
 	void dump(const std::string &filename) const;
 	void load(const std::string &filename);
 
@@ -57,11 +54,6 @@ public:
 	iterator end();
 	const_iterator end() const;
 
-	/**
-	 Retrieves the trajectory of a detected particle
-	Procedure: takes the initial state of the particle, re-runs the ModuleList for that particle and captures trajectory
-	*/
-	void getTrajectory(ModuleList *mlist, std::size_t i, Module *output) const;
 	/**
 	 Retrieves the trajectory of a detected particle
 	Procedure: takes the initial state of the particle, re-runs the ModuleList for that particle and captures trajectory

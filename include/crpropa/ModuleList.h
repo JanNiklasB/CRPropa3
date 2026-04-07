@@ -31,9 +31,6 @@ public:
 	void setShowProgress(bool show = true); ///< activate a progress bar
 
 	void add(ref_ptr<Module> module);
-	inline void add(Module *module){
-		add(ref_ptr<Module>(module));
-	}
 	void remove(std::size_t i);
 	std::size_t size() const;
 	ref_ptr<Module> operator[](const std::size_t i);
@@ -41,13 +38,8 @@ public:
 	void process(ref_ptr<Candidate> candidate) const; ///< call process in all modules
 
 	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
-	void run(Candidate* candidate, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a single candidate
-	
 	void run(ref_ptr<const candidate_vector_t> candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
-	void run(const candidate_vector_t *candidates, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a candidate vector
-
 	void run(ref_ptr<SourceInterface> source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source	
-	void run(SourceInterface* source, size_t count, bool recursive = true, bool secondariesFirst = false); ///< run simulation for a number of candidates from the given source
 
 	std::string getDescription() const;
 	void showModules() const;
@@ -61,13 +53,7 @@ public:
 	const_iterator end() const;
 
 	void setInterruptAction(ref_ptr<Output> action);
-	inline void setInterruptAction(Output *action){
-		setInterruptAction(ref_ptr<Output>(action));
-	}
 	void dumpCandidate(ref_ptr<Candidate> cand) const;
-	inline void dumpCandidate(Candidate *cand) const{
-		dumpCandidate(ref_ptr<Candidate>(cand));
-	}
 
 private:
 	module_list_t modules;
@@ -87,7 +73,6 @@ private:
 public:
 
 	ModuleListRunner(ref_ptr<ModuleList> mlist);
-	ModuleListRunner(ModuleList *mlist);
 	void process(ref_ptr<Candidate> candidate) const; ///< call run of wrapped ModuleList
 	std::string getDescription() const;
 };

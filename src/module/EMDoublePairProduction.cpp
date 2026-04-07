@@ -15,13 +15,6 @@ EMDoublePairProduction::EMDoublePairProduction(ref_ptr<PhotonField> photonField,
 	setThinning(thinning);
 }
 
-EMDoublePairProduction::EMDoublePairProduction(PhotonField *photonField, bool haveElectrons, double thinning, double limit) {
-	setPhotonField(photonField);
-	setHaveElectrons(haveElectrons);
-	setLimit(limit);
-	setThinning(thinning);
-}
-
 void EMDoublePairProduction::setPhotonField(ref_ptr<PhotonField> photonField) {
 	this->photonField = photonField;
 	std::string fname = photonField->getFieldName();

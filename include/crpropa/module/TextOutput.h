@@ -70,14 +70,6 @@ public:
 	 @param collector	object of type ParticleCollector that will store the information
 	 */
 	static void load(const std::string &filename, ref_ptr<ParticleCollector> collector);
-	/** Loads a file to a particle collector.
-	 This is useful for analysis involving, e.g., magnetic lenses.
-	 @param filename	string containing the name of the file to be loaded
-	 @param collector	object of type ParticleCollector that will store the information
-	 */
-	static inline void load(const std::string &filename, ParticleCollector *collector){
-		load(filename, ref_ptr<ParticleCollector>(collector));
-	}
 	std::string getDescription() const;
 
 	void dumpIndexList(std::vector<int> indicies);

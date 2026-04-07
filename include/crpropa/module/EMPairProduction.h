@@ -51,19 +51,9 @@ public:
 	 @param limit			step size limit as fraction of mean free path
 	 */
 	EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons = false, double thinning = 0,double limit = 0.1);
-	/** Constructor
-	 @param photonField		target photon field
-	 @param haveElectrons	if true, add secondary electrons as candidates
-	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
-	 @param limit			step size limit as fraction of mean free path
-	 */
-	EMPairProduction(PhotonField *photonField, bool haveElectrons = false, double thinning = 0,double limit = 0.1);
 
 	// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
-	inline void setPhotonField(PhotonField *photonField){
-		setPhotonField(ref_ptr<PhotonField>(photonField));
-	}
 
 	// decide if secondary electrons are added to the simulation
 	void setHaveElectrons(bool haveElectrons);
@@ -89,9 +79,6 @@ public:
 
 	void process(ref_ptr<Candidate> candidate) const;
 	void performInteraction(ref_ptr<Candidate> candidate) const;
-	inline void performInteraction(Candidate *candidate) const{
-		performInteraction(ref_ptr<Candidate>(candidate));
-	}
 };
 /** @}*/
 

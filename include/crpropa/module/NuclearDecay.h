@@ -67,21 +67,9 @@ public:
 
 	void process(ref_ptr<Candidate> candidate) const;
 	void performInteraction(ref_ptr<Candidate> candidate, int channel) const;
-	inline void performInteraction(Candidate *candidate, int channel) const{
-		performInteraction(ref_ptr<Candidate>(candidate), channel);
-	}
 	void gammaEmission(ref_ptr<Candidate> candidate, int channel) const;
-	inline void gammaEmission(Candidate *candidate, int channel) const{
-		gammaEmission(ref_ptr<Candidate>(candidate), channel);
-	}
 	void betaDecay(ref_ptr<Candidate> candidate, bool isBetaPlus) const;
-	inline void betaDecay(Candidate *candidate, bool isBetaPlus) const{
-		betaDecay(ref_ptr<Candidate>(candidate), isBetaPlus);
-	}
 	void nucleonEmission(ref_ptr<Candidate> candidate, int dA, int dZ) const;
-	inline void nucleonEmission(Candidate *candidate, int dA, int dZ) const{
-		nucleonEmission(ref_ptr<Candidate>(candidate), dA, dZ);
-	}
 
 	/**
 	 Return the mean free path.

@@ -76,7 +76,6 @@ private:
 
 public:
 	DensityGrid(ref_ptr<Grid1f> grid, bool isForHI = false, bool isForHII = false, bool isForH2 = false);
-	DensityGrid(Grid1f *grid, bool isForHI = false, bool isForHII = false, bool isForH2 = false);
 
 	/** Get HI density at a given position.
 	 @param position position in Galactic coordinates with Earth at (-8.5 kpc, 0, 0)
@@ -132,9 +131,6 @@ public:
 	 @param grid (Grid1f) new grid for the density. 
 	*/
 	void setGrid(ref_ptr<Grid1f> grid);
-	inline void setGrid(Grid1f *grid){
-		setGrid(ref_ptr<Grid1f>(grid));
-	}
 
 	std::string getDescription();
 };

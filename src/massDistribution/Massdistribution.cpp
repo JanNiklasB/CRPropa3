@@ -62,11 +62,6 @@ DensityGrid::DensityGrid(ref_ptr<Grid1f> grid, bool isForHI, bool isForHII, bool
 		checkAndWarn();
 	}
 
-DensityGrid::DensityGrid(Grid1f *grid, bool isForHI, bool isForHII, bool isForH2) : 
-	grid(grid), isForHI(isForHI), isForHII(isForHII), isForH2(isForH2) {
-		checkAndWarn();
-	}
-
 void DensityGrid::checkAndWarn() {
 	bool allDeactivated = (isForHI == false) && (isForHII == false) && (isForH2 == false);
 	if (allDeactivated) {

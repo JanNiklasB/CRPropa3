@@ -32,9 +32,6 @@ private:
 public:
 	~PerformanceModule();
 	void add(ref_ptr<Module> module);
-	inline void add(Module *module){
-		add(ref_ptr<Module>(module));
-	}
 	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };
@@ -66,11 +63,7 @@ class EmissionMapFiller: public Module {
 	ref_ptr<EmissionMap> emissionMap;
 public:
 	EmissionMapFiller(ref_ptr<EmissionMap> emissionMap);
-	EmissionMapFiller(EmissionMap *emissionMap);
 	void setEmissionMap(ref_ptr<EmissionMap> emissionMap);
-	inline void setEmissionMap(EmissionMap *emissionMap){
-		setEmissionMap(ref_ptr<EmissionMap>(emissionMap));
-	}
 	void process(ref_ptr<Candidate> candidate) const;
 	std::string getDescription() const;
 };

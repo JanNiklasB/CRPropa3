@@ -141,11 +141,6 @@ double QuasiLinearTheory::modify(double steplength, ref_ptr<Candidate> candidate
 }
 
 
-ParticleSplitting::ParticleSplitting(Surface *surface, int	crossingThreshold, 
-	int numberSplits, double minWeight, std::string counterid)
-	: surface(surface), crossingThreshold(crossingThreshold),
-	  numberSplits(numberSplits), minWeight(minWeight), counterid(counterid){}
-
 ParticleSplitting::ParticleSplitting(ref_ptr<Surface> surface, int	crossingThreshold, 
 	int numberSplits, double minWeight, std::string counterid)
 	: surface(surface), crossingThreshold(crossingThreshold),

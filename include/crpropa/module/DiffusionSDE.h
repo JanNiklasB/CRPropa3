@@ -55,14 +55,6 @@ public:
 	DiffusionSDE(ref_ptr<MagneticField> magneticField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1);
 	/** Constructor
 	 @param magneticField	the magnetic field to be used 
-	 @param tolerance		Tolerance is criterion for step adjustment. Step adjustment takes place when the  tangential vector of the magnetic field line is calculated.
-	 @param minStep			minStep/c_light is the minimum integration time step
-	 @param maxStep			maxStep/c_light is the maximum integration time step
-	 @param epsilon			Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
-	 */
-	DiffusionSDE(MagneticField *magneticField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1);
-	/** Constructor
-	 @param magneticField	the magnetic field to be used 
 	 @param advectionField	object containing advection field
 	 @param tolerance		Tolerance is criterion for step adjustment. Step adjustment takes place when the  tangential vector of the magnetic field line is calculated.
 	 @param minStep			minStep/c_light is the minimum integration time step
@@ -70,15 +62,6 @@ public:
 	 @param epsilon			Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
 	 */
 	DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1);
-	/** Constructor
-	 @param magneticField	the magnetic field to be used 
-	 @param advectionField	object containing advection field
-	 @param tolerance		Tolerance is criterion for step adjustment. Step adjustment takes place when the  tangential vector of the magnetic field line is calculated.
-	 @param minStep			minStep/c_light is the minimum integration time step
-	 @param maxStep			maxStep/c_light is the maximum integration time step
-	 @param epsilon			Ratio of parallel and perpendicular diffusion coefficient D_par = epsilon*D_perp
-	 */
-	DiffusionSDE(MagneticField *magneticField, AdvectionField *advectionField, double tolerance = 1e-4, double minStep = 10 * pc, double maxStep = 1 * kpc, double epsilon = 0.1);
 
 	void process(ref_ptr<Candidate> candidate) const;
 
@@ -93,13 +76,7 @@ public:
 	void setAlpha(double alpha);
 	void setScale(double Scale);
 	void setMagneticField(ref_ptr<MagneticField> magneticField);
-	inline void setMagneticField(MagneticField *magneticField){
-		setMagneticField(ref_ptr<MagneticField>(magneticField));
-	}
 	void setAdvectionField(ref_ptr<AdvectionField> advectionField);
-	inline void setAdvectionField(AdvectionField *advectionField){
-		setAdvectionField(ref_ptr<AdvectionField>(advectionField));
-	}
 
 	double getMinimumStep() const;
 	double getMaximumStep() const;

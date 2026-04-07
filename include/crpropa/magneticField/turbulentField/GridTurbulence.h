@@ -45,19 +45,11 @@ class GridTurbulence : public TurbulentField {
 	/* Helper functions for synthetic turbulent field models */
 	// Check the grid properties before the FFT procedure
 	static void checkGridRequirements(ref_ptr<Grid3f> grid, double lMin, double lMax);
-	static inline void checkGridRequirements(Grid3f *grid, double lMin, double lMax){
-		checkGridRequirements(ref_ptr<Grid3f>(grid), lMin, lMax);
-	}
 	// Execute inverse discrete FFT in-place for a 3D grid, from complex to real
 	// space
 	static void executeInverseFFTInplace(ref_ptr<Grid3f> grid,
 										fftwf_complex *Bkx, fftwf_complex *Bky,
 										fftwf_complex *Bkz);
-	static inline void executeInverseFFTInplace(Grid3f *grid,
-	                                     fftwf_complex *Bkx, fftwf_complex *Bky,
-	                                     fftwf_complex *Bkz){
-		executeInverseFFTInplace(ref_ptr<Grid3f>(grid), Bkx, Bky, Bkz);
-	}
 
 	// Usefull checks for a grid field
 	/** Evaluate the mean vector of all grid points */

@@ -107,8 +107,4 @@ void ParticleCollector::getTrajectory(ref_ptr<ModuleList> mlist, std::size_t i, 
 	mlist->remove(mlist->size()-1);
 }
 
-void ParticleCollector::getTrajectory(ModuleList* mlist, std::size_t i, Module *output) const {
-	ParticleCollector::getTrajectory(ref_ptr<ModuleList>(mlist), i, ref_ptr<Module>(output));
-}
-
 } // namespace crpropa

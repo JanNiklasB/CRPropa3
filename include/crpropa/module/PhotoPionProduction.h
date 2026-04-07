@@ -114,31 +114,9 @@ public:
 		bool antiNucleons = false,
 		double limit = 0.1,
 		bool haveRedshiftDependence = false);
-	/**
-	 * @brief pion production on a given target photon field
-	 * 
-	 * @param photonField 	target photon field
-	 * @param photons 		if true, secondary photons are added to the simulation
-	 * @param neutrinos 	if true, secondary neutrinos are added to the simulation
-	 * @param electrons 	if true, secondary electrons are added to the simulation
-	 * @param antiNucleons 	if true, secondary anti nucleons are added to the simulation
-	 * @param limit 		fraction of the mean free path, to which the propagation step will be limited
-	 * @param haveRedshiftDependence 	use redshift dependent tabulated loss rates; if false, the redshift scaling of the photon field will be used
-	 */
-	PhotoPionProduction(
-		PhotonField* photonField,
-		bool photons = false,
-		bool neutrinos = false,
-		bool electrons = false,
-		bool antiNucleons = false,
-		double limit = 0.1,
-		bool haveRedshiftDependence = false);
 
 	// set the target photon field
 	void setPhotonField(ref_ptr<PhotonField> photonField);
-	inline void setPhotonField(PhotonField *photonField){
-		setPhotonField(ref_ptr<PhotonField>(photonField));
-	}
 
 	// decide if secondary photons are added to the simulation
 	void setHavePhotons(bool b);
@@ -183,9 +161,6 @@ public:
 	double nucleiModification(int A, int X) const;
 	void process(ref_ptr<Candidate> candidate) const;
 	void performInteraction(ref_ptr<Candidate> candidate, bool onProton) const;
-	inline void performInteraction(Candidate *candidate, bool onProton) const{
-		performInteraction(ref_ptr<Candidate>(candidate), onProton);
-	}
 
 	/**
 	 Calculates the loss length E dx/dE in [m].
