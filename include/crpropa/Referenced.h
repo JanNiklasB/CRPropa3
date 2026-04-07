@@ -62,9 +62,9 @@ class ref_ptr {
 		return *this;
 	}
 
-	// operator T*() const {
-	// 	return get();
-	// }
+	operator T*() const {
+		return get();
+	}
 
 	T& operator*() const {
 		if (_raw_ptr) return *_raw_ptr;
@@ -75,9 +75,9 @@ class ref_ptr {
 		return _shared_ptr.get();
 	}
 
-	bool operator==(const ref_ptr& rp) const {
-		return get()==rp.get();
-	}
+	// bool operator==(const ref_ptr& rp) const {
+	// 	return get()==rp.get();
+	// }
 
 	T* get() const {
 		if (_raw_ptr) return _raw_ptr;
