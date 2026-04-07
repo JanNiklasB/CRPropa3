@@ -16,6 +16,33 @@
 #endif
 
 
+%include "std_shared_ptr.i"
+%shared_ptr(std::vector< crpropa::ref_ptr<crpropa::Candidate> >);
+%shared_ptr(crpropa::Candidate);
+%shared_ptr(crpropa::Surface);
+%shared_ptr(crpropa::Module);
+%shared_ptr(std::list< crpropa::ref_ptr<crpropa::Module> >);
+%shared_ptr(crpropa::AbstractCondition);
+%shared_ptr(crpropa::Output);
+%shared_ptr(crpropa::MagneticField);
+%shared_ptr(crpropa::PhotonField);
+%shared_ptr(crpropa::AdvectionField);
+%shared_ptr(crpropa::Density);
+%shared_ptr(crpropa::Grid<crpropa::Vector3<float> > );
+%shared_ptr(crpropa::Grid<crpropa::Vector3<double> > );
+%shared_ptr(crpropa::Grid<float> );
+%shared_ptr(crpropa::Grid<double> );
+%shared_ptr(crpropa::EmissionMap);
+%shared_ptr(crpropa::CylindricalProjectionMap);
+%shared_ptr(crpropa::Observer);
+%shared_ptr(crpropa::ObserverFeature);
+%shared_ptr(crpropa::SourceInterface);
+%shared_ptr(crpropa::SourceFeature);
+%shared_ptr(crpropa::ModuleList);
+%shared_ptr(crpropa::ParticleCollector);
+%shared_ptr(crpropa::StepLengthModifier);
+
+
 %{
 #include "CRPropa.h"
   // for usage of namespace in header files, necessary for keyword arguments with units
@@ -236,22 +263,34 @@
 };
 %thread; /* reenable threading */
 
-
+%implicitconv crpropa::ref_ptr<std::vector< crpropa::ref_ptr<crpropa::Candidate> >>;
+%template(CandidateVectorRefPtr) crpropa::ref_ptr<std::vector< crpropa::ref_ptr<crpropa::Candidate> >>;
 %template(CandidateVector) std::vector< crpropa::ref_ptr<crpropa::Candidate> >;
+%implicitconv crpropa::ref_ptr<crpropa::Candidate>;
 %template(CandidateRefPtr) crpropa::ref_ptr<crpropa::Candidate>;
 %include "crpropa/Candidate.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::Surface>;
+%template(SurfaceRefPtr) crpropa::ref_ptr<crpropa::Surface>;
 %feature("director") crpropa::Surface;
+// %implicitconv crpropa::ref_ptr<crpropa::ClosedSurface>;
+// %template(ClosedSurfaceRefPtr) crpropa::ref_ptr<crpropa::ClosedSurface>;
 %feature("director") crpropa::ClosedSurface;
 %include "crpropa/Geometry.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::Module>;
 %template(ModuleRefPtr) crpropa::ref_ptr<crpropa::Module>;
 %template(stdModuleList) std::list< crpropa::ref_ptr<crpropa::Module> >;
+%implicitconv crpropa::ref_ptr<std::list< crpropa::ref_ptr<crpropa::Module> >>;
+%template(stdModuleListRefPtr) crpropa::ref_ptr<std::list< crpropa::ref_ptr<crpropa::Module> >>;
 %feature("director") crpropa::Module;
+%implicitconv crpropa::ref_ptr<crpropa::AbstractCondition>;
+%template(AbstractConditionRefPtr) crpropa::ref_ptr<crpropa::AbstractCondition>;
 %feature("director") crpropa::AbstractCondition;
 %include "crpropa/Module.h"
 
-%template(OutputRefPtr) crpropa::ref_ptr<Output>;
+%implicitconv crpropa::ref_ptr<crpropa::Output>;
+%template(OutputRefPtr) crpropa::ref_ptr<crpropa::Output>;
 %feature("director") crpropa::Output;
 %ignore crpropa::Output::dumpIndexList(std::vector<int>);
 %include "crpropa/module/Output.h"
@@ -330,7 +369,11 @@
 %include "crpropa/module/BreakCondition.h"
 %include "crpropa/module/Boundary.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::Observer>;
+%template(ObserverRefPtr) crpropa::ref_ptr<crpropa::Observer>;
 %feature("director") crpropa::Observer;
+%implicitconv crpropa::ref_ptr<crpropa::ObserverFeature>;
+%template(ObserverFeatureRefPtr) crpropa::ref_ptr<crpropa::ObserverFeature>;
 %feature("director") crpropa::ObserverFeature;
 %include "crpropa/module/Observer.h"
 %include "crpropa/module/SimplePropagation.h"
@@ -397,8 +440,10 @@
 %template(IntSet) std::set<int>;
 %include "crpropa/module/Tools.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::SourceInterface>;
 %template(SourceInterfaceRefPtr) crpropa::ref_ptr<crpropa::SourceInterface>;
 %feature("director") crpropa::SourceInterface;
+%implicitconv crpropa::ref_ptr<crpropa::SourceFeature>;
 %template(SourceFeatureRefPtr) crpropa::ref_ptr<crpropa::SourceFeature>;
 %feature("director") crpropa::SourceFeature;
 %include "crpropa/Source.h"
@@ -445,9 +490,11 @@
   }
 };
 
+%implicitconv crpropa::ref_ptr<crpropa::ModuleList>;
 %template(ModuleListRefPtr) crpropa::ref_ptr<crpropa::ModuleList>;
 %include "crpropa/ModuleList.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::ParticleCollector>;
 %template(ParticleCollectorRefPtr) crpropa::ref_ptr<crpropa::ParticleCollector>;
 
 %inline %{
@@ -523,6 +570,7 @@
 %include "crpropa/massDistribution/ConstantDensity.h"
 
 
+%implicitconv crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %template(StepLengthModifierRefPtr) crpropa::ref_ptr<crpropa::StepLengthModifier>;
 %feature("director") crpropa::StepLengthModifier;
 %include "crpropa/module/Acceleration.h"
