@@ -19,14 +19,14 @@ class ref_ptr {
 	public:
 	typedef T element_type;
 
-	ref_ptr() {}
+	ref_ptr() : _raw_ptr(NULL), _shared_ptr(NULL) {}
 	ref_ptr(T& obj) {
 		_raw_ptr = &obj;
-		_shared_ptr = 0;
+		_shared_ptr = NULL;
 	}
 	ref_ptr(T* ptr) {
 		_shared_ptr = std::shared_ptr<T>(ptr);
-		_raw_ptr = 0;
+		_raw_ptr = NULL;
 	}
 	ref_ptr(const ref_ptr& rp) {
 		_shared_ptr = rp._shared_ptr;
@@ -38,13 +38,13 @@ class ref_ptr {
 	}
 	template<class Other> ref_ptr(const std::shared_ptr<Other>& shared_ptr) {
 		_shared_ptr = shared_ptr;
-		_raw_ptr = 0;
+		_raw_ptr = NULL;
 	}
 
-	// ~ref_ptr() {
-	// 	_shared_ptr = 0;
-	// 	_raw_ptr = 0;  // do not delete, it is expected to be managed by user
-	// }
+	~ref_ptr() {
+		_shared_ptr = NULL;
+		_raw_ptr = NULL;  // do not delete, it is expected to be managed by user
+	}
 
 	ref_ptr& operator =(const ref_ptr& rp) {
 		assign(rp);
@@ -57,8 +57,8 @@ class ref_ptr {
 	}
 
 	inline ref_ptr& operator =(long int ptr) {
-		_shared_ptr = ptr;
-		_raw_ptr = ptr;
+		_shared_ptr = NULL;
+		_raw_ptr = NULL;
 		return *this;
 	}
 
@@ -84,14 +84,18 @@ class ref_ptr {
 		return _shared_ptr.get();
 	}
 
+	std::shared_ptr<T> get_shared() const{
+		return _shared_ptr;
+	}
+
 	bool valid() const {
 		if (_raw_ptr) return true;
-		return _shared_ptr != 0;
+		return _shared_ptr != NULL;
 	}
 
 	void release() {
-		_shared_ptr.reset();
-		_raw_ptr = 0;  // do not delete, it is expected to be managed by user
+		_shared_ptr = NULL;
+		_raw_ptr = NULL;  // do not delete, it is expected to be managed by user
 	}
 
 	void swap(ref_ptr& rp) {
@@ -113,8 +117,8 @@ class ref_ptr {
 
 	template<class Other> friend class ref_ptr;
 
-	std::shared_ptr<T> _shared_ptr = 0;
-	T* _raw_ptr = 0;
+	std::shared_ptr<T> _shared_ptr = NULL;
+	T* _raw_ptr = NULL;
 };
 
 template<class T> inline
@@ -134,7 +138,7 @@ inline ref_ptr<T> dynamic_pointer_cast(const ref_ptr<Y>& rp) {
 
 template<class T, class Y> 
 inline ref_ptr<T> const_pointer_cast(const ref_ptr<Y>& rp) {
-	return std::const_pointer_cast<T>(rp);
+	return std::const_pointer_cast<T>(rp.get_shared());
 }
 
 /** @}*/
