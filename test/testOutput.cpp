@@ -37,7 +37,7 @@ namespace crpropa {
 TEST(Output, size) {
 	Candidate c;
 	Output output;
-	for (int it = 0; it < 5; ++it, output.process(&c));
+	for (int it = 0; it < 5; ++it, output.process(c));
 
 	EXPECT_EQ(output.size(), 5);
 }
@@ -48,7 +48,7 @@ TEST(TextOutput, printHeader_Trajectory1D) {
 	TextOutput output(Output::Trajectory1D);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")), "#\tID\tE\tX");
@@ -59,7 +59,7 @@ TEST(TextOutput, printHeader_Event1D) {
 	TextOutput output(Output::Event1D);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")), "#\tD\tID\tE\tID0\tE0");
@@ -70,7 +70,7 @@ TEST(TextOutput, printHeader_Trajectory3D) {
 	TextOutput output(Output::Trajectory3D);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")),
@@ -82,7 +82,7 @@ TEST(TextOutput, printHeader_Event3D) {
 	TextOutput output(Output::Event3D);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(
@@ -101,7 +101,7 @@ TEST(TextOutput, printHeader_Custom) {
 	output.enable(Output::TimeColumn);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	EXPECT_EQ(captured.substr(0, captured.find("\n")),
@@ -115,7 +115,7 @@ TEST(TextOutput, printProperty) {
 	output.enableProperty("foo", 2.0, "Bar");
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	// name in first line of header
@@ -127,7 +127,7 @@ TEST(TextOutput, printHeader_Version) {
 	TextOutput output(Output::Event1D);
 
 	::testing::internal::CaptureStdout();
-	output.process(&c);
+	output.process(c);
 	std::string captured = testing::internal::GetCapturedStdout();
 
 	// length of the prefix is 19 chars
@@ -271,7 +271,7 @@ TEST(ParticleCollector, runModuleList) {
 
 	modules.setShowProgress(false);
 	auto candidates = collector->getContainer();
-	modules.run(&candidates);
+	modules.run(candidates);
 }
 
 int main(int argc, char **argv) {
