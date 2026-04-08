@@ -417,6 +417,12 @@ public:
 		data[2] = f;
 		return *this;
 	}
+	
+	const std::string getDescription() {
+		char buffer[256];
+		snprintf(buffer, 256, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
+		return buffer;
+	}
 
 
 	#if defined(Python_FOUND) or defined(SWIG)
