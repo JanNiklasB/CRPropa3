@@ -15,33 +15,17 @@
   //%import (module="quimby") quimby.i
 #endif
 
+%feature("ref")   ""
+%feature("unref") ""  // let c++ handle all memory, swig now never deletes pointer itself
 
-%include "std_shared_ptr.i"
-%shared_ptr(std::vector< crpropa::ref_ptr<crpropa::Candidate> >);
-%shared_ptr(crpropa::Candidate);
-%shared_ptr(crpropa::Surface);
-%shared_ptr(crpropa::Module);
-%shared_ptr(std::list< crpropa::ref_ptr<crpropa::Module> >);
-%shared_ptr(crpropa::AbstractCondition);
-%shared_ptr(crpropa::Output);
-%shared_ptr(crpropa::MagneticField);
-%shared_ptr(crpropa::PhotonField);
-%shared_ptr(crpropa::AdvectionField);
-%shared_ptr(crpropa::Density);
-%shared_ptr(crpropa::Grid<crpropa::Vector3<float> > );
-%shared_ptr(crpropa::Grid<crpropa::Vector3<double> > );
-%shared_ptr(crpropa::Grid<float> );
-%shared_ptr(crpropa::Grid<double> );
-%shared_ptr(crpropa::EmissionMap);
-%shared_ptr(crpropa::CylindricalProjectionMap);
-%shared_ptr(crpropa::Observer);
-%shared_ptr(crpropa::ObserverFeature);
-%shared_ptr(crpropa::SourceInterface);
-%shared_ptr(crpropa::SourceFeature);
-%shared_ptr(crpropa::ModuleList);
-%shared_ptr(crpropa::ParticleCollector);
-%shared_ptr(crpropa::StepLengthModifier);
+%feature("ref")   crpropa::Vector3<double> ""
+%feature("unref") crpropa::Vector3<double> "delete $this;"
 
+%feature("ref")   crpropa::Vector3<float> ""
+%feature("unref") crpropa::Vector3<float> "delete $this;"
+
+%newobject crpropa::Vector3<double>::__array__;
+%newobject crpropa::Vector3<float>::__array__;
 
 %{
 #include "CRPropa.h"
