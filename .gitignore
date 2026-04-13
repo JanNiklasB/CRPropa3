@@ -14,8 +14,6 @@ share/
 doc/api/
 .vscode/
 
-!final_doc/ # needed for deployment of the documentation
-
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
 
@@ -28,3 +26,7 @@ cmake/CMakeFiles/
 *.ipynb_checkpoints
 *.idea
 *.code-workspace
+
+!final_doc/ # needed for deployment of the documentation
+!CMakeFiles
+!libs/*/CMakeLists.txt
