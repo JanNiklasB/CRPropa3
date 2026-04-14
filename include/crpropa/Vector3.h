@@ -448,12 +448,6 @@ public:
 	size_t __len__() {
 		return 3;
 	}
-
-	const std::string getDescription() {
-		char buffer[256];
-		sprintf(buffer, "Vector(%.6G, %.6G, %.6G)", data[0], data[1], data[2]);
-		return buffer;
-	}
 	
 	// initialize the vector from a numpy array
 	Vector3(PyObject* inputObject) {
