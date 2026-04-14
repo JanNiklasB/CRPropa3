@@ -7,10 +7,10 @@
 #include <cstdlib>
 #include <sstream>
 
-#include <crpropa/Vector3.h>
-#include <crpropa/Module.h>
-#include <crpropa/Units.h>
-#include <crpropa/advectionField/AdvectionField.h>
+#include "crpropa/Vector3.h"
+#include "crpropa/Module.h"
+#include "crpropa/Units.h"
+#include "crpropa/advectionField/AdvectionField.h"
 #include <kiss/logger.h>
 
 

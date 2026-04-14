@@ -1,8 +1,8 @@
 #ifndef CRPROPA_GRID_H
 #define CRPROPA_GRID_H
 
-#include <crpropa/Referenced.h>
-#include <crpropa/Vector3.h>
+#include "crpropa/Referenced.h"
+#include "crpropa/Vector3.h"
 
 #include <kiss/string.h>
 #include <kiss/logger.h>

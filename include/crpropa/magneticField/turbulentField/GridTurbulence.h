@@ -3,8 +3,8 @@
 
 #ifdef CRPROPA_HAVE_FFTW3F
 
-#include <crpropa/Grid.h>
-#include <crpropa/magneticField/turbulentField/TurbulentField.h>
+#include "crpropa/Grid.h"
+#include "crpropa/magneticField/turbulentField/TurbulentField.h"
 
 #include <fftw3.h>
 

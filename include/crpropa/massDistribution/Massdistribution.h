@@ -1,9 +1,9 @@
 #ifndef CRPROPA_MASSDISTRIBUTION_H
 #define CRPROPA_MASSDISTRIBUTION_H
 
-#include <crpropa/massDistribution/Density.h>
-#include <crpropa/Vector3.h>
-#include <crpropa/Grid.h>
+#include "crpropa/massDistribution/Density.h"
+#include "crpropa/Vector3.h"
+#include "crpropa/Grid.h"
 
 #include <kiss/logger.h>
 

@@ -1,7 +1,7 @@
 #ifndef CRPROPA_POLARIZEDSINGLEMODEMAGNETICFIELD_H
 #define CRPROPA_POLARIZEDSINGLEMODEMAGNETICFIELD_H
 
-#include <crpropa/magneticField/MagneticField.h>
+#include "crpropa/magneticField/MagneticField.h"
 
 
 #include <string>
@@ -10,9 +10,9 @@
 #include <cstdlib>
 #include <sstream>
 
-#include <crpropa/Vector3.h>
-#include <crpropa/Referenced.h>
-#include <crpropa/Units.h>
+#include "crpropa/Vector3.h"
+#include "crpropa/Referenced.h"
+#include "crpropa/Units.h"
 
 namespace crpropa {
 /**

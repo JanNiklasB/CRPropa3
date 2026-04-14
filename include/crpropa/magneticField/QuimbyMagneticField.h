@@ -3,8 +3,8 @@
 
 #ifdef CRPROPA_HAVE_QUIMBY
 
-#include <crpropa/Units.h>
-#include <crpropa/magneticField/MagneticField.h>
+#include "crpropa/Units.h"
+#include "crpropa/magneticField/MagneticField.h"
 
 #include <quimby/MagneticField.h>
 
