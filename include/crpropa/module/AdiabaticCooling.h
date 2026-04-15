@@ -11,7 +11,7 @@
 #include "crpropa/Module.h"
 #include "crpropa/Units.h"
 #include "crpropa/advectionField/AdvectionField.h"
-#include <kiss/logger.h>
+#include "kiss/logger.h"
 
 
 namespace crpropa {

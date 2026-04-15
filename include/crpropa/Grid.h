@@ -4,8 +4,8 @@
 #include "crpropa/Referenced.h"
 #include "crpropa/Vector3.h"
 
-#include <kiss/string.h>
-#include <kiss/logger.h>
+#include "kiss/string.h"
+#include "kiss/logger.h"
 
 #include <vector>
 #include <type_traits>

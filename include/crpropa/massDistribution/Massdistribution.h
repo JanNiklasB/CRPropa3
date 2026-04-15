@@ -5,7 +5,7 @@
 #include "crpropa/Vector3.h"
 #include "crpropa/Grid.h"
 
-#include <kiss/logger.h>
+#include "kiss/logger.h"
 
 #include <vector>
 

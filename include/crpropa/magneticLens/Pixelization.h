@@ -24,7 +24,7 @@
 #ifndef PIXELIZATION_HH
 #define PIXELIZATION_HH
 
-#include <healpix_base/healpix_base.h>
+#include "healpix_base/healpix_base.h"
 #include <cmath>
 #include <stdint.h>
 

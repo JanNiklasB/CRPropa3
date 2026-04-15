@@ -6,7 +6,7 @@
 #include "crpropa/Units.h"
 #include "crpropa/magneticField/MagneticField.h"
 
-#include <quimby/MagneticField.h>
+#include "quimby/MagneticField.h"
 
 #include <stdexcept>
 #include <sstream>

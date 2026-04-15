@@ -6,7 +6,7 @@
 #include "crpropa/Grid.h"
 #include "crpropa/magneticField/turbulentField/TurbulentField.h"
 
-#include <fftw3.h>
+#include "fftw3.h"
 
 namespace crpropa {
 /**

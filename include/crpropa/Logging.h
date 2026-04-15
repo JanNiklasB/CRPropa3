@@ -3,7 +3,7 @@
 
 #include "crpropa/Version.h"
 
-#include <kiss/logger.h>
+#include "kiss/logger.h"
 
 #include <fstream>
 
