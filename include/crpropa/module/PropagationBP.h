@@ -28,7 +28,7 @@ class PropagationBP: public Module {
 public:
 	class Y {
 	public:
-		Vector3d x, u; /*< phase-point: position and velocity */
+		Vector3d x, u; /*< phase-point: position and direction */
 
 		Y() {
 		}
@@ -79,13 +79,13 @@ public:
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
-	 * @param vel	current velocity of the candidate
+	 * @param dir	current direction of the candidate
 	 * @param step	current step size of the candidate
 	 * @param z		current redshift is needed to calculate the magnetic field
 	 * @param current current particle state
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	virtual Y dY(Vector3d pos, Vector3d vel, double step, double z, ParticleState &current) const;
+	virtual Y dY(Vector3d pos, Vector3d dir, double step, double z, ParticleState &current) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -110,7 +110,7 @@ public:
 	 * @param p		 current particle state
 	 * @param z		 current red shift
 	 */
-	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z) const;
+	virtual void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z) const;
 
 	/** Set functions for the parameters of the class PropagationBP */
 
