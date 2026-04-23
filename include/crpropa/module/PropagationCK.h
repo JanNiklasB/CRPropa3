@@ -61,11 +61,11 @@ public:
 	/** Constructor for the adaptive Kash Carp.
 	 * @param field
 	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
-	 * @param minStep	   minStep/c_light is the minimum integration time step
-	 * @param maxStep	   maxStep/c_light is the maximum integration time step. 
+	 * @param minStep	   minStep is the minimum integration time step
+	 * @param maxStep	   maxStep is the maximum integration time step. 
 	 */
     PropagationCK(ref_ptr<MagneticField> field = NULL, double tolerance = 1e-4,
-			double minStep = (0.1 * kpc), double maxStep = (1 * Gpc));
+			double minStep = (1 * kiloyear), double maxStep = (1 * Gigayear));
 
 	void process(Candidate *candidate) const;
 

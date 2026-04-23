@@ -6,7 +6,7 @@
 
 namespace crpropa {
 	void PropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
-			ParticleState &particle, double z) const {
+			ParticleState particle, double z) const {
 		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
 
 		Y outHelp = dY(y.x, y.u, h/2, z, particle);  // 2 steps with h/2
@@ -17,10 +17,11 @@ namespace crpropa {
 
 
 	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double step, 
-		double z, ParticleState &current) const {
+		double z, ParticleState current) const {
 
+		double vel = current.getVelocity().getR();
 		// half leap frog step in the position
-		pos += dir * step / 2.;
+		pos += dir * step / 2. * vel;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
@@ -28,7 +29,7 @@ namespace crpropa {
 		double m = current.getLorentzFactor()*current.getMass();
 
 		// Boris help vectors
-		Vector3d t = B * current.getCharge() / 2 / m * step / current.getVelocity().getR();
+		Vector3d t = B * current.getCharge() / 2 / m * step;
 		Vector3d s = t * 2 / (1 + t.dot(t));
 		Vector3d v_help;
 
@@ -37,7 +38,7 @@ namespace crpropa {
 		dir = dir + v_help.cross(s);
 
 		// the other half leap frog step in the position
-		pos += dir * step / 2.;
+		pos += dir * step / 2. * vel;
 		return Y(pos, dir);
 	}
 
@@ -81,7 +82,7 @@ namespace crpropa {
 		// rectilinear propagation for neutral particles
 		if (q == 0) {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
-			current.setPosition(yIn.x + yIn.u * step);
+			current.setPosition(yIn.x + yIn.u * candidate->getVelocity() * step);
 			candidate->setCurrentStep(step);
 			candidate->setNextStep(maxStep);
 			return;
@@ -209,8 +210,8 @@ namespace crpropa {
 		std::stringstream s;
 		s << "Propagation in magnetic fields using the adaptive Boris push method.";
 		s << " Target error: " << tolerance;
-		s << ", Minimum Step: " << minStep / kpc << " kpc";
-		s << ", Maximum Step: " << maxStep / kpc << " kpc";
+		s << ", Minimum Step: " << minStep / kiloyear << " kiloyear";
+		s << ", Maximum Step: " << maxStep / kiloyear << " kiloyear";
 		return s.str();
 	}
 } // namespace crpropa

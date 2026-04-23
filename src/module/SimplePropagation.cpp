@@ -14,11 +14,12 @@ SimplePropagation::SimplePropagation(double minStep, double maxStep) :
 void SimplePropagation::process(Candidate *c) const {
 	c->previous = c->current;
 
-	double step = clip(c->getNextStep(), minStep, maxStep);
-	c->setCurrentStep(step);
+	double dt = clip(c->getNextStep(), minStep, maxStep);
+	c->setCurrentStep(dt);
 	Vector3d pos = c->current.getPosition();
 	Vector3d dir = c->current.getDirection();
-	c->current.setPosition(pos + dir * step);
+	double vel = c->getVelocity();
+	c->current.setPosition(pos + dir * vel * dt);
 	c->setNextStep(maxStep);
 }
 
@@ -44,8 +45,8 @@ double SimplePropagation::getMaximumStep() const {
 
 std::string SimplePropagation::getDescription() const {
 	std::stringstream s;
-	s << "SimplePropagation: Step size = " << minStep / kpc
-			<< " - " << maxStep / kpc << " kpc";
+	s << "SimplePropagation: Step size = " << minStep / kiloyear
+			<< " - " << maxStep / kiloyear << " kiloyear";
 	return s.str();
 }
 

@@ -113,12 +113,12 @@ DetectionState ObserverTracking::checkDetection(Candidate *candidate) const {
 	// no detection if outside of observer sphere
 	if (d > radius) {
 		// conservatively limit next step to prevent overshooting
-		candidate->limitNextStep(fabs(d - radius));
+		candidate->limitNextStep(fabs(d - radius) / candidate->getVelocity());
 
 		return NOTHING;
 	} else {
 		// limit next step
-		candidate->limitNextStep(stepSize);
+		candidate->limitNextStep(stepSize / candidate->getVelocity());
 
 		return DETECTED;
 	}
@@ -138,7 +138,7 @@ DetectionState Observer1D::checkDetection(Candidate *candidate) const {
 	double x = candidate->current.getPosition().x;
 	if (x > 0) {
 		// Limits the next step size to prevent candidates from overshooting in case of non-detection
-		candidate->limitNextStep(x);
+		candidate->limitNextStep(x/candidate->getVelocity());
 		return NOTHING;
 	}
 	// Detects particles when reaching x = 0
@@ -289,13 +289,13 @@ DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 		// Limit next step and detect candidate.
 		// Increase the index by one in case of detection
 		if (distance < 0.) {
-			c->limitNextStep(-distance);
+			c->limitNextStep(-distance/c->getVelocity());
 			return NOTHING;
 		}
 		else {
 
 			if (index < nIntervals-2) {
-				c->limitNextStep(getTime(index+1)-length);
+				c->limitNextStep((getTime(index+1)-length)/c->getVelocity());
 			}
 			c->setProperty(DI, Variant::fromUInt64(index+1));
 
@@ -395,7 +395,7 @@ DetectionState ObserverSurface::checkDetection(Candidate *candidate) const
 {
 		double currentDistance = surface->distance(candidate->current.getPosition());
 		double previousDistance = surface->distance(candidate->previous.getPosition());
-		candidate->limitNextStep(fabs(currentDistance));
+		candidate->limitNextStep(fabs(currentDistance)/candidate->getVelocity());
 
 		if (currentDistance * previousDistance > 0)
 			return NOTHING;
