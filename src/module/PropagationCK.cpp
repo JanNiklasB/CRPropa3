@@ -91,7 +91,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	// rectilinear propagation for neutral particles
 	if (current.getCharge() == 0) {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
-		current.setPosition(yIn.x + yIn.u * step);
+		current.setPosition(yIn.x + yIn.u * step * candidate->getVelocity());
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(maxStep);
 		return;
@@ -105,7 +105,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	// if minStep is the same as maxStep the adaptive algorithm with its error
 	// estimation is not needed and the computation time can be saved:
 	if (minStep == maxStep){
-		tryStep(yIn, yOut, yErr, step / candidate->getVelocity(), current, z);
+		tryStep(yIn, yOut, yErr, step, current, z);
 	} else {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
 		newStep = step;
@@ -113,7 +113,7 @@ void PropagationCK::process(Candidate *candidate) const {
 
 		// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 		while (true) {
-			tryStep(yIn, yOut, yErr, step / candidate->getVelocity(), current, z);
+			tryStep(yIn, yOut, yErr, step, current, z);
 			r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
 			if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 				if (step == minStep)  // already minimum step size
@@ -200,8 +200,8 @@ std::string PropagationCK::getDescription() const {
 	std::stringstream s;
 	s << "Propagation in magnetic fields using the Cash-Karp method.";
 	s << " Target error: " << tolerance;
-	s << ", Minimum Step: " << minStep / kpc << " kpc";
-	s << ", Maximum Step: " << maxStep / kpc << " kpc";
+	s << ", Minimum Step: " << minStep / kiloyear << " kiloyear";
+	s << ", Maximum Step: " << maxStep / kiloyear << " kiloyear";
 	return s.str();
 }
 

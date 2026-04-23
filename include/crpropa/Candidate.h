@@ -44,8 +44,8 @@ private:
 	double weight; /**< Weight of the candidate */
 	double redshift; /**< Current simulation time-point in terms of redshift z */
 	double trajectoryLength; /**< Comoving distance [m] the candidate has traveled so far */
-	double currentStep; /**< Size of the currently performed step in [m] comoving units */
-	double nextStep; /**< Proposed size of the next propagation step in [m] comoving units */
+	double currentStep; /**< Length of the currently performed step in [s] */
+	double nextStep; /**< Proposed length of the next propagation step in [s] */
 	std::string tagOrigin; /**< Name of interaction/source process which created this candidate*/
 	double time; /**< Time [s] that has passed in the laboratory frame of reference */
 
@@ -89,10 +89,13 @@ public:
 	double getWeight() const;
 
 	/**
-	 Sets the current step and increases the trajectory length accordingly.
+	 Sets the current step and increases the trajectory length and time accordingly.
 	 Only the propagation module should use this.
 	 */
 	void setCurrentStep(double step);
+	/**
+	 * Gets current stepsize in [s]
+	 */
 	double getCurrentStep() const;
 
 	/**
@@ -100,6 +103,9 @@ public:
 	 Only the propagation module should use this.
 	 */
 	void setNextStep(double step);
+	/**
+	 * Gets next proposed step in [s]
+	 */
 	double getNextStep() const;
 
 	/**
@@ -115,7 +121,7 @@ public:
 	double getTime() const;
 
 	/**
-	 Make a bid for the next step size: the lowest wins.
+	 Make a bid for the next step size [s]: the lowest wins.
 	 */
 	void limitNextStep(double step);
 

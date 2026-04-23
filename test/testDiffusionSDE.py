@@ -147,8 +147,8 @@ class DiffusionOneDirection(unittest.TestCase):
     BField = crpropa.UniformMagneticField(ConstMagVec)
 
     precision = 1e-4
-    minStep = 1*pc
-    maxStep = 10*kpc
+    minStep = 1*crpropa.year
+    maxStep = 10*crpropa.kiloyear
     epsilon = 0.
 
     Dif = crpropa.DiffusionSDE(BField, precision, minStep, maxStep, epsilon)
@@ -171,7 +171,7 @@ class DiffusionOneDirection(unittest.TestCase):
         # check for position
         self.Dif.process(c)
         pos = c.current.getPosition()
-        self.assertAlmostEqual(pos.x/pc, 1.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(pos.x/(crpropa.year*c.getVelocity()), 1.) #AlmostEqual due to rounding error
         self.assertEqual(pos.y, 0.)
         self.assertEqual(pos.z, 0.)
 
@@ -184,8 +184,8 @@ class DiffusionOneDirection(unittest.TestCase):
         BField = crpropa.UniformMagneticField(ConstMagVec)
 
         precision = 1e-4
-        minStep = 1*pc
-        maxStep = 10*kpc
+        minStep = 1*crpropa.year
+        maxStep = 10*crpropa.kiloyear
         epsilon = 0.
 
         Dif = crpropa.DiffusionSDE(BField, precision, minStep, maxStep, epsilon)
@@ -197,7 +197,7 @@ class DiffusionOneDirection(unittest.TestCase):
         # check for position
         Dif.process(c)
         pos = c.current.getPosition()
-        self.assertAlmostEqual(pos.x/pc, 1.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(pos.x/(crpropa.year*c.getVelocity()), 1.) #AlmostEqual due to rounding error
         self.assertEqual(pos.y, 0.)
         self.assertEqual(pos.z, 0.)
 
@@ -228,7 +228,7 @@ class DiffusionOneDirection(unittest.TestCase):
         Dif.process(c)
         pos = c.current.getPosition()
         self.assertEqual(pos.x, 0.)
-        self.assertAlmostEqual(pos.y, minStep/c.getVelocity()*1e6)
+        self.assertAlmostEqual(pos.y, minStep*1e6)
         self.assertEqual(pos.z, 0.)
 
         # Step size is increased to maxStep
@@ -384,8 +384,8 @@ class DiffusionOneDirection(unittest.TestCase):
         AdvField = crpropa.UniformAdvectionField(ConstAdvVec)
 
         precision = 1e-4
-        minStep = 1*pc
-        maxStep = 10*kpc
+        minStep = 1*crpropa.year
+        maxStep = 10*crpropa.kiloyear
 
         DifAdv = crpropa.DiffusionSDE(BField, AdvField, precision, minStep, maxStep, epsilon)
 

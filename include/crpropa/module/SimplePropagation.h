@@ -23,7 +23,11 @@ private:
 	double minStep, maxStep;
 
 public:
-	SimplePropagation(double minStep = (0.1 * kpc), double maxStep = (1 * Gpc));
+	/** Constructor
+	 * @param minStep	minimum stepsize in [s]
+	 * @param maxStep	maximum stepsize in [s]
+	 */
+	SimplePropagation(double minStep = (1 * kiloyear), double maxStep = (1 * Gigayear));
 	void process(Candidate *candidate) const;
 	void setMinimumStep(double minStep);
 	void setMaximumStep(double maxStep);

@@ -19,7 +19,7 @@ void ConstantMomentumDiffusion::process(Candidate *c) const {
 	}
 	
 	double p = c->current.getMomentum().getR();
-	double dt = c->getCurrentStep() / c->getVelocity();
+	double dt = c->getCurrentStep();
 	
 	double eta =  Random::instance().randNorm();
 	double domega = eta * sqrt(dt);
@@ -29,7 +29,7 @@ void ConstantMomentumDiffusion::process(Candidate *c) const {
 
 	double dp = AScal * dt + BScal * domega;
 	c->current.setEnergy(c_light*sqrt( pow(p + dp, 2) * pow(c->current.getMass()*c_light, 2) ));	
-	c->limitNextStep(limit * p / AScal * c->getVelocity());
+	c->limitNextStep(limit * p / AScal);
 }
 
 double ConstantMomentumDiffusion::calculateAScalar(double p) const {

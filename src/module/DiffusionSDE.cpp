@@ -51,7 +51,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
-	double h = clip(candidate->getNextStep(), minStep, maxStep) / candidate->getVelocity();
+	double h = clip(candidate->getNextStep(), minStep, maxStep);
 	Vector3d PosIn = current.getPosition();
 	Vector3d DirIn = current.getDirection();
 
@@ -69,7 +69,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		}
 
 		current.setPosition(Pos + LinProp + dir*h*candidate->getVelocity());
-		candidate->setCurrentStep(h * candidate->getVelocity());
+		candidate->setCurrentStep(h);
 		candidate->setNextStep(maxStep);
 		return;
 	}
@@ -138,15 +138,15 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		if (advectionField){
 			driftStep(Pos, LinProp, h, time);
 			current.setPosition(Pos + LinProp);
-	 		candidate->setCurrentStep(h*candidate->getVelocity());
-	  		double newStep = 5*h*candidate->getVelocity();
+	 		candidate->setCurrentStep(h);
+	  		double newStep = 5*h;
 			newStep = clip(newStep, minStep, maxStep);
 	  		candidate->setNextStep(newStep);
 	  		return;
 		}
 		current.setPosition(Pos + dir*h*candidate->getVelocity());
-	 	candidate->setCurrentStep(h*candidate->getVelocity());
-		double newStep = 5*h*candidate->getVelocity();
+	 	candidate->setCurrentStep(h);
+		double newStep = 5*h;
 		newStep = clip(newStep, minStep, maxStep);
 	  	candidate->setNextStep(newStep);
 	  	return;
@@ -196,14 +196,14 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	DirOut = Random::instance().randConeVector(TVec, M_PI/2.);
 	current.setPosition(PO);
 	current.setDirection(DirOut);
-	candidate->setCurrentStep(h * candidate->getVelocity());
+	candidate->setCurrentStep(h);
 
 	double nextStep;
 	if (stepNumber>1){
-		nextStep = h*pow(stepNumber, -2.)*candidate->getVelocity();
+		nextStep = h*pow(stepNumber, -2.);
 	}
 	else {
-		nextStep = 4 * h*candidate->getVelocity();
+		nextStep = 4 * h;
 	}
 
 	candidate->setNextStep(nextStep);
@@ -385,8 +385,8 @@ Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d pos, double t) const
 
 std::string DiffusionSDE::getDescription() const {
 	std::stringstream s;
-	s << "minStep: " << minStep / kpc  << " kpc, ";
-	s << "maxStep: " << maxStep / kpc  << " kpc, ";
+	s << "minStep: " << minStep / kiloyear  << " kiloyear, ";
+	s << "maxStep: " << maxStep / kiloyear  << " kiloyear, ";
 	s << "tolerance: " << tolerance << "\n";
 
 	if (epsilon != 0.1) {
