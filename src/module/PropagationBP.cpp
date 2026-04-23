@@ -16,11 +16,11 @@ namespace crpropa {
 	}
 
 
-	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d vel, double step, 
+	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double step, 
 		double z, ParticleState &current) const {
 
 		// half leap frog step in the position
-		pos += vel.getUnitVector() * step / 2.;
+		pos += dir * step / 2.;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
@@ -28,17 +28,17 @@ namespace crpropa {
 		double m = current.getLorentzFactor()*current.getMass();
 
 		// Boris help vectors
-		Vector3d t = B * current.getCharge() / 2 / m * step / vel.getR();
+		Vector3d t = B * current.getCharge() / 2 / m * step / current.getVelocity().getR();
 		Vector3d s = t * 2 / (1 + t.dot(t));
 		Vector3d v_help;
 
 		// Boris push
-		v_help = vel + vel.cross(t);
-		vel = vel + v_help.cross(s);
+		v_help = dir + dir.cross(t);
+		dir = dir + v_help.cross(s);
 
 		// the other half leap frog step in the position
-		pos += vel.getUnitVector() * step / 2.;
-		return Y(pos, vel);
+		pos += dir * step / 2.;
+		return Y(pos, dir);
 	}
 
 
@@ -67,10 +67,10 @@ namespace crpropa {
 		ParticleState &current = candidate->current;
 		candidate->previous = current;
 
-		Y yIn(current.getPosition(), current.getVelocity());
+		Y yIn(current.getPosition(), current.getDirection());
 
 		// if particle has no velocity it is not effected by the magnetic field:
-		if (yIn.u.getR() == 0) {
+		if (current.getVelocity().getR() == 0) {
 			return;
 		}
 
@@ -81,7 +81,7 @@ namespace crpropa {
 		// rectilinear propagation for neutral particles
 		if (q == 0) {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
-			current.setPosition(yIn.x + yIn.u.getUnitVector() * step);
+			current.setPosition(yIn.x + yIn.u * step);
 			candidate->setCurrentStep(step);
 			candidate->setNextStep(maxStep);
 			return;
