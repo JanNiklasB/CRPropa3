@@ -33,7 +33,7 @@ namespace crpropa {
 		Vector3d s = t * 2 / (1 + t.dot(t));
 		Vector3d v_help;
 
-		// Boris push
+		// Boris push -> does not change R without E-Field
 		v_help = dir + dir.cross(t);
 		dir = dir + v_help.cross(s);
 
@@ -69,11 +69,6 @@ namespace crpropa {
 		candidate->previous = current;
 
 		Y yIn(current.getPosition(), current.getDirection());
-
-		// if particle has no velocity it is not effected by the magnetic field:
-		if (current.getVelocity().getR() == 0) {
-			return;
-		}
 
 		// calculate charge of particle
 		double q = current.getCharge();

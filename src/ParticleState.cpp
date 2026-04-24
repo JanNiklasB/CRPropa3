@@ -83,7 +83,7 @@ void ParticleState::setCharge(int ChargeNumber) {
 double ParticleState::getLorentzFactor() const {
 	if (pmass==0)
 		return INFINITY;
-	return energy/pmass/c_squared + 1;
+	return energy/pmass/c_squared + 1;  // should never be inf as long as the energy is representable
 }
 
 void ParticleState::setLorentzFactor(double lf) {
