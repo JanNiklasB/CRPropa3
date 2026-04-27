@@ -7,10 +7,10 @@
 namespace crpropa {
 	void PropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
 			ParticleState particle, double z) const {
-		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
-
 		Y outHelp = dY(y.x, y.u, h/2, z, particle);  // 2 steps with h/2
 		Y outCompare = dY(outHelp.x, outHelp.u, h/2, z, particle);
+
+		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
 
 		error = errorEstimation(out.x , outCompare.x , h);
 	}
