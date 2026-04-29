@@ -305,7 +305,7 @@ public:
 	 Checks whether to make a detection at the current step of candidate or not.
 	 This function is called in Observer.process with the simulated Candidate.
 	 */
-	DetectionState checkDetection(Candidate *candidate) const;
+	virtual DetectionState checkDetection(Candidate *candidate) const;
 	/** Function
 	 @param enableConstruction	if true, constructs detList from range of min, max, numb
 	 when calling addTime
@@ -366,6 +366,28 @@ public:
 	 This function does not create a detList.
 	 */
 	std::string getDescription() const;
+};
+
+
+/**
+ @class ObserverSpacialEvolution
+ @brief Observes the spacial evolution of the candidates (phase-space elements)
+
+ This observer is very useful if the spacial evolution of the particle density is needed. 
+ It detects all candidates in lin-spaced, log-spaced, or user-defined time intervals and 
+ limits the nextStep of candidates to prevent overshooting of detection intervals.
+ */
+class ObserverSpacialEvolution: public ObserverTimeEvolution{
+	public:
+	using ObserverTimeEvolution::ObserverTimeEvolution;
+
+	/** Function
+	 @param candidate	Candidate usally given by a module list
+
+	 Checks whether to make a detection at the current step of candidate or not.
+	 This function is called in Observer.process with the simulated Candidate.
+	 */
+	DetectionState checkDetection(Candidate *candidate) const;
 };
 
 /** @} */
