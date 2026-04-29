@@ -74,7 +74,6 @@ void MaximumTime::setMaximumTime(double time){
 
 void MaximumTime::process(Candidate *c) const {
 	double time = c->getTime();
-	Vector3d position = c->current.getPosition();
 
 	if (time >= maxTime) {
 		reject(c);
