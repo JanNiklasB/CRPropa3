@@ -98,6 +98,30 @@ std::string ObserverDetectAll::getDescription() const {
 	return description;
 }
 
+
+// ObserverSurface--------------------------------------------------------------
+ObserverSurface::ObserverSurface(Surface* _surface) : surface(_surface) { }
+
+DetectionState ObserverSurface::checkDetection(Candidate *candidate) const
+{
+		double currentDistance = surface->distance(candidate->current.getPosition());
+		double previousDistance = surface->distance(candidate->previous.getPosition());
+		candidate->limitNextStep(fabs(currentDistance)/candidate->getVelocity());
+
+		if (currentDistance * previousDistance > 0)
+			return NOTHING;
+		else if (previousDistance == 0)
+			return NOTHING;
+		else
+			return DETECTED;
+}
+
+std::string ObserverSurface::getDescription() const {
+	std::stringstream ss;
+	ss << "ObserverSurface: << " << surface->getDescription();
+	return ss.str();
+}
+
 // ObserverTracking --------------------------------------------------------
 ObserverTracking::ObserverTracking(Vector3d center, double radius, double stepSize) :
 		center(center), radius(radius), stepSize(stepSize) {
@@ -387,29 +411,5 @@ std::string ObserverTimeEvolution::getDescription() const {
 	  s << "  - " << getTime(i) / kpc;
 	return s.str();
 }
-
-// ObserverSurface--------------------------------------------------------------
-ObserverSurface::ObserverSurface(Surface* _surface) : surface(_surface) { }
-
-DetectionState ObserverSurface::checkDetection(Candidate *candidate) const
-{
-		double currentDistance = surface->distance(candidate->current.getPosition());
-		double previousDistance = surface->distance(candidate->previous.getPosition());
-		candidate->limitNextStep(fabs(currentDistance)/candidate->getVelocity());
-
-		if (currentDistance * previousDistance > 0)
-			return NOTHING;
-		else if (previousDistance == 0)
-			return NOTHING;
-		else
-			return DETECTED;
-}
-
-std::string ObserverSurface::getDescription() const {
-	std::stringstream ss;
-	ss << "ObserverSurface: << " << surface->getDescription();
-	return ss.str();
-}
-
 
 } // namespace crpropa
