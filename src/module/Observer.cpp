@@ -290,7 +290,7 @@ ObserverTimeEvolution::ObserverTimeEvolution(const std::vector<double> &detList)
 DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 
 	if (nIntervals) {
-		double length = c->getTrajectoryLength();
+		double time = c->getTime();
 		size_t index;
 		const std::string DI = "DetectionIndex";
 
@@ -308,18 +308,18 @@ DetectionState ObserverTimeEvolution::checkDetection(Candidate *c) const {
 		}
 
 		// Calculate the distance to next detection
-		double distance = length - getTime(index);
+		double distance = time - getTime(index);
 
 		// Limit next step and detect candidate.
 		// Increase the index by one in case of detection
 		if (distance < 0.) {
-			c->limitNextStep(-distance/c->getVelocity());
+			c->limitNextStep(-distance);
 			return NOTHING;
 		}
 		else {
 
 			if (index < nIntervals-2) {
-				c->limitNextStep((getTime(index+1)-length)/c->getVelocity());
+				c->limitNextStep(getTime(index+1)-time);
 			}
 			c->setProperty(DI, Variant::fromUInt64(index+1));
 
@@ -410,6 +410,51 @@ std::string ObserverTimeEvolution::getDescription() const {
 	for (size_t i = 0; i < nIntervals; i++)
 	  s << "  - " << getTime(i) / kpc;
 	return s.str();
+}
+
+
+// ObserverSpacialEvolution --------------------------------------------------------
+
+DetectionState ObserverSpacialEvolution::checkDetection(Candidate *c) const {
+
+	if (nIntervals) {
+		double length = c->getTrajectoryLength();
+		size_t index;
+		const std::string DI = "DetectionIndex";
+
+		// Load the last detection index
+		if (c->hasProperty(DI)) {
+			index = c->getProperty(DI).asUInt64();
+		}
+		else {
+			index = 0;
+		}
+
+		// Break if the particle has been detected once for all possible times.
+		if (index >= nIntervals) {
+			return NOTHING;
+		}
+
+		// Calculate the distance to next detection
+		double distance = length - getTime(index);
+
+		// Limit next step and detect candidate.
+		// Increase the index by one in case of detection
+		if (distance < 0.) {
+			c->limitNextStep(-distance/c->getVelocity());
+			return NOTHING;
+		}
+		else {
+
+			if (index < nIntervals-2) {
+				c->limitNextStep((getTime(index+1)-length)/c->getVelocity());
+			}
+			c->setProperty(DI, Variant::fromUInt64(index+1));
+
+			return DETECTED;
+		}
+	}
+	return NOTHING;
 }
 
 } // namespace crpropa
