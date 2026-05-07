@@ -74,6 +74,20 @@ PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
 	bs.assign(cash_karp_bs, cash_karp_bs + 6);
 }
 
+PropagationCK::PropagationCK(double tolerance, double minStep, double maxStep, 
+	ref_ptr<MagneticField> field) :
+		minStep(0) {
+	setField(field);
+	setTolerance(tolerance);
+	setMaximumTimeStep(maxStep);
+	setMinimumTimeStep(minStep);
+
+	// load Cash-Karp coefficients
+	a.assign(cash_karp_a, cash_karp_a + 36);
+	b.assign(cash_karp_b, cash_karp_b + 6);
+	bs.assign(cash_karp_bs, cash_karp_bs + 6);
+}
+
 void PropagationCK::process(Candidate *candidate) const {
 	// save the new previous particle state
 	ParticleState &current = candidate->current;
@@ -171,6 +185,20 @@ void PropagationCK::setTolerance(double tol) {
 }
 
 void PropagationCK::setMinimumStep(double min) {
+	if (min/c_light < 0)
+		throw std::runtime_error("PropagationCK: minStep < 0 ");
+	if (min/c_light > maxStep)
+		throw std::runtime_error("PropagationCK: minStep > maxStep");
+	minStep = min/c_light;
+}
+
+void PropagationCK::setMaximumStep(double max) {
+	if (max/c_light < minStep)
+		throw std::runtime_error("PropagationCK: maxStep < minStep");
+	maxStep = max/c_light;
+}
+
+void PropagationCK::setMinimumTimeStep(double min) {
 	if (min < 0)
 		throw std::runtime_error("PropagationCK: minStep < 0 ");
 	if (min > maxStep)
@@ -178,22 +206,10 @@ void PropagationCK::setMinimumStep(double min) {
 	minStep = min;
 }
 
-void PropagationCK::setMaximumStep(double max) {
+void PropagationCK::setMaximumTimeStep(double max) {
 	if (max < minStep)
 		throw std::runtime_error("PropagationCK: maxStep < minStep");
 	maxStep = max;
-}
-
-double PropagationCK::getTolerance() const {
-	return tolerance;
-}
-
-double PropagationCK::getMinimumStep() const {
-	return minStep;
-}
-
-double PropagationCK::getMaximumStep() const {
-	return maxStep;
 }
 
 std::string PropagationCK::getDescription() const {
