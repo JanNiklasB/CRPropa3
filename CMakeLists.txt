@@ -404,6 +404,7 @@ add_library(crpropa SHARED
   src/magneticField/UF23Field.cpp
   src/magneticField/KST24Field.cpp
   src/magneticField/CMZField.cpp
+  src/electricField/ElectricField.cpp
   src/advectionField/AdvectionField.cpp
   src/advectionField/TimeDependentAdvectionField.cpp
   src/massDistribution/ConstantDensity.cpp
