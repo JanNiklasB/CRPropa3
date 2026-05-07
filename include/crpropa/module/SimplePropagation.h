@@ -24,15 +24,25 @@ private:
 
 public:
 	/** Constructor
-	 * @param minStep	minimum stepsize in [s]
-	 * @param maxStep	maximum stepsize in [s]
+	 * @param minStep	minimum stepsize in [m], is converted to [s] over 1/c_light
+	 * @param maxStep	maximum stepsize in [m], is converted to [s] over 1/c_light
 	 */
-	SimplePropagation(double minStep = (1 * kiloyear), double maxStep = (1 * Gigayear));
+	SimplePropagation(double minStep = (1 * kiloparsec), double maxStep = (1 * gigaparsec));
+	/** Constructor
+	 * @param useTimeStep   bool to differenciate from other constructor
+	 * @param minTimeStep	minimum timestep in [s]
+	 * @param maxTimeStep	maximum timestep in [s]
+	 */
+	SimplePropagation(bool useTimeSteps, double minStep, double maxStep);
 	void process(Candidate *candidate) const;
 	void setMinimumStep(double minStep);
 	void setMaximumStep(double maxStep);
-	double getMinimumStep() const;
-	double getMaximumStep() const;
+	void setMinimumTimeStep(double minStep);
+	void setMaximumTimeStep(double maxStep);
+	inline double getMinimumStep() const {return minStep*c_light;}
+	inline double getMaximumStep() const {return maxStep*c_light;}
+	inline double getMinimumTimeStep() const {return minStep;}
+	inline double getMaximumTimeStep() const {return maxStep;}
 	std::string getDescription() const;
 };
 /** @}*/
