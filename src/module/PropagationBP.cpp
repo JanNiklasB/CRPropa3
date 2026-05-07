@@ -50,11 +50,11 @@ namespace crpropa {
 			vel = v_prime + acc;  // final velocity
 		} else {  // relativistic
 			Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
-					( acc/gamma - vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+					( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
 			Vector3d v_prime = v_minus + v_minus.cross(t);
 			v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
-			vel = 1/(1 + acc.dot(vel)/c_squared)*
-				( acc/gamma - vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );  // final velocity
+			vel = 1/(1 + acc.dot(v_prime)/c_squared)*
+				( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
 		}
 
 		double rm = current.getMass();  // rest mass
@@ -71,6 +71,7 @@ namespace crpropa {
 			return Y(pos, (acc*-1).getUnitVector());
 		else
 			return Y(pos, vel.getUnitVector());
+
 	}
 
 	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, double fixedStep) :
@@ -207,8 +208,8 @@ namespace crpropa {
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);
 		// correct energy, previous already saved by PropagationBP::process
-		candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
-		deltaE = 0;
+		// candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
+		// deltaE = 0;
 	}
 
 	void PropagationBP::setField(ref_ptr<MagneticField> f) {

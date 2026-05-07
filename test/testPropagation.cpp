@@ -19,15 +19,15 @@ TEST(testSimplePropagation, step) {
 
 	Candidate c(p);
 
-	double minStep = 20;
-	double maxStep = 100;
-	SimplePropagation propa(minStep*c_light, maxStep*c_light);
-	c.setNextStep(10);
+	double minStep = 20;  // [m]
+	double maxStep = 100;  // [m]
+	SimplePropagation propa(minStep, maxStep);
+	c.setNextStep(10/c_light);
 
 	propa.process(&c);
 
-	EXPECT_EQ(minStep, c.getCurrentStep());
-	EXPECT_EQ(maxStep, c.getNextStep());
+	EXPECT_EQ(propa.getMinimumTimeStep(), c.getCurrentStep());
+	EXPECT_EQ(propa.getMaximumTimeStep(), c.getNextStep());
 	EXPECT_EQ(Vector3d(0,  0, 0), c.created.getPosition());
 	EXPECT_EQ(Vector3d(0,  1, 0), c.created.getDirection());
 	EXPECT_EQ(Vector3d(0,  0, 0), c.previous.getPosition());
@@ -43,8 +43,8 @@ TEST(testSimplePropagationTime, step) {
 
 	Candidate c(p);
 
-	double minStep = 20;
-	double maxStep = 100;
+	double minStep = 20;  // [s]
+	double maxStep = 100;  // [s]
 	SimplePropagation propa(true, minStep, maxStep);
 	c.setNextStep(10);
 
@@ -56,7 +56,7 @@ TEST(testSimplePropagationTime, step) {
 	EXPECT_EQ(Vector3d(0,  1, 0), c.created.getDirection());
 	EXPECT_EQ(Vector3d(0,  0, 0), c.previous.getPosition());
 	EXPECT_EQ(Vector3d(0,  1, 0), c.previous.getDirection());
-	EXPECT_EQ(Vector3d(0, 20, 0), c.current.getPosition());
+	EXPECT_EQ(Vector3d(0, 20*p.getVelocity().getR(), 0), c.current.getPosition());
 	EXPECT_EQ(Vector3d(0,  1, 0), c.current.getDirection());
 }
 
@@ -160,7 +160,7 @@ TEST(testPropagationCK, reduceStep) {
 	// small tolerance leads to large values of r
 	propa.setTolerance(1e-15);
 	// large step leads to large errors and thus in combination with the low tolerance to high values of r
-	c.setNextStep(maxStep/c.getVelocity());
+	c.setNextStep(maxStep);
 
 	propa.process(&c);
 
@@ -307,7 +307,7 @@ TEST(testPropagationBPTime, zeroField) {
 	Candidate c(p);
 	c.setNextStep(0);
 	
-	double minStep = 0.1 * kpc/c.getVelocity();
+	double minStep = 0.01 * kpc/c.getVelocity();
 	propa.setMinimumTimeStep(minStep);
 	propa.setTolerance(0.42);
 
@@ -324,20 +324,20 @@ TEST(testPropagationBPTime, exceptions) {
 	// Too large tolerance: tolerance should be between 0 and 1
 	EXPECT_THROW(PropagationBP propa(42., 10 * kiloyear , 20 * kiloyear, new UniformMagneticField(Vector3d(0, 0, 1 * nG))), std::runtime_error);
 
-	PropagationBP propa(new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
+	PropagationBP propa(1 * Megayear, new UniformMagneticField(Vector3d(0, 0, 1 * nG)));
 
 	// set maximum step, so that it can be tested what happens if a larger minStep is set.
-	propa.setMaximumStep(1 * Megayear);
+	propa.setMaximumTimeStep(1 * Megayear);
 
 	// this tests _that_ the expected exception is thrown
 	EXPECT_THROW(propa.setTolerance(2.), std::runtime_error);
-	EXPECT_THROW(propa.setMinimumStep(-1.), std::runtime_error);
-	EXPECT_THROW(propa.setMinimumStep(2 * Megayear), std::runtime_error);
+	EXPECT_THROW(propa.setMinimumTimeStep(-1.), std::runtime_error);
+	EXPECT_THROW(propa.setMinimumTimeStep(2 * Megayear), std::runtime_error);
 
 	// set minimum step, so that it can be tested what happens if a smaller maxStep is set.
-	propa.setMinimumStep(0.5 * Megayear);
+	propa.setMinimumTimeStep(0.5 * Megayear);
 
-	EXPECT_THROW(propa.setMaximumStep(0.1 * Megayear), std::runtime_error);
+	EXPECT_THROW(propa.setMaximumTimeStep(0.1 * Megayear), std::runtime_error);
 }
 #endif
 
@@ -392,13 +392,13 @@ TEST(testPropagationBPTime, reduceStep) {
 	Candidate c(p);
 	// large step leads to large errors and thus in combination with the low tolerance to high values of r
 	
-	double minStep = 0.1 * kpc/c.getVelocity();
-	double maxStep = 1 * Gpc/c.getVelocity();
+	double minStep = 0.1 * kpc / c.getVelocity();
+	double maxStep = 1 * Gpc / c.getVelocity();
 	propa.setMinimumTimeStep(minStep);
 	propa.setMaximumTimeStep(maxStep);
 	// small tolerance leads to large values of r
 	propa.setTolerance(1e-15);
-	c.setNextStep(maxStep/c.getVelocity());
+	c.setNextStep(maxStep);
 
 	propa.process(&c);
 
@@ -510,7 +510,7 @@ TEST(testPropagationBPTime, gyration) {
 TEST(testPropagationBPTime, fixedStepOptimization) {
 	// particle 1 with fixed step sizes
 	double fixed_step = kiloyear;
-	PropagationBP propa1(10, 1, fixed_step, new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc)));
+	PropagationBP propa1(fixed_step, new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1));
 	ParticleState p1;
 	p1.setId(nucleusId(1, 1));
 	p1.setEnergy(100 * EeV);
@@ -526,7 +526,7 @@ TEST(testPropagationBPTime, fixedStepOptimization) {
 	// particle 2 with different min and max steps. The tolerance is chosen such that particle 2 will be
 	// propagated with the same step as particle 1, however not using the optimization for fixed step sizes
 	double tolerance = 1;
-	PropagationBP propa2(, tolerance, fixed_step, 1.1*fixed_step, new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1));
+	PropagationBP propa2(tolerance, fixed_step, 1.1*fixed_step, new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1));
 	ParticleState p2;
 	p2.setId(nucleusId(1, 1));
 	p2.setEnergy(100 * EeV);
@@ -677,13 +677,13 @@ TEST(testPropagationBP, reduceStep) {
 	propa.setMaximumStep(maxStep);
 	// small tolerance leads to large values of r
 	propa.setTolerance(1e-15);
-	c.setNextStep(propa.getMaximumTimeStep());
+	c.setNextStep(maxStep/c_light);
 
 	propa.process(&c);
 
 	// adaptive algorithm should propagate particle with minimum step size due to the low value for the tolerance
-	EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getCurrentStep());  // perform minimum step because of large r due to small tolerance
-	EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getNextStep());  // stay at minimum step because of large r due to small tolerance
+	EXPECT_DOUBLE_EQ(minStep/c_light, c.getCurrentStep());  // perform minimum step because of large r due to small tolerance
+	EXPECT_DOUBLE_EQ(minStep/c_light, c.getNextStep());  // stay at minimum step because of large r due to small tolerance
 }
 
 
@@ -746,7 +746,7 @@ TEST(testPropagationBP, gyration) {
 	
 	ParticleState p;
 	p.setId(nucleusId(1, 1));
-	p.setEnergy(100 * EeV);
+	p.setEnergy(1000 * EeV);
 	p.setPosition(Vector3d(0, 0, 0));
 	p.setDirection(Vector3d(1, 1, 1));
 	Candidate c(p);
@@ -781,6 +781,7 @@ TEST(testPropagationBP, gyration) {
 
 	// Compare the numerical solutions after ten steps with the analytical solution of the trajectories
 	EXPECT_DOUBLE_EQ(2 / 3., dirX * dirX + dirY * dirY);  // constant momentum in the perpendicular plane to background magnetic field field
+	// it is only expected to be near 1/3. since we hand over stepsize for a particle with velocity only approx. c_light
 	EXPECT_DOUBLE_EQ(1 / 3., dirZ * dirZ);  // constant momentum parallel to the background magnetic field
 	EXPECT_DOUBLE_EQ(100 * step * step / 3., posZ * posZ);  // constant velocity parallel to the background magnetic field
 }
