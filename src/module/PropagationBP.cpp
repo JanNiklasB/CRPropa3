@@ -15,53 +15,135 @@ namespace crpropa {
 		error = errorEstimation(out.x , outCompare.x , h);
 	}
 
-
-	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double step, 
+	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double dt, 
 		double z, ParticleState current) const {
 
-		double vel = current.getVelocity().getR();
-		// half leap frog step in the position
-		pos += dir * step / 2. * vel;
-
-		// get B field at particle position
-		Vector3d B = getFieldAtPosition(pos, z);
-
+		double q = current.getCharge();
+		double gamma = current.getLorentzFactor();
+		// lorentz factor is between 1 and infinity (but never actually infinity)
+		// so the value can be trusted
 		double m = current.getLorentzFactor()*current.getMass();
+		Vector3d vel = dir*current.getVelocity().getR();
+			
+		// half leap frog step in the position
+		pos += vel * dt / 2.;
+
+		// get E and B field at particle position
+		Vector3d B = getBFieldAtPosition(pos, z);
+		Vector3d E = getEFieldAtPosition(pos, z);
+
+		// if the velocity and the electric field are zero, we return
+		if ((E.getR2()==0) && (vel.getR2()==0))
+			return Y(pos, dir);
 
 		// Boris help vectors
-		Vector3d t = B * current.getCharge() / 2 / m * step;
-		Vector3d s = t * 2 / (1 + t.dot(t));
-		Vector3d v_help;
+		Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
+		Vector3d t = B * q / 2. / m * dt;
+		Vector3d s = t * 2. / (1. + t.dot(t));
 
-		// Boris push -> does not change R without E-Field
-		v_help = dir + dir.cross(t);
-		dir = dir + v_help.cross(s);
+		// differentiate the case for performance improvements 
+		// (the relativistic case goes towards the non-relativistic case)
+		if (abs(1/gamma - 1) <= 1.e-3){
+			Vector3d v_minus = vel + acc;
+			Vector3d v_prime = v_minus + v_minus.cross(t);
+			v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+			vel = v_prime + acc;  // final velocity
+		} else {  // relativistic
+			Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
+					( acc/gamma - vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+			Vector3d v_prime = v_minus + v_minus.cross(t);
+			v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+			vel = 1/(1 + acc.dot(vel)/c_squared)*
+				( acc/gamma - vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );  // final velocity
+		}
+
+		double rm = current.getMass();  // rest mass
+		double rm2 = rm*rm;
+		double v2 = vel.getR2();
+		// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
+		deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
 
 		// the other half leap frog step in the position
-		pos += dir * step / 2. * vel;
-		return Y(pos, dir);
+		pos += vel * dt / 2.;
+		// out velocity might be zero after the the influence of the electric field
+		// if that is the case, we know vel must point in the same direction as -acc:
+		if (vel.getR2() == 0)
+			return Y(pos, (acc*-1).getUnitVector());
+		else
+			return Y(pos, vel.getUnitVector());
 	}
 
-
-	// with a fixed step size
-	PropagationBP::PropagationBP(ref_ptr<MagneticField> field, double fixedStep) :
-			minStep(0) {
-		setField(field);
+	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, double fixedStep) :
+		minStep(0) {
+		setBField(BField);
 		setTolerance(0.42);
-		setMaximumStep(fixedStep);
-		setMinimumStep(fixedStep);
+		setMaximumTimeStep(fixedStep/c_light);
+		setMinimumTimeStep(fixedStep/c_light);
 	}
 
-
-	// with adaptive step size
-	PropagationBP::PropagationBP(ref_ptr<MagneticField> field, double tolerance, double minStep, double maxStep) :
-			minStep(0) {
-		setField(field);
+	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, double tolerance, double minStep, double maxStep) :
+		minStep(0) {
+		setBField(BField);
 		setTolerance(tolerance);
-		setMaximumStep(maxStep);
-		setMinimumStep(minStep);
+		setMaximumTimeStep(maxStep/c_light);
+		setMinimumTimeStep(minStep/c_light);
 	}
 
+	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, ref_ptr<ElectricField> EField,
+		double fixedStep) : minStep(0)
+	{
+		setBField(BField);
+		setEField(EField);
+		setTolerance(0.42);
+		setMaximumTimeStep(fixedStep/c_light);
+		setMinimumTimeStep(fixedStep/c_light);
+	}
+
+	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, ref_ptr<ElectricField> EField, 
+		double tolerance, double minStep,  double maxStep) : minStep(0)
+	{
+		setBField(BField);
+		setEField(EField);
+		setTolerance(tolerance);
+		setMaximumTimeStep(maxStep/c_light);
+		setMinimumTimeStep(minStep/c_light);
+	}
+
+	PropagationBP::PropagationBP(double fixedTimeStep, ref_ptr<MagneticField> BField) :
+		minStep(0) {
+		setBField(BField);
+		setTolerance(0.42);
+		setMaximumTimeStep(fixedTimeStep);
+		setMinimumTimeStep(fixedTimeStep);
+	}
+
+	PropagationBP::PropagationBP(double tolerance, double minTimeStep, double maxTimeStep, ref_ptr<MagneticField> BField) :
+		minStep(0) {
+		setBField(BField);
+		setTolerance(tolerance);
+		setMaximumTimeStep(maxTimeStep);
+		setMinimumTimeStep(minTimeStep);
+	}
+
+	PropagationBP::PropagationBP(double fixedTimeStep, ref_ptr<MagneticField> BField, ref_ptr<ElectricField> EField) : 
+		minStep(0)
+	{
+		setBField(BField);
+		setEField(EField);
+		setTolerance(0.42);
+		setMaximumTimeStep(fixedTimeStep);
+		setMinimumTimeStep(fixedTimeStep);
+	}
+
+	PropagationBP::PropagationBP(double tolerance, double minTimeStep,  double maxTimeStep, 
+		ref_ptr<MagneticField> BField, ref_ptr<ElectricField> EField) : minStep(0)
+	{
+		setBField(BField);
+		setEField(EField);
+		setTolerance(tolerance);
+		setMaximumTimeStep(maxTimeStep);
+		setMinimumTimeStep(minTimeStep);
+	}
 
 	void PropagationBP::process(Candidate *candidate) const {
 		// save the new previous particle state
@@ -124,26 +206,34 @@ namespace crpropa {
 		current.setDirection(yOut.u);
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);
+		// correct energy, previous already saved by PropagationBP::process
+		candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
+		deltaE = 0;
 	}
-
 
 	void PropagationBP::setField(ref_ptr<MagneticField> f) {
-		field = f;
+		setBField(f);
 	}
 
-
-	ref_ptr<MagneticField> PropagationBP::getField() const {
-		return field;
+	void PropagationBP::setBField(ref_ptr<MagneticField> BField) {
+		this->BField = BField;
 	}
 
+	void PropagationBP::setEField(ref_ptr<ElectricField> EField) {
+		this->EField = EField;
+	}
 
 	Vector3d PropagationBP::getFieldAtPosition(Vector3d pos, double z) const {
+		return getBFieldAtPosition(pos, z);
+	}
+
+	Vector3d PropagationBP::getBFieldAtPosition(Vector3d pos, double z) const{
 		Vector3d B(0, 0, 0);
 		try {
 			// check if field is valid and use the field vector at the
 			// position pos with the redshift z
-			if (field.valid())
-				B = field->getField(pos, z);
+			if (BField.valid())
+				B = BField->getField(pos, z);
 		} catch (std::exception &e) {
 			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
 					<< e.what();
@@ -151,6 +241,19 @@ namespace crpropa {
 		return B;
 	}
 
+	Vector3d PropagationBP::getEFieldAtPosition(Vector3d pos, double z) const{
+		Vector3d E(0, 0, 0);
+		try {
+			// check if field is valid and use the field vector at the
+			// position pos with the redshift z
+			if (EField.valid())
+				E = EField->getField(pos, z);
+		} catch (std::exception &e) {
+			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
+					<< e.what();
+		}	
+		return E;
+	}
 
 	double PropagationBP::errorEstimation(const Vector3d x1, const Vector3d x2, double step) const {
 		// compare the position after one step with the position after two steps with step/2.
@@ -161,7 +264,6 @@ namespace crpropa {
 		return S;
 	}
 
-
 	void PropagationBP::setTolerance(double tol) {
 		if ((tol > 1) or (tol < 0))
 			throw std::runtime_error(
@@ -169,8 +271,21 @@ namespace crpropa {
 		tolerance = tol;
 	}
 
-
 	void PropagationBP::setMinimumStep(double min) {
+		if (min/c_light < 0)
+			throw std::runtime_error("PropagationBP: minStep < 0 ");
+		if (min/c_light > maxStep)
+			throw std::runtime_error("PropagationBP: minStep > maxStep");
+		minStep = min/c_light;
+	}
+
+	void PropagationBP::setMaximumStep(double max) {
+		if (max/c_light < minStep)
+			throw std::runtime_error("PropagationBP: maxStep < minStep");
+		maxStep = max/c_light;
+	}
+
+	void PropagationBP::setMinimumTimeStep(double min) {
 		if (min < 0)
 			throw std::runtime_error("PropagationBP: minStep < 0 ");
 		if (min > maxStep)
@@ -178,28 +293,11 @@ namespace crpropa {
 		minStep = min;
 	}
 
-
-	void PropagationBP::setMaximumStep(double max) {
+	void PropagationBP::setMaximumTimeStep(double max) {
 		if (max < minStep)
 			throw std::runtime_error("PropagationBP: maxStep < minStep");
 		maxStep = max;
 	}
-
-
-	double PropagationBP::getTolerance() const {
-		return tolerance;
-	}
-
-
-	double PropagationBP::getMinimumStep() const {
-		return minStep;
-	}
-
-
-	double PropagationBP::getMaximumStep() const {
-		return maxStep;
-	}
-
 
 	std::string PropagationBP::getDescription() const {
 		std::stringstream s;

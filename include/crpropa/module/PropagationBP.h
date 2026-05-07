@@ -4,6 +4,7 @@
 #include "crpropa/Module.h"
 #include "crpropa/Units.h"
 #include "crpropa/magneticField/MagneticField.h"
+#include "crpropa/electricField/ElectricField.h"
 #include "kiss/logger.h"
 
 namespace crpropa {
@@ -53,39 +54,123 @@ public:
 	};
 
 private:
-	ref_ptr<MagneticField> field;
+	ref_ptr<MagneticField> BField = NULL;
+	ref_ptr<ElectricField> EField = NULL;
+	mutable double deltaE = 0; /** energy change caused by the electric field */
 	double tolerance; /** target relative error of the numerical integration */
 	double minStep; /** minimum step size of the propagation */
 	double maxStep; /** maximum step size of the propagation */
 
 public:
 	/** Default constructor for the Boris push. It is constructed with a fixed step size.
-	 * @param field		Magnetic field
-	 * @param fixedStep Fixed stepsize in [s]
+	 * @param BField		Magnetic field
+	 * @param fixedStep Fixed stepsize in [m], is converted to time with 1/c_light
 	 */
-	PropagationBP(ref_ptr<MagneticField> field = NULL, double fixedStep = 1 * kiloyear);
+	PropagationBP(
+		ref_ptr<MagneticField> BField = NULL, 
+		double fixedStep = 1 * kiloparsec
+	);
 
 	/** Constructor for the adaptive Boris push.
-	 * @param field		Magnetic field
+	 * @param BField		Magnetic field
 	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
-	 * @param minStep	   minStep is the minimum integration time step
-	 * @param maxStep	   maxStep is the maximum integration time step. 
+	 * @param minStep	   minStep is the minimum length step and is converted to time with 1/c_light
+	 * @param maxStep	   maxStep is the maximum length step and is converted to time with 1/c_light. 
 	 */
-    PropagationBP(ref_ptr<MagneticField> field, double tolerance, double minStep, double maxStep);
+    PropagationBP(
+		ref_ptr<MagneticField> BField, 
+		double tolerance, 
+		double minStep, 
+		double maxStep
+	);
+
+	/** Default constructor for the Boris push. It is constructed with a fixed step size.
+	 * @param BField	 Magnetic field, ignored if set to NULL
+	 * @param EField	 Electric field, ignored if set to NULL
+	 * @param fixedStep	 A fixed stepsize [m], is converted to time with 1/c_light
+	 */
+	PropagationBP(
+		ref_ptr<MagneticField> BField,
+		ref_ptr<ElectricField> EField,
+		double fixedStep
+	);
+
+	/** Constructor for the adaptive Boris push.
+	 * @param BField		Magnetic Field, ignored if set to NULL
+	 * @param EField	 	Electric Field, ignored if set to NULL
+	 * @param tolerance	 	tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
+	 * @param minStep	    minStep is the minimum length step and is converted to time with 1/c_light
+	 * @param maxStep	    maxStep is the maximum length step and is converted to time with 1/c_light. 
+	 */
+	PropagationBP(
+		ref_ptr<MagneticField> BField,
+		ref_ptr<ElectricField> EField,
+		double tolerance, 
+		double minStep, 
+		double maxStep
+	);
+
+	/** Default constructor for the Boris push. It is constructed with a fixed timestep.
+	 * @param fixedTimeStep Fixed timestep in [s]
+	 * @param BField		Magnetic field
+	 */
+	PropagationBP(
+		double fixedTimeStep,
+		ref_ptr<MagneticField> BField
+	);
+
+	/** Constructor for the adaptive Boris push.
+	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
+	 * @param minTimeStep	   minTimeStep is the minimum time step
+	 * @param maxTimeStep	   maxTimeStep is the maximum time step
+	 * @param BField		Magnetic field
+	 */
+    PropagationBP(
+		double tolerance, 
+		double minTimeStep, 
+		double maxTimeStep,
+		ref_ptr<MagneticField> BField
+	);
+
+	/** Default constructor for the Boris push. It is constructed with a fixed timestep.
+	 * @param fixedTimeStep	 A fixed timestep [s]
+	 * @param BField	 Magnetic field, ignored if set to NULL
+	 * @param EField	 Electric field, ignored if set to NULL
+	 */
+	PropagationBP(
+		double fixedTimeStep,
+		ref_ptr<MagneticField> BField,
+		ref_ptr<ElectricField> EField
+	);
+
+	/** Constructor for the adaptive Boris push.
+	 * @param tolerance	 	tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep
+	 * @param minTimeStep	minTimeStep is the minimum time step
+	 * @param maxTimeStep	maxTimeStep is the maximum time step
+	 * @param BField		Magnetic Field, ignored if set to NULL
+	 * @param EField	 	Electric Field, ignored if set to NULL
+	 */
+	PropagationBP(
+		double tolerance, 
+		double minTimeStep, 
+		double maxTimeStep,
+		ref_ptr<MagneticField> BField,
+		ref_ptr<ElectricField> EField
+	);
 
 	/** Propagates the particle. Is called once per iteration.
 	 * @param candidate	 The Candidate is a passive object, that holds the information about the state of the cosmic ray and the simulation itself. */
-	virtual void process(Candidate *candidate) const;
+	void process(Candidate *candidate) const;
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
 	 * @param dir	current direction of the candidate
-	 * @param step	current step size of the candidate in [s]
+	 * @param dt	current timestep size of the candidate in [s]
 	 * @param z		current redshift is needed to calculate the magnetic field
 	 * @param current current particle state
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	virtual Y dY(Vector3d pos, Vector3d dir, double step, double z, ParticleState current) const;
+	Y dY(Vector3d pos, Vector3d dir, double dt, double z, ParticleState current) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -95,12 +180,24 @@ public:
 	 */
 	double errorEstimation(const Vector3d x1, const Vector3d x2, double step) const;
 
-	/** Get magnetic field vector at current candidate position
+	/** DEPRECATED, use getBFieldAtPosition instead!
 	 * @param pos   current position of the candidate
 	 * @param z	 current redshift is needed to calculate the magnetic field
 	 * @return	  magnetic field vector at the position pos 
 	 */
 	Vector3d getFieldAtPosition(Vector3d pos, double z) const;
+	/** Get magnetic field vector at current candidate position
+	 * @param pos   current position of the candidate
+	 * @param z	 current redshift is needed to calculate the magnetic field
+	 * @return	  magnetic field vector at the position pos 
+	 */
+	Vector3d getBFieldAtPosition(Vector3d pos, double redshift) const;
+	/** Get electric field vector at current candidate position
+	 * @param pos   current position of the candidate
+	 * @param z	 current redshift is needed to calculate the electric field
+	 * @return	  electric field vector at the position pos 
+	 */
+	Vector3d getEFieldAtPosition(Vector3d pos, double redshift) const;
 
 	/** Adapt step size if required and calculates the new position and direction of the particle with the usage of the function dY
 	 * @param y		 current position and direction of candidate
@@ -110,33 +207,61 @@ public:
 	 * @param p		 current particle state
 	 * @param z		 current red shift
 	 */
-	virtual void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState p, double z) const;
+	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState p, double z) const;
 
 	/** Set functions for the parameters of the class PropagationBP */
 
-	/** Set a specific magnetic field
+	/** DEPRECATED, use setBField instead!
 	 * @param field	 specific magnetic field 
 	 */
 	void setField(ref_ptr<MagneticField> field);
+	/** Set a specific magnetic field
+	 * @param BField specific magnetic field 
+	 */
+	void setBField(ref_ptr<MagneticField> BField);
+	/** Set a specific electric field
+	 * @param EField specific electric field 
+	 */
+	void setEField(ref_ptr<ElectricField> EField);
 	/** Set a specific tolerance for the step size adaption
 	 * @param tolerance	 tolerance is criterion for step adjustment. Step adjustment takes place only if minStep < maxStep. 
 	 */
 	void setTolerance(double tolerance);
 	/** Set the minimum step for the Boris push
-	 * @param minStep	   minStep is the minimum integration time step 
+	 * @param minStep	   minStep is the minimum integration step [m], is converted to time with 1/c_light
 	 */
 	void setMinimumStep(double minStep);
 	/** Set the maximum step for the Boris push
-	 * @param maxStep	   maxStep is the maximum integration time step 
+	 * @param maxStep	   maxStep is the maximum integration step [m], is converted to time with 1/c_light
 	 */
 	void setMaximumStep(double maxStep);
+	/** Set the minimum time step for the Boris push
+	 * @param minStep	   minStep is the minimum integration time step 
+	 */
+	void setMinimumTimeStep(double minStep);
+	/** Set the maximum time step for the Boris push
+	 * @param maxStep	   maxStep is the maximum integration time step 
+	 */
+	void setMaximumTimeStep(double maxStep);
 
 	/** Get functions for the parameters of the class PropagationBP, similar to the set functions */
 
-	ref_ptr<MagneticField> getField() const;
-	double getTolerance() const;
-	double getMinimumStep() const;
-	double getMaximumStep() const;
+	/// DEPCRECATED, use getBField instead!
+	inline ref_ptr<MagneticField> getField() const {return getBField();}
+	/// Returns the current magnetic field
+	inline ref_ptr<MagneticField> getBField() const {return BField;}
+	/// Returns the current electric field
+	inline ref_ptr<ElectricField> getEField() const {return EField;}
+	/// Returns the current tolerance of the stepsize corrector
+	inline double getTolerance() const {return tolerance;}
+	/// Returns the minimum stepsize
+	inline double getMinimumStep() const {return minStep*c_light;}
+	/// Returns the maximum stepsize
+	inline double getMaximumStep() const {return maxStep*c_light;}
+	/// Returns the minimum timestep
+	inline double getMinimumTimeStep() const {return minStep;}
+	/// Returns the maximum timestep
+	inline double getMaximumTimeStep() const {return maxStep;}
 	std::string getDescription() const;
 };
 /** @}*/
