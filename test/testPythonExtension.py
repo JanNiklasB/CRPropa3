@@ -326,7 +326,7 @@ class testParticleCollector(unittest.TestCase):
 	def testParticleCollectorAsModuleListInput(self):
 		sim = crp.ModuleList()
 		sim.add(crp.MaximumTrajectoryLength(3.14))
-		sim.add(crp.SimplePropagation(0.001/crp.c_light, 0.001/crp.c_light))
+		sim.add(crp.SimplePropagation(0.001, 0.001))
 		collector = crp.ParticleCollector()
 		c1 = crp.Candidate()
 		c2 = crp.Candidate()
@@ -339,7 +339,7 @@ class testParticleCollector(unittest.TestCase):
 	def testParticleCollectorAsModuleListOutput(self):
 		sim = crp.ModuleList()
 		sim.add(crp.MaximumTrajectoryLength(3.14))
-		sim.add(crp.SimplePropagation(0.001/crp.c_light, 0.001/crp.c_light))
+		sim.add(crp.SimplePropagation(0.001, 0.001))
 		collector = crp.ParticleCollector()
 		sim.add(collector)
 		c = crp.Candidate()
