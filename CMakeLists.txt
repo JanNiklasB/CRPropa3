@@ -609,6 +609,10 @@ if(ENABLE_TESTING)
   target_link_libraries(testMagneticField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testMagneticField testMagneticField)
 
+  add_executable(testElectricField test/testElectricField.cpp)
+  target_link_libraries(testElectricField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
+  add_test(testElectricField testElectricField)
+
   add_executable(testTurbulentField test/testTurbulentField.cpp)
   target_link_libraries(testTurbulentField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testTurbulentField testTurbulentField)
