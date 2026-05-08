@@ -6,13 +6,13 @@
 #include <vector>
 #include <limits>
 #include <algorithm>
-#include <unistd.h>
-
-#if defined(Python_FOUND) or defined(SWIG)
+#ifdef CRPROPA_HAVE_PYTHON
 #include <Python.h>
 #include <numpy/arrayobject.h>
+#endif // CRPROPA_HAVE_PYTHON
+#include <unistd.h>
+
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
-#endif
 
 namespace crpropa {
 
@@ -424,12 +424,10 @@ public:
 		return buffer;
 	}
 
-
-	#if defined(Python_FOUND) or defined(SWIG)
 	// ----------------------------
 	// 	Python numpy interface 
 	// ----------------------------
-
+#ifdef CRPROPA_HAVE_PYTHON
 	PyObject* __array__() {
 		npy_intp dims[1] = {3};
 		PyObject *array;
@@ -496,8 +494,8 @@ public:
 		// free the reference to the numpy array
 		Py_DECREF(array);
 	}
-	#endif
-	
+#endif // CRPROPA_HAVE_PYTHON	
+
 };
 
 #ifndef SWIG
