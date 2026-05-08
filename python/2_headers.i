@@ -265,6 +265,11 @@
 %feature("director") crpropa::MagneticField;
 %include "crpropa/magneticField/MagneticField.h"
 
+%implicitconv crpropa::ref_ptr<crpropa::ElectricField>;
+%template(ElectricFieldRefPtr) crpropa::ref_ptr<crpropa::ElectricField>;
+%feature("director") crpropa::ElectricField;
+%include "crpropa/electricField/ElectricField.h"
+
 %implicitconv crpropa::ref_ptr<crpropa::PhotonField>;
 %template(PhotonFieldRefPtr) crpropa::ref_ptr<crpropa::PhotonField>;
 %feature("director") crpropa::PhotonField;
