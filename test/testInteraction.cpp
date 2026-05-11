@@ -1301,11 +1301,13 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
 	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
 
+	std::printf("test before process\n");
 	sync.process(c);
 	EXPECT_TRUE(c.secondaries.size() > 0);	// must have secondaries
 
 	// check avg energy of the secondary photons 
 	double Esec = 0; 
+	std::printf("test before getEnergy loop\n");
 	for (size_t i = 0; i < c.secondaries.size(); i++) {
 		Esec += c.secondaries[i] -> current.getEnergy();
 	}
