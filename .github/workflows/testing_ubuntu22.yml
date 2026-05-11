@@ -39,7 +39,8 @@ jobs:
           cmake --build .
       - name: Run tests
         run: |
-          build/testInteraction
+          cd build
+          ./testInteraction
       - name: Archive test results
         if: always()
         uses: actions/upload-artifact@v4
