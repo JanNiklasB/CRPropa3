@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.14)
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 set(CRPROPA_EXTRA_SOURCES)
@@ -449,7 +449,6 @@ option(ENABLE_PYTHON "Create python library via SWIG" ON)
 
 find_package(Python 3.0 COMPONENTS Interpreter Development NumPy)
 if(Python_FOUND)
-  message("Python was not found!")
   set(ENABLE_PYTHON OFF)
 endif()
 

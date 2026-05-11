@@ -197,9 +197,8 @@ void SynchrotronRadiation::process(ref_ptr<Candidate> candidate) const {
 		// thinning procedure: accepts only a few random secondaries
 		if (random.rand() < pow(f, thinning)) {
 			Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
-			if (Ephoton > secondaryThreshold){ // create only photons with energies above threshold
+			if (Ephoton > secondaryThreshold) // create only photons with energies above threshold
 				candidate->addSecondary(22, Ephoton, pos, w, interactionTag);
-			}
 		}
 	}
 }
