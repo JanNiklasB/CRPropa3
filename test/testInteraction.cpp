@@ -1316,8 +1316,38 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 	EXPECT_NEAR(Esec, Ecrit, Ecrit);
 }
 
+
+void testSynchrotronPhotonEnergy(){
+	double brms = 1 * muG; 
+	std::printf("test before SynchrotronRadiationConstructor\n");
+	SynchrotronRadiation sync(brms, true);
+	sync.setSecondaryThreshold(0.); // allow all secondaries for testing
+
+	std::printf("before Candidate constructor\n");
+	double E = 1 * TeV;
+	Candidate c(11, E);
+	c.setCurrentStep(10 * pc); 
+	c.setNextStep(10 * pc);
+	
+	double lf = c.current.getLorentzFactor();
+	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
+	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
+
+	std::printf("test before process\n");
+	sync.process(c);
+
+	// check avg energy of the secondary photons 
+	double Esec = 0; 
+	std::printf("test before getEnergy loop\n");
+	for (size_t i = 0; i < c.secondaries.size(); i++) {
+		Esec += c.secondaries[i] -> current.getEnergy();
+	}
+	Esec /= c.secondaries.size();
+}
+
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
+	testSynchrotronPhotonEnergy();
 	return RUN_ALL_TESTS();
 }
 
