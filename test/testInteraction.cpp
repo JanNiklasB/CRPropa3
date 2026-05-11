@@ -33,14 +33,16 @@ void testSynchrotronPhotonEnergy(){
 	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
 	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
 
-	throw std::runtime_error("Error before process\n");
+	printf("before process\n");
 	sync.process(c);
 
 	// check avg energy of the secondary photons 
 	double Esec = 0; 
+	printf("before for loop\n");
 	for (size_t i = 0; i < c.secondaries.size(); i++) {
 		Esec += c.secondaries[i] -> current.getEnergy();
 	}
+	printf("after for loop\n");
 	Esec /= c.secondaries.size();
 }
 
