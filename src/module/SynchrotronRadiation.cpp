@@ -201,7 +201,6 @@ void SynchrotronRadiation::process(ref_ptr<Candidate> candidate) const {
 		if (random.rand() < pow(f, thinning)) {
 			Vector3d pos = random.randomInterpolatedPosition(candidate->previous.getPosition(), candidate->current.getPosition());
 			if (Ephoton > secondaryThreshold){ // create only photons with energies above threshold
-				printf("Add secondary:\n");
 				candidate->addSecondary(22, Ephoton, pos, w, interactionTag);
 			}
 		}
