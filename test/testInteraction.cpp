@@ -21,11 +21,9 @@ namespace crpropa {
 
 void testSynchrotronPhotonEnergy(){
 	double brms = 1 * muG; 
-	std::cout << "test before SynchrotronRadiationConstructor\n";
 	SynchrotronRadiation sync(brms, true);
 	sync.setSecondaryThreshold(0.); // allow all secondaries for testing
 
-	std::cout << "before Candidate constructor\n";
 	double E = 1 * TeV;
 	Candidate c(11, E);
 	c.setCurrentStep(10 * pc); 
@@ -35,14 +33,12 @@ void testSynchrotronPhotonEnergy(){
 	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
 	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
 
-	std::cout << "test before process\n";
 	sync.process(c);
+	std::runtime_error("Error after process\n");
 
 	// check avg energy of the secondary photons 
 	double Esec = 0; 
-	std::cout << "test before getEnergy loop\n";
 	for (size_t i = 0; i < c.secondaries.size(); i++) {
-		std::cout << i << std::endl;
 		Esec += c.secondaries[i] -> current.getEnergy();
 	}
 	Esec /= c.secondaries.size();
