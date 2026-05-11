@@ -10,16 +10,16 @@ jobs:
         config:
          - name: "ubuntu-22"
            os: ubuntu-22.04
-           cxx: "g++-11"
-           cc: "gcc-11"
-           fc: "gfortran-11"
+           cxx: "g++"
+           cc: "gcc"
+           fc: "gfortran"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install gfortran-11 g++-11 gcc-11 cmake libmuparser-dev libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov ninja-build -y
+          sudo apt-get install gfortran g++ gcc cmake libmuparser-dev libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov ninja-build -y
       - name: Set up the build
         env:
           CXX: ${{ matrix.config.cxx }}

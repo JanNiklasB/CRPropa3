@@ -632,7 +632,8 @@ if(ENABLE_TESTING)
   add_test(testBreakCondition testBreakCondition)
 
   add_executable(testInteraction test/testInteraction.cpp)
-  target_link_libraries(testInteraction crpropa)
+  target_link_libraries(testInteraction crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
+  add_test(testInteraction testInteraction)
 
   add_executable(testSource test/testSource.cpp)
   target_link_libraries(testSource crpropa gtest gtest_main pthread ${COVERAGE_LIBS})

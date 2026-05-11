@@ -119,11 +119,9 @@ void SynchrotronRadiation::process(ref_ptr<Candidate> candidate) const {
 	double z = candidate->getRedshift();
 	double B;
 	if (field.valid()) {
-		printf("Field is valid\n");
 		Vector3d Bvec = field->getField(candidate->current.getPosition(), z);
 		B = Bvec.cross(candidate->current.getDirection()).getR();
 	} else {
-		printf("Field is not valid\n");
 		B = sqrt(2. / 3) * Brms; // average perpendicular field component
 	}
 	B *= pow(1 + z, 2); // cosmological scaling
@@ -190,7 +188,6 @@ void SynchrotronRadiation::process(ref_ptr<Candidate> candidate) const {
 	if (maximumSamples > 0 && dE > 0)
 		w1 = 1. / (1. - dE / dE0); 
 
-	printf("before loop that adds secondaries:\n");
 	// loop over sampled photons and attribute weights accordingly
 	for (int i = 0; i < energies.size(); i++) {
 		double Ephoton = energies[i];
