@@ -26,9 +26,11 @@ jobs:
         env:
           accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
           token: ${{ secrets.ANACONDA_TOKEN }}
-          FAST_WAVES: ON
-          SIMD_EXTENSIONS: avx+fma
+          FAST_WAVES: "ON"
+          SIMD_EXTENSIONS: "avx+fma"
         run: |
+          echo $FAST_WAVES
+          echo $SIMD_EXTENSIONS
           set -ex
           conda init &> /dev/null
           cd conda-bld
@@ -75,6 +77,8 @@ jobs:
           SIMD_EXTENSIONS: "none"
         run: |
           source ~/miniconda3/bin/activate
+          echo $FAST_WAVES
+          echo $SIMD_EXTENSIONS
           set -ex
           conda init &> /dev/null
           cd conda-bld
