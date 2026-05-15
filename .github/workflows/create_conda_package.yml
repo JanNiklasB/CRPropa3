@@ -39,12 +39,12 @@ jobs:
   #       if: always()
   #       uses: actions/upload-artifact@v4
   #       with:
-  #         name: "Anaconda_Build_Log"
+  #         name: "Anaconda_Build_x64_Log"
   #         path: conda-bld/build.log
 
   arm:
     if: github.repository=='JanNiklasB/CRPropa3'
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     strategy:
       fail-fast: false
     steps:
@@ -58,10 +58,11 @@ jobs:
           wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh &> /dev/null
           sh Miniconda3-latest-Linux-aarch64.sh -b
       - name: Install Additional Conda Packages
+        # the path is reseted in each new step:
         run: |
-          set -ex
           source ~/miniconda3/bin/activate
-          conda init
+          set -ex
+          conda init &> /dev/null
           conda update -n base conda -y &> /dev/null
           conda install conda-build anaconda-client -y &> /dev/null
       - name: Build Conda Package
@@ -69,8 +70,8 @@ jobs:
           accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
           token: ${{ secrets.ANACONDA_TOKEN }}
         run: |
-          set -ex
           source ~/miniconda3/bin/activate
+          set -ex
           conda init &> /dev/null
           cd conda-bld
           conda config --set anaconda_upload yes 
@@ -82,5 +83,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: "Anaconda_Build_Log"
+          name: "Anaconda_Build_ARM_Log"
           path: conda-bld/build.log
