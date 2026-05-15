@@ -1,7 +1,7 @@
 name: create_conda_package
 on:
   push:
-    branches: [master, condaWorkflowTests]
+    branches: [master, AnacondaWorkflows]
   label:
     types: [created, edited]
 
