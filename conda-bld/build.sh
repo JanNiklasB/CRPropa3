@@ -37,7 +37,7 @@ do
 	cp $file $PREFIX/share/crpropa/test/
 done
 cp CTestTestfile.cmake $PREFIX/share/crpropa/test/
-echo 'ctest --test-dir ${PREFIX}/share/crpropa/test/ --output-on-failure' > $PREFIX/bin/testCRPropa
+echo ctest --test-dir $PREFIX/share/crpropa/test/ --output-on-failure > $PREFIX/bin/testCRPropa
 chmod +x $PREFIX/bin/testCRPropa
 
 # Copy the [de]activate scripts to $PREFIX/etc/conda/[de]activate.d.
