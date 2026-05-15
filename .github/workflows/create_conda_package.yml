@@ -18,11 +18,9 @@ jobs:
       - name: Preinstall
         run: |
           ldd --version
-          wget https://repo.anaconda.com/archive/Anaconda3-2025.12-2-Linux-x86_64.sh
-          sh Anaconda3-2025.12-2-Linux-x86_64.sh -b
-          source ~/.bashrc
           conda init
-          conda update -n base conda
+          conda update -n base conda -y
+          conda install conda-build -y
       - name: Build Conda Package
         run: |
           conda init
