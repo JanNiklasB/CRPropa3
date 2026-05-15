@@ -106,6 +106,7 @@ jobs:
           sh Miniconda3-latest-MacOSX-arm64.sh -b
       - name: Install Additional Conda Packages
         run: |
+          source ~/miniconda3/bin/activate
           set -ex
           conda init
           conda update -n base conda -y &> /dev/null
@@ -117,6 +118,7 @@ jobs:
           FAST_WAVES: "OFF"
           SIMD_EXTENSIONS: "none"
         run: |
+          source ~/miniconda3/bin/activate
           set -ex
           conda init &> /dev/null
           cd conda-bld
