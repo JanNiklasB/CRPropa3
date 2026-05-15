@@ -25,7 +25,6 @@ cmake .. -G Ninja \
 	-DFAST_WAVES=OFF \
 	-DINSTALL_EIGEN=OFF \
 	-DOMP_SCHEDULE=dynamic \
-	-DSIMD_EXTENSIONS=avx+fma \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .
