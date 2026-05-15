@@ -11,6 +11,7 @@ build:
   script_env:
     - FAST_WAVES
     - SIMD_EXTENSIONS
+    - IS_MACOS
 
 requirements:
   build:

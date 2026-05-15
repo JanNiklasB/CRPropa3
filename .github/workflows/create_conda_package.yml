@@ -117,6 +117,7 @@ jobs:
           token: ${{ secrets.ANACONDA_TOKEN }}
           FAST_WAVES: "OFF"
           SIMD_EXTENSIONS: "none"
+          IS_MACOS: "True"
         run: |
           source ~/miniconda3/bin/activate
           set -ex
