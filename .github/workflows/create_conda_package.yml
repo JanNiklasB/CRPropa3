@@ -1,0 +1,30 @@
+name: create_conda_package
+on:
+  push:
+    branches: [master, condaWorkflowTests]
+  label:
+    types: [created, edited]
+
+
+jobs:
+  linux:
+    if: github.repository == "JanNiklasB/CRPropa3"
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Preinstall
+        run: |
+          ldd --version
+          wget https://repo.anaconda.com/archive/Anaconda3-2025.12-2-Linux-x86_64.sh
+          sh Anaconda3-2025.12-2-Linux-x86_64.sh -b
+          source ~/.bashrc
+          conda init
+          conda update -n base conda
+      - name: Build Conda Package
+        run: |
+          conda init
+          cd conda-bld
+          conda build -m conda_build_config.yaml -c conda-forge .
