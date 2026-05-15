@@ -26,8 +26,8 @@ jobs:
           accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
           token: ${{ secrets.ANACONDA_TOKEN }}
         run: |
+          set -ex
           conda init
-          conda activate base
           cd conda-bld
           conda config --set anaconda_upload yes
           conda build -m conda_build_config.yaml -c conda-forge . \
