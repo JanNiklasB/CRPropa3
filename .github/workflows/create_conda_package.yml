@@ -17,8 +17,9 @@ jobs:
         uses: actions/checkout@v4
       - name: Preinstall
         run: |
+          set -ex
           ldd --version
-          conda init $> /dev/null
+          conda init &> /dev/null
           echo update -n base conda ...
           conda update -n base conda -y &> /dev/null
           echo   Finished updating conda!
@@ -31,7 +32,7 @@ jobs:
           token: ${{ secrets.ANACONDA_TOKEN }}
         run: |
           set -ex
-          conda init $> /dev/null
+          conda init &> /dev/null
           cd conda-bld
           conda config --set anaconda_upload yes 
           conda build -m conda_build_config.yaml -c conda-forge . \
