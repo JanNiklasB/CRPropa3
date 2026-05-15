@@ -50,16 +50,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Preinstall
+      - name: Install Miniconda
         run: |
           set -ex
           ldd --version
-          lscpu
-          cd ..
-          pwd
-          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh &> /dev/null
           sh Miniconda3-latest-Linux-aarch64.sh -b
-          source ~/.bashrc
+      - name: Install Additional Conda Packages
+        run: |
+          set -ex
           conda init
           conda update -n base conda -y &> /dev/null
           conda install conda-build anaconda-client -y &> /dev/null
