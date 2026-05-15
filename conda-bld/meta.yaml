@@ -6,6 +6,11 @@ source:
   git_url: ../
   folder: crpropa
 
+build:
+  script_env:
+    - FAST_WAVES=OFF
+    - SIMD_EXTENSIONS=none
+
 requirements:
   build:
     - {{ compiler('c') }}
