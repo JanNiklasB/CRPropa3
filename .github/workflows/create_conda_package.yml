@@ -20,7 +20,7 @@ jobs:
           ldd --version
           conda init
           conda update -n base conda -y
-          conda install anaconda-client conda-build -y
+          conda install anaconda -y
       - name: Build Conda Package
         env:
           accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
