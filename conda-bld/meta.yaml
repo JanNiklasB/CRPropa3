@@ -12,6 +12,9 @@ build:
     - FAST_WAVES
     - SIMD_EXTENSIONS
     - IS_MACOS
+    - CXX
+    - CC
+    - FC
 
 requirements:
   build:
