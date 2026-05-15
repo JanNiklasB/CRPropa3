@@ -71,8 +71,8 @@ jobs:
         env:
           accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
           token: ${{ secrets.ANACONDA_TOKEN }}
-          FAST_WAVES: OFF
-          SIMD_EXTENSIONS: none
+          FAST_WAVES: "OFF"
+          SIMD_EXTENSIONS: "none"
         run: |
           source ~/miniconda3/bin/activate
           set -ex
