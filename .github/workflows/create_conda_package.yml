@@ -21,6 +21,7 @@ jobs:
           conda init
           conda update -n base conda -y
           conda install conda-build -y
+          conda upload -h
       - name: Build Conda Package
         run: |
           conda init
