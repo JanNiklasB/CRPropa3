@@ -11,15 +11,14 @@ build:
   script_env:
     - FAST_WAVES
     - SIMD_EXTENSIONS
-    - IS_MACOS
-    - CXX
-    - CC
-    - FC
+    - IS_MACOS="true" # [osx]
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }} # [linux]
+    - {{ compiler('cxx') }} # [linux]
+    - clang # [osx]
+    - clang++ # [osx]
     - {{ compiler('fortran') }}
     - git
     - cmake

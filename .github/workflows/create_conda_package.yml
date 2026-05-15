@@ -117,10 +117,6 @@ jobs:
           token: ${{ secrets.ANACONDA_TOKEN }}
           FAST_WAVES: "OFF"
           SIMD_EXTENSIONS: "none"
-          IS_MACOS: "True"
-          CXX: "clang++"
-          CC: "clang"
-          FC: "gfortran-14"
         run: |
           source ~/miniconda3/bin/activate
           set -ex
