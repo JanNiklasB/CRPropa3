@@ -28,6 +28,6 @@ jobs:
         run: |
           conda init
           cd conda-bld
-          printf "${accountName}\n${password}" | anaconda login --at anaconda.org
+          printf "${accountName}\n${password}" | conda login --at anaconda.org
           conda config --set anaconda_upload yes
           conda build -m conda_build_config.yaml -c conda-forge .
