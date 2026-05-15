@@ -22,10 +22,10 @@ cmake .. -G Ninja \
 	-DENABLE_QUIMBY=OFF \
 	-DENABLE_SWIG_BUILTIN=ON \
 	-DENABLE_TESTING=ON \
-	-DFAST_WAVES=ON \
+	-DFAST_WAVES=OFF \
 	-DINSTALL_EIGEN=OFF \
 	-DOMP_SCHEDULE=dynamic \
-	-DSIMD_EXTENSIONS=none \
+	-DSIMD_EXTENSIONS=avx+fma \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .
