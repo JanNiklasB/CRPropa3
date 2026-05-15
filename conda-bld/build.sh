@@ -25,7 +25,7 @@ cmake .. -G Ninja \
 	-DFAST_WAVES="${FAST_WAVES}" \
 	-DINSTALL_EIGEN=OFF \
 	-DOMP_SCHEDULE=dynamic \
-	-DSIMD_EXTENSIONS="${SIMD_EXTENSION}" \
+	-DSIMD_EXTENSIONS="${SIMD_EXTENSIONS}" \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .

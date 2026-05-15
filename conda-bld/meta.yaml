@@ -8,8 +8,8 @@ source:
 
 build:
   script_env:
-    - FAST_WAVES
-    - SIMD_EXTENSIONS
+    - FAST_WAVES=OFF
+    - SIMD_EXTENSIONS=none
 
 requirements:
   build:
