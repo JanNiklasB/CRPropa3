@@ -101,7 +101,6 @@ jobs:
       - name: Install Miniconda
         run: |
           set -ex
-          ldd --version
           cd ~
           curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh &> /dev/null
           sh Miniconda3-latest-MacOSX-arm64.sh -b
