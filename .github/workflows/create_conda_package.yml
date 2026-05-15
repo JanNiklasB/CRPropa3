@@ -20,10 +20,14 @@ jobs:
           ldd --version
           conda init
           conda update -n base conda -y
-          conda install conda-build -y
-          conda upload -h
+          conda install anaconda-client conda-build -y
       - name: Build Conda Package
+        env:
+          accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
+          password: ${{ secrets.ANACONDA_PASSWORD }}
         run: |
           conda init
           cd conda-bld
+          printf "${accountName}\n${password}" | anaconda login --at anaconda.org
+          conda config --set anaconda_upload yes
           conda build -m conda_build_config.yaml -c conda-forge .
