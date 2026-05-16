@@ -38,7 +38,7 @@ cmake .. -G Ninja \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .
-$PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
+# $PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
 # copy tests to share folder so user can test crpropa:
 mkdir $PREFIX/share/crpropa/test/
 for file in test*
