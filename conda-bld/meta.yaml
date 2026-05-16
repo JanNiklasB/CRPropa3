@@ -1,7 +1,6 @@
 package:
   name: crpropa
-  # version: {{ environ.get('GITHUB_REF_NAME') }}
-  version: master
+  version: {{ environ.get('CRPROPA_VERSION', 'master') }}
 
 source:
   git_url: ../
@@ -15,10 +14,8 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }} # [linux]
-    - {{ compiler('cxx') }} # [linux]
-    - clang # [osx]
-    - clang++ # [osx]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - {{ compiler('fortran') }}
     - git
     - cmake

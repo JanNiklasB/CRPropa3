@@ -3,7 +3,7 @@ set -ex
 PYTHON_INCLUDE_DIR=$(${PYTHON} -c "import sysconfig; print(sysconfig.get_paths()['include'])")
 NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 
-if [ -z $IS_MACOS ]; then
+if [ -n "$IS_MACOS" ]; then
 	CXXSTANDARD=17
 	CXXFLAGS="-std=c++17 -stdlib=libc++"
 else
