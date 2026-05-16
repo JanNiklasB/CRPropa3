@@ -33,8 +33,8 @@ jobs:
           conda init &> /dev/null
           cd conda-bld
           conda config --set anaconda_upload yes 
+          export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
           conda build -m conda_build_config.yaml -c conda-forge . -k \
-            CRPROPA_VERSION=${GITHUB_REF_NAME,,} \
             --user $accountName \
             --token $token \
             | tee build.log
@@ -79,9 +79,9 @@ jobs:
           set -ex
           conda init &> /dev/null
           cd conda-bld
-          conda config --set anaconda_upload yes 
+          conda config --set anaconda_upload yes
+          export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
           conda build -m conda_build_config.yaml -c conda-forge . -k \
-            CRPROPA_VERSION=${GITHUB_REF_NAME,,} \
             --user $accountName \
             --token $token \
             | tee build.log
@@ -125,8 +125,8 @@ jobs:
           conda init &> /dev/null
           cd conda-bld
           conda config --set anaconda_upload yes 
+          export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
           conda build -m conda_build_config.yaml -c conda-forge . -k \
-            CRPROPA_VERSION=${GITHUB_REF_NAME,,} \
             --user $accountName \
             --token $token \
             | tee build.log
