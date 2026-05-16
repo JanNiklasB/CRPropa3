@@ -6,6 +6,8 @@ NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 if [ -n "$IS_MACOS" ]; then
 	CXXSTANDARD=17
 	CXXFLAGS="-std=c++17 -stdlib=libc++"
+	CXX="clang++"
+	CC="clang"
 else
 	CXXSTANDARD=11
 fi
@@ -38,7 +40,7 @@ cmake .. -G Ninja \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .
-# $PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
+$PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
 # copy tests to share folder so user can test crpropa:
 mkdir $PREFIX/share/crpropa/test/
 for file in test*

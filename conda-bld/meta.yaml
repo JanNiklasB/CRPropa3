@@ -14,8 +14,10 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
+    - {{ compiler('c') }} # [linux]
+    - {{ compiler('cxx') }} # [linux]
+    - clang # [osx]
+    - clangxx # [osx]
     - {{ compiler('fortran') }}
     - git
     - cmake
