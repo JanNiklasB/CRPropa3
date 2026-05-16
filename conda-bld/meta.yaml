@@ -17,7 +17,7 @@ requirements:
     - {{ compiler('c') }} # [linux]
     - {{ compiler('cxx') }} # [linux]
     - clang # [osx]
-    - clang++ # [osx]
+    - clangxx # [osx]
     - {{ compiler('fortran') }}
     - git
     - cmake
