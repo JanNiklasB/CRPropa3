@@ -6,7 +6,13 @@ NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 if [ -n "$IS_MACOS" ]; then
 	CXXSTANDARD=17
 	CXXFLAGS="-std=c++17 -stdlib=libc++"
-	RPATH=OFF
+	# Needed due to https://github.com/actions/runner-images/issues/3371
+	# Supported versions: https://github.com/actions/runner-images/blob/main/images/macos/macos-14-arm64-Readme.md
+	FC=gfortran-13
+	F77=gfortran-13
+	F90=gfortran-13
+	CC=clang
+	CXX=clang++
 else
 	CXXSTANDARD=11
 	RPATH=ON
@@ -37,7 +43,7 @@ cmake .. -G Ninja \
 	-DINSTALL_EIGEN=OFF \
 	-DOMP_SCHEDULE=dynamic \
 	-DSIMD_EXTENSIONS="${SIMD_EXTENSIONS}" \
-	-DUSE_ABSOLUTE_RPATH="${RPATH}"
+	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
 cmake --install .
 $PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
