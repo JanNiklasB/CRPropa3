@@ -5,7 +5,7 @@ NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 
 if [ -n "$IS_MACOS" ]; then
 	CXXSTANDARD=17
-	CXXFLAGS="-std=c++17 -stdlib=libc++"
+	CXXFLAGS="-std=c++17 -stdlib=libcxx"
 else
 	CXXSTANDARD=11
 fi
