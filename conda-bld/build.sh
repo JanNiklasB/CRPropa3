@@ -6,8 +6,10 @@ NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 if [ -n "$IS_MACOS" ]; then
 	CXXSTANDARD=17
 	CXXFLAGS="-std=c++17 -stdlib=libc++"
+	RPATH=OFF
 else
 	CXXSTANDARD=11
+	RPATH=ON
 fi
 
 cd $SRC_DIR/crpropa
@@ -35,7 +37,7 @@ cmake .. -G Ninja \
 	-DINSTALL_EIGEN=OFF \
 	-DOMP_SCHEDULE=dynamic \
 	-DSIMD_EXTENSIONS="${SIMD_EXTENSIONS}" \
-	-DUSE_ABSOLUTE_RPATH=ON
+	-DUSE_ABSOLUTE_RPATH="${RPATH}"
 cmake --build .
 cmake --install .
 $PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
