@@ -3,15 +3,6 @@ set -ex
 PYTHON_INCLUDE_DIR=$(${PYTHON} -c "import sysconfig; print(sysconfig.get_paths()['include'])")
 NUMPY_INCLUDE_DIR=$(${PYTHON} -c "import numpy; print(numpy.get_include())")
 
-if [ -n "$IS_MACOS" ]; then
-	CXXSTANDARD=17
-	CXXFLAGS="-std=c++17 -stdlib=libc++"
-	CXX="clangxx"
-	CC="clang"
-else
-	CXXSTANDARD=11
-fi
-
 cd $SRC_DIR/crpropa
 mkdir build && cd build
 cmake .. -G Ninja \
@@ -21,8 +12,6 @@ cmake .. -G Ninja \
 	-DPython_INCLUDE_DIR="${PYTHON_INCLUDE_DIR}" \
 	-DPython_INSTALL_PACKAGE_DIR="${SP_DIR}" \
 	-DCMAKE_INSTALL_PREFIX="${PREFIX}" \
-	-DCMAKE_CXX_STANDARD="${CXXSTANDARD}" \
-	-DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
 	-DBUILD_DOC=OFF \
 	-DDOWNLOAD_DATA=ON \
 	-DENABLE_COVERAGE=OFF \
@@ -39,6 +28,7 @@ cmake .. -G Ninja \
 	-DSIMD_EXTENSIONS="${SIMD_EXTENSIONS}" \
 	-DUSE_ABSOLUTE_RPATH=ON
 cmake --build .
+ctest --output-on-failure
 cmake --install .
 $PREFIX/bin/pybind11-stubgen -o ${SP_DIR} crpropa
 # copy tests to share folder so user can test crpropa:
