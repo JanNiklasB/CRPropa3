@@ -16,13 +16,13 @@ requirements:
   build:
     - {{ compiler('c') }} # [linux]
     - {{ compiler('cxx') }} # [linux]
-    - {{ compiler('gcc') }} # [osx]
-    - {{ compiler('gxx') }} # [osx]
+    - clang # [osx]
     - {{ compiler('fortran') }}
     - git
     - cmake
     - ninja
     - swig
+    - pkgconfig
   
   host:
     # host only requirements
@@ -48,6 +48,7 @@ requirements:
     - cmake
     # python requirements
     - python
+    - pkgconfig
     - numpy >=1.26,<3
 
 test:
