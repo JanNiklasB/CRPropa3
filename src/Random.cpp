@@ -60,8 +60,6 @@
 #include "crpropa/Random.h"
 
 #include "crpropa/base64.h"
-#include "xsf/cephes/erfinv.h"
-#include "xsf/erf.h"
 
 #include <cstdio>
 
@@ -114,16 +112,6 @@ double Random::randNorm(const double& mean, const double& variance) {
 	double r = sqrt(-2.0 * log(1.0 - randDblExc())) * variance;
 	double phi = 2.0 * 3.14159265358979323846264338328 * randExc();
 	return mean + r * cos(phi);
-}
-
-double Random::randNormTrunc( const double& minimum, const double& maximum,
-	const double& mean, const double& variance){
-
-	auto F = [](double x){ return 1./2.*(xsf::erfc(-x/sqrt(2.)));};
-	auto FINV = [](double x){ return -sqrt(2.)*xsf::cephes::erfcinv(2.*x);};
-	double x = (randNorm(mean, variance)-mean)/variance;
-	double FA = F((minimum-mean)/variance);
-	return FINV(F(x)*(F((maximum-mean)/variance)-FA) + FA)*variance+mean;
 }
  
 double Random::randUniform(double min, double max) {
