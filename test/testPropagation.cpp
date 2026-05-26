@@ -1552,6 +1552,76 @@ TEST(testPropagationBP, fixedStepOptimization) {
 }
 
 
+// Test that the velocity is added correctly in the relativistic limit and non relativistic limit
+TEST(testPropagationBP, relativisticLimit) {
+	double step = 1. * microsecond;
+	Vector3d Field(0, 0, 100 * volt);
+	PropagationBP propa(
+		step,
+		NULL,  // no B-Field so we only change the velocity through the E-Field
+		new UniformElectricField(Field)
+	);
+	
+	{  // relativistic limit
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(100 * EeV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+
+		Candidate c(p);
+		propa.process(&c);
+
+		double gamma = p.getLorentzFactor();
+		double m = p.getMass()*gamma;
+		Vector3d acc = eplus*Field/2./m*step;
+		Vector3d vel = p.getVelocity();
+
+		// calculate the velocity manually (without B-Field) relativistic
+		Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
+			( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+		vel = 1/(1 + acc.dot(v_minus)/c_squared)*
+			( acc/gamma + v_minus + 1/c_squared*gamma/(1+gamma)*acc.dot(v_minus)*v_minus );
+			
+		// can have small differences since we convert to energy in between
+		EXPECT_NEAR(vel.getR(), c.getVelocity(), vel.getR()*1.e-6);
+		
+		// also compare Energy:
+		double rm = p.getMass();  // rest mass
+		double rm2 = rm*rm;
+		double v2 = vel.getR2();
+		double Energy = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared;
+
+		EXPECT_EQ(Energy, c.current.getEnergy());
+	}
+
+	{  // non relativistic limit
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(1 * eV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+
+		Candidate c(p);
+		propa.process(&c);
+
+		double m = p.getMass()*p.getLorentzFactor();
+		Vector3d acc = eplus*Field/m*step;
+		Vector3d vel = p.getVelocity();
+
+		// calculate the velocity manually (without B-Field) classically
+		vel += acc;
+		
+		// can have small differences since we convert to energy in between
+		EXPECT_NEAR(vel.getR(), c.getVelocity(), vel.getR()*1.e-6);
+		
+		// also compare Energy:
+		double Energy = m*vel.getR2()/2;
+		EXPECT_DOUBLE_EQ(Energy, c.current.getEnergy());
+	}
+}
+
+
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
