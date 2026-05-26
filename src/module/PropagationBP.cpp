@@ -57,6 +57,10 @@ namespace crpropa {
 				Vector3d v_prime = v_minus + v_minus.cross(t);
 				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
 				vel = v_prime + acc;  // final velocity
+
+				// Energy change can only happen when a electric field is present:
+				deltaE = m*vel.getR2()/2 - current.getEnergy();
+
 			} else {  // relativistic
 				Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
 						( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
@@ -64,14 +68,15 @@ namespace crpropa {
 				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
 				vel = 1/(1 + acc.dot(v_prime)/c_squared)*
 					( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
+				
+				// Energy change can only happen when a electric field is present:
+				double rm = current.getMass();  // rest mass
+				double rm2 = rm*rm;
+				double v2 = vel.getR2();
+				// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
+				deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
 			}
-
-			// Energy change can only happen when a electric field is present:
-			double rm = current.getMass();  // rest mass
-			double rm2 = rm*rm;
-			double v2 = vel.getR2();
-			// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
-			deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
+			
 
 			// final velocity might be zero after the the influence of the electric field
 			// if that is the case, we know vel must point in the same direction as -acc.
@@ -219,9 +224,8 @@ namespace crpropa {
 		current.setDirection(yOut.u);
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);
-		// correct energy, previous already saved by PropagationBP::process
-		// candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
-		// deltaE = 0;
+		candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
+		deltaE = 0;
 	}
 
 	void PropagationBP::setField(ref_ptr<MagneticField> f) {
