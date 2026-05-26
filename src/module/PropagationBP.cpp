@@ -36,22 +36,19 @@ namespace crpropa {
 		// we first do a half leapfrog step
 		pos += vel * dt / 2.;
 
+		// Boris help vectors:
+		Vector3d t = B * q / 2. / m * dt;
+		Vector3d s = t * 2. / (1. + t.dot(t));
+
 		// if the E field is 0 we only need to do the classical boris push
 		// since we are not changing the absolute value of the candidates velocity
 		if (E.getR2()==0){
-			// Boris help vectors
-			Vector3d t = B * q / 2. / m * dt;
-			Vector3d s = t * 2. / (1. + t.dot(t));
-			Vector3d v_help;
-
 			// Boris push
-			v_help = dir + dir.cross(t);
-			dir = dir + v_help.cross(s);
+			Vector3d v_prime = vel + vel.cross(t);
+			vel = vel + v_prime.cross(s);  // final velocity
 		} else {  // otherwise we need to respect the electic field and relativity
-			// Boris help vectors
+			// half acceleration (once done before BP once after)
 			Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
-			Vector3d t = B * q / 2. / m * dt;
-			Vector3d s = t * 2. / (1. + t.dot(t));
 
 			// differentiate the case for performance improvement:
 			// (the relativistic case goes towards the non-relativistic case)
@@ -288,7 +285,7 @@ namespace crpropa {
 	}
 
 	void PropagationBP::setMinimumStep(double min) {
-		if (min/c_light < 0)
+		if (min < 0)
 			throw std::runtime_error("PropagationBP: minStep < 0 ");
 		if (min/c_light > maxStep)
 			throw std::runtime_error("PropagationBP: minStep > maxStep");
