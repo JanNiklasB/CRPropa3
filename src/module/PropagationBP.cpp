@@ -18,60 +18,75 @@ namespace crpropa {
 	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double dt, 
 		double z, ParticleState current) const {
 
-		double q = current.getCharge();
-		double gamma = current.getLorentzFactor();
-		// lorentz factor is between 1 and infinity (but never actually infinity)
-		// so the value can be trusted
-		double m = current.getLorentzFactor()*current.getMass();
-		Vector3d vel = dir*current.getVelocity().getR();
-			
-		// half leap frog step in the position
-		pos += vel * dt / 2.;
-
 		// get E and B field at particle position
 		Vector3d B = getBFieldAtPosition(pos, z);
 		Vector3d E = getEFieldAtPosition(pos, z);
 
-		// if the velocity and the electric field are zero, we return
-		if ((E.getR2()==0) && (vel.getR2()==0))
+		// if the velocity and the electric field are zero nothing would happen
+		if ((E.getR2()==0) && (current.getVelocity().getR2()==0))
 			return Y(pos, dir);
 
-		// Boris help vectors
-		Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
-		Vector3d t = B * q / 2. / m * dt;
-		Vector3d s = t * 2. / (1. + t.dot(t));
+		// get some needed candidate features
+		Vector3d vel = dir*current.getVelocity().getR();
+		double q = current.getCharge();
+		// lorentz factor is between 1 and infinity (but never actually infinity)
+		double gamma = current.getLorentzFactor();
+		double m = gamma*current.getMass();
 
-		// differentiate the case for performance improvements 
-		// (the relativistic case goes towards the non-relativistic case)
-		if (abs(1/gamma - 1) <= 1.e-3){
-			Vector3d v_minus = vel + acc;
-			Vector3d v_prime = v_minus + v_minus.cross(t);
-			v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
-			vel = v_prime + acc;  // final velocity
-		} else {  // relativistic
-			Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
-					( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
-			Vector3d v_prime = v_minus + v_minus.cross(t);
-			v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
-			vel = 1/(1 + acc.dot(v_prime)/c_squared)*
-				( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
+		// we first do a half leapfrog step
+		pos += vel * dt / 2.;
+
+		// if the E field is 0 we only need to do the classical boris push
+		// since we are not changing the absolute value of the candidates velocity
+		if (E.getR2()==0){
+			// Boris help vectors
+			Vector3d t = B * q / 2. / m * dt;
+			Vector3d s = t * 2. / (1. + t.dot(t));
+			Vector3d v_help;
+
+			// Boris push
+			v_help = dir + dir.cross(t);
+			dir = dir + v_help.cross(s);
+		} else {  // otherwise we need to respect the electic field and relativity
+			// Boris help vectors
+			Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
+			Vector3d t = B * q / 2. / m * dt;
+			Vector3d s = t * 2. / (1. + t.dot(t));
+
+			// differentiate the case for performance improvement:
+			// (the relativistic case goes towards the non-relativistic case)
+			if (abs(1/gamma - 1) <= 1.e-3){
+				Vector3d v_minus = vel + acc;
+				Vector3d v_prime = v_minus + v_minus.cross(t);
+				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+				vel = v_prime + acc;  // final velocity
+			} else {  // relativistic
+				Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
+						( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+				Vector3d v_prime = v_minus + v_minus.cross(t);
+				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+				vel = 1/(1 + acc.dot(v_prime)/c_squared)*
+					( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
+			}
+
+			// Energy change can only happen when a electric field is present:
+			double rm = current.getMass();  // rest mass
+			double rm2 = rm*rm;
+			double v2 = vel.getR2();
+			// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
+			deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
+
+			// final velocity might be zero after the the influence of the electric field
+			// if that is the case, we know vel must point in the same direction as -acc.
+			// since it also has no influence on the next leap frog step we return here:
+			if (vel.getR2() == 0)
+				return Y(pos, (acc*-1).getUnitVector());
 		}
 
-		double rm = current.getMass();  // rest mass
-		double rm2 = rm*rm;
-		double v2 = vel.getR2();
-		// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
-		deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
-
-		// the other half leap frog step in the position
+		// the other half leapfrog step (only happens if vel!=0)
 		pos += vel * dt / 2.;
-		// out velocity might be zero after the the influence of the electric field
-		// if that is the case, we know vel must point in the same direction as -acc:
-		if (vel.getR2() == 0)
-			return Y(pos, (acc*-1).getUnitVector());
-		else
-			return Y(pos, vel.getUnitVector());
 
+		return Y(pos, vel.getUnitVector());
 	}
 
 	PropagationBP::PropagationBP(ref_ptr<MagneticField> BField, double fixedStep) :
