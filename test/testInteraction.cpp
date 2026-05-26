@@ -1297,12 +1297,13 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 	double brms = 1 * muG; 
 	SynchrotronRadiation sync(brms, true);
 	sync.setSecondaryThreshold(0.); // allow all secondaries for testing
+	sync.setMaximumSamples(1000); // reduce the amount of generated secondaries
 
 	double E = 1 * TeV;
 	Candidate c(11, E);
-	c.setCurrentStep(10 * pc/c.getVelocity()); 
-	c.setNextStep(10 * pc/c.getVelocity());
-	
+	c.setCurrentStep(10 * pc); 
+	c.setNextStep(10 * pc);
+
 	double lf = c.current.getLorentzFactor();
 	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
 	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
@@ -1312,10 +1313,15 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 
 	// check avg energy of the secondary photons 
 	double Esec = 0; 
+	double weightSum = 0;
 	for (size_t i = 0; i < c.secondaries.size(); i++) {
 		Esec += c.secondaries[i] -> current.getEnergy();
+		double weight = c.secondaries[i]->getWeight();
+		Esec += c.secondaries[i] -> current.getEnergy()*weight;
+		weightSum += weight;
 	}
 	Esec /= c.secondaries.size();
+	Esec /= weightSum;
 
 	EXPECT_NEAR(Esec, Ecrit, Ecrit);
 }
