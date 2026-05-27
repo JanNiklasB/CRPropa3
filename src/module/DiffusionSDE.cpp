@@ -29,9 +29,10 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, double toleranc
   	setEpsilon(epsilon);
   	setScale(1.);
   	setAlpha(1./3.);
-	}
+}
 
-DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField, double tolerance, double minStep, double maxStep, double epsilon) :
+DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField,
+	double tolerance, double minStep, double maxStep, double epsilon) :
   	minStep(0)
 {
 	setMagneticField(magneticField);
@@ -42,7 +43,33 @@ DiffusionSDE::DiffusionSDE(ref_ptr<MagneticField> magneticField, ref_ptr<Advecti
 	setEpsilon(epsilon);
 	setScale(1.);
 	setAlpha(1./3.);
-  	}
+}
+
+DiffusionSDE::DiffusionSDE(double tolerance, double minStep, double maxStep, double epsilon,
+	ref_ptr<MagneticField> magneticField) : minStep(0)
+{
+  	setMagneticField(magneticField);
+  	setMaximumTimeStep(maxStep);
+  	setMinimumTimeStep(minStep);
+  	setTolerance(tolerance);
+  	setEpsilon(epsilon);
+  	setScale(1.);
+  	setAlpha(1./3.);
+}
+
+DiffusionSDE::DiffusionSDE(double tolerance, double minStep, double maxStep, double epsilon,
+	ref_ptr<MagneticField> magneticField, ref_ptr<AdvectionField> advectionField) :
+  	minStep(0)
+{
+	setMagneticField(magneticField);
+	setAdvectionField(advectionField);
+	setMaximumTimeStep(maxStep);
+	setMinimumTimeStep(minStep);
+	setTolerance(tolerance);
+	setEpsilon(epsilon);
+	setScale(1.);
+	setAlpha(1./3.);
+}
 
 void DiffusionSDE::process(Candidate *candidate) const {
 
@@ -268,8 +295,21 @@ void DiffusionSDE::calculateBTensor(double r, double BTen[], Vector3d pos, Vecto
 
 }
 
-
 void DiffusionSDE::setMinimumStep(double min) {
+	if (min < 0)
+		throw std::runtime_error("DiffusionSDE: minStep < 0 ");
+	if (min/c_light > maxStep)
+		throw std::runtime_error("DiffusionSDE: minStep > maxStep");
+	minStep = min/c_light;
+}
+
+void DiffusionSDE::setMaximumStep(double max) {
+	if (max/c_light < minStep)
+		throw std::runtime_error("DiffusionSDE: maxStep < minStep");
+	maxStep = max/c_light;
+}
+
+void DiffusionSDE::setMinimumTimeStep(double min) {
 	if (min < 0)
 		throw std::runtime_error("DiffusionSDE: minStep < 0 ");
 	if (min > maxStep)
@@ -277,12 +317,11 @@ void DiffusionSDE::setMinimumStep(double min) {
 	minStep = min;
 }
 
-void DiffusionSDE::setMaximumStep(double max) {
+void DiffusionSDE::setMaximumTimeStep(double max) {
 	if (max < minStep)
 		throw std::runtime_error("DiffusionSDE: maxStep < minStep");
 	maxStep = max;
 }
-
 
 void DiffusionSDE::setTolerance(double tol) {
 	if ((tol > 1) or (tol < 0))
@@ -321,34 +360,6 @@ void DiffusionSDE::setAdvectionField(ref_ptr<AdvectionField> f) {
 	advectionField = f;
 }
 
-double DiffusionSDE::getMinimumStep() const {
-	return minStep;
-}
-
-double DiffusionSDE::getMaximumStep() const {
-	return maxStep;
-}
-
-double DiffusionSDE::getTolerance() const {
-	return tolerance;
-}
-
-double DiffusionSDE::getEpsilon() const {
-	return epsilon;
-}
-
-double DiffusionSDE::getAlpha() const {
-	return alpha;
-}
-
-double DiffusionSDE::getScale() const {
-	return scale;
-}
-
-ref_ptr<MagneticField> DiffusionSDE::getMagneticField() const {
-	return magneticField;
-}
-
 Vector3d DiffusionSDE::getMagneticFieldAtPosition(Vector3d pos, double z) const {
 	Vector3d B(0, 0, 0);
 	try {
@@ -362,10 +373,6 @@ Vector3d DiffusionSDE::getMagneticFieldAtPosition(Vector3d pos, double z) const 
 				<< e.what();
 	}	
 	return B;
-}
-
-ref_ptr<AdvectionField> DiffusionSDE::getAdvectionField() const {
-	return advectionField;
 }
 
 Vector3d DiffusionSDE::getAdvectionFieldAtPosition(Vector3d pos, double t) const {

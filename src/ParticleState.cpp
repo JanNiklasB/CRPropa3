@@ -92,7 +92,7 @@ void ParticleState::setLorentzFactor(double lf) {
 }
 
 double ParticleState::getBeta() const {
-	return getVelocity().getR()/c_squared;
+	return getVelocity().getR2()/c_squared;
 }
 
 Vector3d ParticleState::getVelocity() const {
