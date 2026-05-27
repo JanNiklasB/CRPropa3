@@ -1622,6 +1622,98 @@ TEST(testPropagationBP, relativisticLimit) {
 }
 
 
+// Test propagation with only an E-Field
+TEST(testPropagationBP, EFieldOnly) {
+	double step = 1 * second;
+	Vector3d Field(0, 0, 1 * volt);
+	PropagationBP propa(
+		step,
+		NULL,
+		new UniformElectricField(Field)
+	);
+
+	{  // high energy
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(100 * EeV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+		Candidate c(p);
+
+		propa.process(&c);
+
+		// we expect the velocity to be very close to c_light at this energy
+		// so the electric field should have nearly no effect:
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+		EXPECT_NEAR(c_light*step, c.current.getPosition().z, c_light*step*1.e-6);
+	}
+
+	{  // low energy
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(1 * eV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+		Candidate c(p);
+
+		propa.process(&c);
+
+		double vel = p.getVelocity().getR();
+		double m = p.getMass()*p.getLorentzFactor();
+		double acc = eplus*Field.getR()/m*step;
+
+		// calculate one leapfrog step manually:
+		double distance = vel*step/2;
+		vel += acc;
+		distance += vel*step/2;
+
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+		EXPECT_NEAR(distance, c.current.getPosition().z, distance*1.e-6);
+	}
+}
+
+
+// Tests acceleration of particle at rest
+TEST(testPropagationBP, restAcceleration) {
+	double step = 1 * microsecond;
+	Vector3d Field(0, 0, 1 * volt);
+	PropagationBP propa(
+		step,
+		NULL,
+		new UniformElectricField(Field)
+	);
+
+	ParticleState p;
+	p.setId(nucleusId(1, 1));
+	p.setEnergy(0);
+	p.setPosition(Vector3d(0, 0, 0));
+	p.setDirection(Vector3d(1, 0, 0));
+	Candidate c(p);
+
+	propa.process(&c);
+
+	// particle velocity is zero, so gamma=1
+	double m = p.getMass();
+	Vector3d acc = eplus*Field/m*step;
+
+	// calculate one leapfrog step manually:
+	Vector3d vel = acc;
+	double distance = vel.getR()*step/2;
+
+	EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+	EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+	EXPECT_NEAR(distance, c.current.getPosition().z, distance*1.e-6);
+	EXPECT_DOUBLE_EQ(0, c.current.getVelocity().x);
+	EXPECT_DOUBLE_EQ(0, c.current.getVelocity().y);
+	EXPECT_NEAR(vel.z, c.current.getVelocity().z, vel.z*1.e-3);
+	// also compare Energy:
+	double Energy = m*vel.getR2()/2;
+	EXPECT_DOUBLE_EQ(Energy, c.current.getEnergy());
+}
+
+
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
