@@ -14,6 +14,9 @@ share/
 doc/api/
 .vscode/
 
+!final_doc/
+!conda-bld/build.sh
+
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
 

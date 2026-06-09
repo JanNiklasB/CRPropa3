@@ -51,7 +51,7 @@ std::string getDataPath(std::string filename) {
 	{
 		std::string _path = removeNullCharacter(executable_path() + "../data");
 		if (is_directory(_path)) {
-			dataPath = _path;
+			dataPath = removeNullCharacter(_path);
 			KISS_LOG_INFO << "getDataPath: use executable path, " << dataPath
 					<< std::endl;
 			return concat_path(dataPath, filename);
@@ -62,7 +62,7 @@ std::string getDataPath(std::string filename) {
 	{
 		std::string _path = CRPROPA_BINARY_DIR "/data";
 		if (is_directory(_path)) {
-			dataPath = _path;
+			dataPath = removeNullCharacter(_path);
 			KISS_LOG_INFO
 			<< "getDataPath: use binary path, " << dataPath << std::endl;
 			return concat_path(dataPath, filename);
