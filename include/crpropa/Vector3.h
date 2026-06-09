@@ -1,6 +1,7 @@
 #ifndef CRPROPA_VECTOR3_H
 #define CRPROPA_VECTOR3_H
 
+
 #include <iostream>
 #include <cmath>
 #include <vector>
@@ -9,9 +10,9 @@
 #include <unistd.h>
 
 #if defined(Python_FOUND) or defined(SWIG)
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
 #include <Python.h>
 #include <numpy/arrayobject.h>
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION 
 #endif
 
 namespace crpropa {
