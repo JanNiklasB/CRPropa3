@@ -4,6 +4,7 @@ on:
     branches: 
       - master
       - releases/**
+      - XPointCRPropaAdjustments
     paths:
       - "**.cpp"
       - "**.h"
@@ -17,7 +18,7 @@ on:
 
 jobs:
   x64:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -41,6 +42,7 @@ jobs:
           cd conda-bld
           conda config --set anaconda_upload yes 
           export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
+          if [ "${XPOINT_VERSION}" = xpointcrpropaadjustments ] ; then export XPOINT_VERSION=latest ; fi
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \

@@ -1,6 +1,6 @@
 package:
-  name: crpropa
-  version: {{ environ.get('CRPROPA_VERSION', 'master') }}
+  name: xpointcrpropa
+  version: {{ environ.get('CRPROPA_VERSION', 'latest') }}
 
 source:
   git_url: ../
