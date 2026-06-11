@@ -1,13 +1,10 @@
 name: deploy-documentation
 on: 
   push:
-    branches:
-      - master
-      - 'releases/**'
 
 jobs: 
   build-and-deploy: 
-    if: github.repository=='CRPropa/CRPropa3'
+    # if: github.repository=='CRPropa/CRPropa3'
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -61,8 +58,8 @@ jobs:
         run: | 
           mv build/doc ~/final_doc 
           cp -r build/coverageReport ~/final_doc/pages/coverageReport
-      - name: deploy documentation #deploys the documentation to the gh-pages branch
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-            folder: ~/final_doc
+      # - name: deploy documentation #deploys the documentation to the gh-pages branch
+      #   uses: JamesIves/github-pages-deploy-action@v4
+      #   with:
+      #       folder: ~/final_doc
             
