@@ -37,3 +37,59 @@ After configuration (press c) and generation (press g) you can now build and ins
 Now you can run the python test script. 
 
     python ../testPlugin.py
+
+# Compability with older CRPropa versions
+To ensure compability with older versions you mostly need to watch out to use the correct override of `Module::process`, so either `Module:process(Candidate*)` for versions older then 3.3 or `Module:process(ref_ptr<Candidate>)` for versions newer then 3.3 .
+To achieve this you can use pre compile statements:
+
+example.h:
+```c++
+#pragma once
+
+#include <crpropa/Module>
+#include <crpropa/Candidate>
+#include <crpropa/Referenced>
+// CRPROPA_VERSION is defined in Version.h:
+#include <crpropa/Version.h>
+
+namespace example {
+
+class Example : public crpropa::Module {
+    public:
+        #if CRPROPA_VERSION<=3003000
+            void process(crpropa::Candidate* candidate) const override;
+        #else
+            void process(crpropa::ref_ptr<crpropa::Candidate> candidate) const override;
+        #endif
+};
+
+} // end example namespace
+```
+
+And the same for the cpp file:
+
+example.cpp
+```c++
+#include "myPlugin/example.h"
+
+using namespace crpropa;
+
+namespace example {
+
+#if CRPROPA_VERSION<=3003000
+void Example::process(Candidate* cand) const {
+#else
+void Example::process(ref_ptr<Candidate> cand) const {
+#endif
+    // do stuff here
+}  // end process function
+
+}  // end example namespace
+```
+
+As you can see we can compare the crpropa version in a pragam statement since it is defined
+in `crpropa/Version.h`. It has the following scheme:
+
+```
+1000000*MajorVersion + 1000*MinorVersion + PatchVersion
+```
