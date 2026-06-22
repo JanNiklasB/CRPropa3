@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.14)
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.2+)  # Update for new release
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 set(CRPROPA_EXTRA_SOURCES)
 set(CRPROPA_EXTRA_INCLUDES)
@@ -56,7 +56,6 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif(NOT CMAKE_BUILD_TYPE)
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-
 
 # ----------------------------------------------------------------------------
 # Version info from Git
@@ -145,6 +144,9 @@ endif(ENABLE_COVERAGE)
 add_subdirectory(libs/kiss)
 list(APPEND CRPROPA_EXTRA_LIBRARIES kiss)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/kiss/include)
+
+# nanoflann (provided)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/include)
 
 # HepID (provided)
 add_subdirectory(libs/HepPID)
@@ -342,74 +344,75 @@ file(GLOB_RECURSE CRPROPA_INCLUDES RELATIVE ${CMAKE_SOURCE_DIR} include/*.h)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
 add_library(crpropa SHARED
-  src/base64.cpp
-  src/Candidate.cpp
-  src/Common.cpp
-  src/Cosmology.cpp
-  src/EmissionMap.cpp
-  src/Geometry.cpp
-  src/GridTools.cpp
-  src/Module.cpp
-  src/ParticleID.cpp
-  src/ParticleMass.cpp
-  src/ParticleState.cpp
-  src/PhotonBackground.cpp
-  src/ProgressBar.cpp
-  src/Random.cpp
-  src/Source.cpp
-  src/Variant.cpp
-  src/module/AdiabaticCooling.cpp
-  src/module/Acceleration.cpp
-  src/module/Boundary.cpp
-  src/module/BreakCondition.cpp
-  src/module/CandidateSplitting.cpp
-  src/module/DiffusionSDE.cpp
-  src/module/EMDoublePairProduction.cpp
-  src/module/EMInverseComptonScattering.cpp
-  src/module/EMPairProduction.cpp
-  src/module/EMTripletPairProduction.cpp
-  src/module/ElasticScattering.cpp
-  src/module/ElectronPairProduction.cpp
-  src/module/HDF5Output.cpp
-  src/module/MomentumDiffusion.cpp
-  src/module/NuclearDecay.cpp
-  src/module/Observer.cpp
-  src/module/Output.cpp
-  src/module/OutputShell.cpp
-  src/module/ParticleCollector.cpp
-  src/module/PhotoDisintegration.cpp
-  src/module/PhotoPionProduction.cpp
-  src/module/PhotonOutput1D.cpp
-  src/module/PropagationBP.cpp
-  src/module/PropagationCK.cpp
-  src/module/Redshift.cpp
-  src/module/RestrictToRegion.cpp
-  src/module/SimplePropagation.cpp
-  src/module/SynchrotronRadiation.cpp
-  src/module/TextOutput.cpp
-  src/module/Tools.cpp
-  src/magneticField/ArchimedeanSpiralField.cpp
-  src/magneticField/JF12Field.cpp
-  src/magneticField/JF12FieldSolenoidal.cpp
-  src/magneticField/MagneticField.cpp
-  src/magneticField/MagneticFieldGrid.cpp
-  src/magneticField/PolarizedSingleModeMagneticField.cpp
-  src/magneticField/PT11Field.cpp
-  src/magneticField/turbulentField/GridTurbulence.cpp
-  src/magneticField/turbulentField/HelicalGridTurbulence.cpp
-  src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
-  src/magneticField/turbulentField/SimpleGridTurbulence.cpp
-  src/magneticField/TF17Field.cpp
-  src/magneticField/UF23Field.cpp
-  src/magneticField/KST24Field.cpp
-  src/magneticField/CMZField.cpp
-  src/advectionField/AdvectionField.cpp
-  src/advectionField/TimeDependentAdvectionField.cpp
-  src/massDistribution/ConstantDensity.cpp
-  src/massDistribution/Cordes.cpp
-  src/massDistribution/Ferriere.cpp
-  src/massDistribution/Massdistribution.cpp
-  src/massDistribution/Nakanishi.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/InteractionRates.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElasticScattering.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoPionProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationCK.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticFieldGrid.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PolarizedSingleModeMagneticField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PT11Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/GridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/HelicalGridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/SimpleGridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/TF17Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Cordes.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Massdistribution.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Nakanishi.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 )
@@ -440,7 +443,10 @@ else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
 
-
+# Only add stdc++fs for older GCC (needed for Ubuntu 20)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
+    target_link_libraries(crpropa stdc++fs)
+endif()
 
 # ----------------------------------------------------------------------------
 # Python
@@ -581,16 +587,16 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
 
-
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
 add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
-install(TARGETS crpropa DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_BINARY_DIR}/include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_BINARY_DIR}/data/ DESTINATION share/crpropa/ PATTERN ".git" EXCLUDE)
-install(DIRECTORY libs/kiss/include/ DESTINATION include)
+install(TARGETS crpropa DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # ------------------------------------------------------------------
 # Documentation

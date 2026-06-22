@@ -3,8 +3,6 @@
 #include "kiss/logger.h"
 #include "crpropa/Geometry.h"
 
-#include <iostream>
-
 namespace crpropa {
 
 // Plane ------------------------------------------------------------------
@@ -29,10 +27,14 @@ std::string Plane::getDescription() const {
 	return ss.str();
 };
 
+bool Plane::isInside(const Vector3d& point) const {
+	// if the point is on the "positive" or "negative" side of the infinite plane
+	return distance(point) >= 0;
+}
+
 Vector3d Plane::normal(const Vector3d& point) const {
 	return n;
 }
-
 
 // Sphere ------------------------------------------------------------------
 Sphere::Sphere(const Vector3d& _center, double _radius) : center(_center), radius(_radius) {
@@ -48,11 +50,15 @@ Vector3d Sphere::normal(const Vector3d& point) const {
 	return d.getUnitVector();
 }
 
+bool Sphere::isInside(const Vector3d& point) const {
+	return (point - center).getR2() <= radius * radius;
+}
+
 std::string Sphere::getDescription() const {
 	std::stringstream ss;
 	ss << "Sphere: " << std::endl
-			<< "   Center: " << center << std::endl
-			<< "   Radius: " << radius << std::endl;
+		<< "   Center: " << center << std::endl
+		<< "   Radius: " << radius << std::endl;
 	return ss.str();
 };
 
@@ -112,13 +118,16 @@ Vector3d ParaxialBox::normal(const Vector3d& point) const {
 	return n;
 }
 
+bool ParaxialBox::isInside(const Vector3d& point) const {
+	return distance(point) >= 0;
+}
+
 std::string ParaxialBox::getDescription() const {
 	std::stringstream ss;
 	ss << "ParaxialBox: " << std::endl
-		 << "   corner: " << corner << std::endl
-		 << "     size: " << size << std::endl;
+		<< "   corner: " << corner << std::endl
+		<< "     size: " << size << std::endl;
 	return ss.str();
 };
-
 
 } // namespace
