@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.2+)  # Update for new release
+# Format: 1000000*MajorVersion + 1000*MinorVersion + PatchVersion
+set(CRPROPA_NEXT_VERSION 3003000)  # Update for new release
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -77,7 +79,9 @@ endif()
 
 message(STATUS "CRPropa version: ${GIT_DESC} ${GIT_SHA1} ${GIT_REFSPEC}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/crpropa/Version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/crpropa/Version.h" @ONLY)
 list(APPEND CRPROPA_EXTRA_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp")
+list(APPEND CRPROPA_EXTRA_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # ----------------------------------------------------------------------------
 # Dependencies
