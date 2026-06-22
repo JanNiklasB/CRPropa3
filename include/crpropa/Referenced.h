@@ -56,7 +56,7 @@ class ref_ptr {
 		return *this;
 	}
 
-	inline ref_ptr& operator =(long int ptr) {
+	inline ref_ptr& operator =(nullptr_t ptr) {
 		_raw_ptr = NULL;
 		_shared_ptr = NULL;
 		return *this;
