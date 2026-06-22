@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 project(CRPropa Fortran C CXX)
-set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
+set(CRPROPA_RELEASE_VERSION 3.2.2+)  # Update for new release
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -122,9 +122,9 @@ if(ENABLE_COVERAGE)
       )
       add_custom_target(coverage
         # generate coverage data
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file coverage.info VERBATIM
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info --ignore-errors negative,inconsistent,unused VERBATIM
         # clean external libs
-        COMMAND ${LCOV_PATH} --remove coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o coverage.info.cleaned VERBATIM
+        COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
         # Generate html output
         COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
         COMMAND echo "Generated coverage report in coverageReport/index.html"
@@ -163,6 +163,7 @@ SET(EIGEN_PATH  "" CACHE STRING "Use EIGEN from this path instead of the version
 SET(WITH_GALACTIC_LENSES FALSE)
 
 if(ENABLE_GALACTICMAGNETICLENS)
+  message(DEPRECATION "Galactic magnetic lens support is deprecated and will be removed in a future release.")
   SET(WITH_GALACTIC_LENSES TRUE)
 
   if(EIGEN_PATH)
@@ -295,7 +296,7 @@ if(APPLE OR USE_ABSOLUTE_RPATH)
   list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${ABSOLUTE_RPATH}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
     message(STATUS "Use absolute RPATH ${ABSOLUTE_RPATH}")
-    set(CMAKE_INSTALL_RPATH "${ABSOLUTE_RPATH}")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${ABSOLUTE_RPATH}")
   endif("${isSystemDir}" STREQUAL "-1")
 endif()
 
@@ -447,13 +448,13 @@ endif(BUILD_DOC)
 
 option(ENABLE_PYTHON "Create python library via SWIG" ON)
 
+set(Python_FIND_VIRTUALENV "FIRST")
+set(Python_FIND_STRATEGY "LOCATION")
 find_package(Python 3.0 COMPONENTS Interpreter Development NumPy)
-if(NOT Python_FOUND)
-  set(ENABLE_PYTHON OFF)
-endif()
 
 if(ENABLE_PYTHON AND Python_FOUND)
   find_package(SWIG 3.0 REQUIRED)
+  include(UseSWIG)
   include_directories(${Python_INCLUDE_DIRS})
   add_definitions(-DCRPROPA_HAVE_PYTHON)
   list(APPEND CRPROPA_SWIG_DEFINES -DCRPROPA_HAVE_PYTHON)
@@ -511,6 +512,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
   if(ENABLE_SWIG_BUILTIN)
     set(BUILTIN "-builtin")
+    list(APPEND CRPROPA_SWIG_DEFINES "-builtin")
     if(SWIG_VERSION VERSION_LESS 4.0.2)
         message(WARNING, "The SWIG builtin option should not be used with SWIG version below 4.0.2 due to https://github.com/swig/swig/issues/1595")
     endif()
@@ -520,31 +522,62 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
   set(SWIG_INCLUDES)
   foreach(p in ${SWIG_INCLUDE_DIRECTORIES})
-    list(APPEND SWIG_INCLUDES -I${p})
+    list(APPEND SWIG_INCLUDES ${p})
   endforeach()
 
   file(GLOB_RECURSE CRPROPA_SWIG_INPUTS python/*.i)
-  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx PROPERTIES GENERATED true)
-  add_custom_target(crpropa-swig-wrapper
-    COMMAND swig ${BUILTIN} -c++ -python -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_SOURCE_DIR}/libs/HepPID/include ${SWIG_INCLUDES} ${CRPROPA_SWIG_DEFINES} -dirprot -o ${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx -outdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/python/crpropa${BUILTIN}.i
-    DEPENDS ${CRPROPA_SWIG_INPUTS} ${CRPROPA_INCLUDES} )
+
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa${BUILTIN}.i
+    PROPERTIES
+    CPLUSPLUS ON
+    SWIG_MODULE_NAME "crpropa"
+    SWIG_FLAGS "${CRPROPA_SWIG_DEFINES};-dirprot;${CMAKE_SWIG_FLAGS}"
+    DEPENDS "${CRPROPA_SWIG_INPUTS};${CRPROPA_INCLUDES}"
+    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  )
+  
+  swig_add_library(crpropa-swig TYPE SHARED LANGUAGE python
+    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa${BUILTIN}.i
+  )
+  
+  target_include_directories(crpropa-swig PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include
+    ${SWIG_INCLUDES}
+  )
+  
+  target_link_libraries(crpropa-swig crpropa ${Python_LIBRARIES} ${Python_LIBRARY})
+  
+  set_target_properties(crpropa-swig PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "_crpropa"
+    SUFFIX ".so"
+  )
+
+  if(APPLE)
+    set_target_properties(crpropa-swig PROPERTIES
+      INSTALL_RPATH "@loader_path;@loader_path/../../${PYTHON_PROJECT}/.libs"
+    )
+    set_property(TARGET crpropa-swig APPEND PROPERTY
+      LINK_FLAGS "-flat_namespace -undefined suppress"
+    )
+  endif()
 
   if(BUILD_DOC AND DOXYGEN_FOUND)
-    add_dependencies(crpropa-swig-wrapper docstrings_from_doxy)
+    add_dependencies(crpropa-swig docstrings_from_doxy)
   endif(BUILD_DOC AND DOXYGEN_FOUND)
 
-  add_library(crpropa-swig MODULE ${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx)
-  set_target_properties(crpropa-swig PROPERTIES PREFIX "")
-  # disable warnings on automatically generated interface code
-  set_target_properties(crpropa-swig PROPERTIES COMPILE_FLAGS "-w")
-  set_target_properties(crpropa-swig PROPERTIES OUTPUT_NAME "_crpropa")
-  target_link_libraries(crpropa-swig crpropa ${Python_LIBRARIES} ${Python_LIBRARY})
-  add_dependencies(crpropa-swig crpropa-swig-wrapper)
-
-  install(DIRECTORY "${CMAKE_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
+  install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/crpropa.py" DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
   install(TARGETS crpropa-swig LIBRARY DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
+
+  find_program(PYBIND11_STUBGEN_EXECUTABLE NAMES "pybind11-stubgen")
+	if(PYBIND11_STUBGEN_EXECUTABLE)
+		message(STATUS "Found pybind11-stubgen at ${PYBIND11_STUBGEN_EXECUTABLE}")
+		install(CODE "execute_process(COMMAND ${PYBIND11_STUBGEN_EXECUTABLE} --ignore-all-errors -o ${Python_SITELIB} crpropa)")
+    install(CODE "execute_process(COMMAND echo -- Generated python stubs over pybind11-stubgen for crpropa)")
+	endif()
 
 endif(ENABLE_PYTHON AND Python_FOUND)
 
@@ -577,7 +610,9 @@ if(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
   find_package_handle_standard_args(Sphinx
                                     "Failed to find sphinx-build executable"
                                     SPHINX_EXECUTABLE)
-  set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/doc "${CMAKE_CURRENT_BINARY_DIR}/doc-source")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_BINARY_DIR}/xml "${CMAKE_CURRENT_BINARY_DIR}/doc-source/xml")
+  set(SPHINX_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/doc-source")
   set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/doc)
   add_custom_target(doc
                     ${SPHINX_EXECUTABLE} -b html
@@ -594,8 +629,9 @@ endif(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
 # ----------------------------------------------------------------------------
 if(ENABLE_TESTING)
   enable_testing()
-  add_executable(testCore test/testCore.cpp)
-  target_link_libraries(testCore  crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
+
+  add_executable(testCore ${CMAKE_CURRENT_SOURCE_DIR}/test/testCore.cpp)
+  target_link_libraries(testCore crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testCore testCore)
 
   add_executable(testVector3 test/testVector3.cpp)
@@ -667,16 +703,16 @@ if(ENABLE_TESTING)
       add_test(testMagneticLensPythonInterface ${Python_EXECUTABLE} testMagneticLensPythonInterface.py)
     endif(numpyIncludePath AND WITH_GALACTIC_LENSES)
 
-    CONFIGURE_FILE(test/testSimulationExecution.py testSimulationExecution.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testSimulationExecution.py ${CMAKE_CURRENT_BINARY_DIR}/testSimulationExecution.py COPYONLY)
     add_test(testSimulationExecution ${Python_EXECUTABLE} testSimulationExecution.py)
 
-    CONFIGURE_FILE(test/testDiffusionSDE.py testDiffusionSDE.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testDiffusionSDE.py ${CMAKE_CURRENT_BINARY_DIR}/testDiffusionSDE.py COPYONLY)
     add_test(testDiffusionSDE ${Python_EXECUTABLE} testDiffusionSDE.py)
 
-    CONFIGURE_FILE(test/testMomentumDiffusion.py testMomentumDiffusion.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testMomentumDiffusion.py ${CMAKE_CURRENT_BINARY_DIR}/testMomentumDiffusion.py COPYONLY)
     add_test(testMomentumDiffusion ${Python_EXECUTABLE} testMomentumDiffusion.py)
 
-    CONFIGURE_FILE(test/testPythonExtension.py testPythonExtension.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testPythonExtension.py ${CMAKE_CURRENT_BINARY_DIR}/testPythonExtension.py COPYONLY)
     add_test(testPythonExtension ${Python_EXECUTABLE} testPythonExtension.py)
   endif(ENABLE_PYTHON AND Python_FOUND)
 
