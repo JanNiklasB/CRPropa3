@@ -4,6 +4,7 @@
 #include "crpropa/Candidate.h"
 #include "crpropa/Referenced.h"
 #include "crpropa/Common.h"
+#include "crpropa/Version.h"
 
 #include <string>
 

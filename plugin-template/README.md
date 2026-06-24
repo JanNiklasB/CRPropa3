@@ -46,11 +46,10 @@ example.h:
 ```c++
 #pragma once
 
+// CRPROPA_VERSION is defined in Version.h, but Version.h is included in Module.h:
 #include <crpropa/Module>
 #include <crpropa/Candidate>
 #include <crpropa/Referenced>
-// CRPROPA_VERSION is defined in Version.h:
-#include <crpropa/Version.h>
 
 namespace example {
 
