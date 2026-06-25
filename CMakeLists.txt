@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 project(CRPropa Fortran C CXX)
-set(CRPROPA_RELEASE_VERSION 3.2.1+)  # Update for new release
+set(CRPROPA_RELEASE_VERSION 3.2.2+)  # Update for new release
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -122,9 +122,9 @@ if(ENABLE_COVERAGE)
       )
       add_custom_target(coverage
         # generate coverage data
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file coverage.info VERBATIM
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info --ignore-errors negative,inconsistent,unused VERBATIM
         # clean external libs
-        COMMAND ${LCOV_PATH} --remove coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o coverage.info.cleaned VERBATIM
+        COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
         # Generate html output
         COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
         COMMAND echo "Generated coverage report in coverageReport/index.html"
@@ -163,6 +163,7 @@ SET(EIGEN_PATH  "" CACHE STRING "Use EIGEN from this path instead of the version
 SET(WITH_GALACTIC_LENSES FALSE)
 
 if(ENABLE_GALACTICMAGNETICLENS)
+  message(DEPRECATION "Galactic magnetic lens support is deprecated and will be removed in a future release.")
   SET(WITH_GALACTIC_LENSES TRUE)
 
   if(EIGEN_PATH)
@@ -295,7 +296,7 @@ if(APPLE OR USE_ABSOLUTE_RPATH)
   list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${ABSOLUTE_RPATH}" isSystemDir)
   if("${isSystemDir}" STREQUAL "-1")
     message(STATUS "Use absolute RPATH ${ABSOLUTE_RPATH}")
-    set(CMAKE_INSTALL_RPATH "${ABSOLUTE_RPATH}")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${ABSOLUTE_RPATH}")
   endif("${isSystemDir}" STREQUAL "-1")
 endif()
 
@@ -341,77 +342,76 @@ file(GLOB_RECURSE CRPROPA_INCLUDES RELATIVE ${CMAKE_SOURCE_DIR} include/*.h)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
 add_library(crpropa SHARED
-  src/base64.cpp
-  src/Candidate.cpp
-  src/Clock.cpp
-  src/Common.cpp
-  src/Cosmology.cpp
-  src/EmissionMap.cpp
-  src/Geometry.cpp
-  src/GridTools.cpp
-  src/Module.cpp
-  src/ModuleList.cpp
-  src/ParticleID.cpp
-  src/ParticleMass.cpp
-  src/ParticleState.cpp
-  src/PhotonBackground.cpp
-  src/ProgressBar.cpp
-  src/Random.cpp
-  src/Source.cpp
-  src/Variant.cpp
-  src/module/AdiabaticCooling.cpp
-  src/module/Acceleration.cpp
-  src/module/Boundary.cpp
-  src/module/BreakCondition.cpp
-  src/module/CandidateSplitting.cpp
-  src/module/DiffusionSDE.cpp
-  src/module/EMDoublePairProduction.cpp
-  src/module/EMInverseComptonScattering.cpp
-  src/module/EMPairProduction.cpp
-  src/module/EMTripletPairProduction.cpp
-  src/module/ElasticScattering.cpp
-  src/module/ElectronPairProduction.cpp
-  src/module/HDF5Output.cpp
-  src/module/MomentumDiffusion.cpp
-  src/module/NuclearDecay.cpp
-  src/module/Observer.cpp
-  src/module/Output.cpp
-  src/module/OutputShell.cpp
-  src/module/ParticleCollector.cpp
-  src/module/PhotoDisintegration.cpp
-  src/module/PhotoPionProduction.cpp
-  src/module/PhotonOutput1D.cpp
-  src/module/PropagationBP.cpp
-  src/module/PropagationCK.cpp
-  src/module/Redshift.cpp
-  src/module/RestrictToRegion.cpp
-  src/module/SimplePropagation.cpp
-  src/module/SynchrotronRadiation.cpp
-  src/module/TextOutput.cpp
-  src/module/Tools.cpp
-  src/magneticField/ArchimedeanSpiralField.cpp
-  src/magneticField/JF12Field.cpp
-  src/magneticField/JF12FieldSolenoidal.cpp
-  src/magneticField/MagneticField.cpp
-  src/magneticField/MagneticFieldGrid.cpp
-  src/magneticField/PolarizedSingleModeMagneticField.cpp
-  src/magneticField/PT11Field.cpp
-  src/magneticField/turbulentField/GridTurbulence.cpp
-  src/magneticField/turbulentField/HelicalGridTurbulence.cpp
-  src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
-  src/magneticField/turbulentField/SimpleGridTurbulence.cpp
-  src/magneticField/TF17Field.cpp
-  src/magneticField/UF23Field.cpp
-  src/magneticField/KST24Field.cpp
-  src/magneticField/CMZField.cpp
-  src/electricField/ElectricField.cpp
-  src/advectionField/AdvectionField.cpp
-  src/advectionField/TimeDependentAdvectionField.cpp
-  src/massDistribution/ConstantDensity.cpp
-  src/massDistribution/Cordes.cpp
-  src/massDistribution/Ferriere.cpp
-  src/massDistribution/Massdistribution.cpp
-  src/massDistribution/Nakanishi.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/base64.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Candidate.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Clock.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Common.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Cosmology.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/EmissionMap.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Geometry.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/GridTools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Module.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleID.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleMass.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ParticleState.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/PhotonBackground.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/ProgressBar.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Random.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Source.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/Variant.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/AdiabaticCooling.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Acceleration.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Boundary.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/BreakCondition.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/CandidateSplitting.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/DiffusionSDE.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMDoublePairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMInverseComptonScattering.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/EMTripletPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElasticScattering.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ElectronPairProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/HDF5Output.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/MomentumDiffusion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/NuclearDecay.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Observer.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Output.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/OutputShell.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/ParticleCollector.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoDisintegration.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotoPionProduction.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PhotonOutput1D.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationBP.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/PropagationCK.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Redshift.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/RestrictToRegion.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SimplePropagation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/SynchrotronRadiation.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/TextOutput.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/module/Tools.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/ArchimedeanSpiralField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/JF12FieldSolenoidal.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/MagneticFieldGrid.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PolarizedSingleModeMagneticField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/PT11Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/GridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/HelicalGridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/PlaneWaveTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/turbulentField/SimpleGridTurbulence.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/TF17Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/electricField/ElectricField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Cordes.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Ferriere.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Massdistribution.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/Nakanishi.cpp
 
   ${CRPROPA_EXTRA_SOURCES}
 )
@@ -449,10 +449,13 @@ endif(BUILD_DOC)
 # ----------------------------------------------------------------------------
 option(ENABLE_PYTHON "Create python library via SWIG" ON)
 
-find_package(Python 3.0 REQUIRED COMPONENTS Interpreter Development NumPy)
+set(Python_FIND_VIRTUALENV "FIRST")
+set(Python_FIND_STRATEGY "LOCATION")
+find_package(Python 3.0 COMPONENTS Interpreter Development NumPy)
 
 if(ENABLE_PYTHON AND Python_FOUND)
   find_package(SWIG 3.0 REQUIRED)
+  include(UseSWIG)
   include_directories(${Python_INCLUDE_DIRS})
   add_definitions(-DCRPROPA_HAVE_PYTHON)
   list(APPEND CRPROPA_SWIG_DEFINES -DCRPROPA_HAVE_PYTHON)
@@ -510,40 +513,72 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
   if(ENABLE_SWIG_BUILTIN)
     set(BUILTIN "-builtin")
+    list(APPEND CRPROPA_SWIG_DEFINES "-builtin")
     if(SWIG_VERSION VERSION_LESS 4.0.2)
         message(WARNING, "The SWIG builtin option should not be used with SWIG version below 4.0.2 due to https://github.com/swig/swig/issues/1595")
     endif()
-  else(ENABLE_SWIG_BUILTIN)
+  else()
     set(BUILTIN "")
   endif(ENABLE_SWIG_BUILTIN)
 
   set(SWIG_INCLUDES)
   foreach(p in ${SWIG_INCLUDE_DIRECTORIES})
-    list(APPEND SWIG_INCLUDES -I${p})
+    list(APPEND SWIG_INCLUDES ${p})
   endforeach()
 
   file(GLOB_RECURSE CRPROPA_SWIG_INPUTS python/*.i)
-  set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx PROPERTIES GENERATED true)
-  add_custom_target(crpropa-swig-wrapper
-    COMMAND swig ${BUILTIN} -c++ -python -I${CMAKE_SOURCE_DIR}/include -I${CMAKE_SOURCE_DIR}/libs/HepPID/include ${SWIG_INCLUDES} ${CRPROPA_SWIG_DEFINES} -dirprot -o ${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx -outdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/python/crpropa${BUILTIN}.i
-    DEPENDS ${CRPROPA_SWIG_INPUTS} ${CRPROPA_INCLUDES} )
+
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa${BUILTIN}.i
+    PROPERTIES
+    CPLUSPLUS ON
+    SWIG_MODULE_NAME "crpropa"
+    SWIG_FLAGS "${CRPROPA_SWIG_DEFINES};-dirprot;${CMAKE_SWIG_FLAGS}"
+    DEPENDS "${CRPROPA_SWIG_INPUTS};${CRPROPA_INCLUDES}"
+    OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}
+  )
+  
+  swig_add_library(crpropa-swig TYPE SHARED LANGUAGE python
+    SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa${BUILTIN}.i
+  )
+  
+  target_include_directories(crpropa-swig PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include
+    ${SWIG_INCLUDES}
+  )
+  
+  target_link_libraries(crpropa-swig crpropa ${Python_LIBRARIES} ${Python_LIBRARY})
+  
+  set_target_properties(crpropa-swig PROPERTIES
+    PREFIX ""
+    OUTPUT_NAME "_crpropa"
+    SUFFIX ".so"
+  )
+
+  if(APPLE)
+    set_target_properties(crpropa-swig PROPERTIES
+      INSTALL_RPATH "@loader_path;@loader_path/../../${PYTHON_PROJECT}/.libs"
+    )
+    set_property(TARGET crpropa-swig APPEND PROPERTY
+      LINK_FLAGS "-flat_namespace -undefined suppress"
+    )
+  endif()
 
   if(BUILD_DOC AND DOXYGEN_FOUND)
-    add_dependencies(crpropa-swig-wrapper docstrings_from_doxy)
+    add_dependencies(crpropa-swig docstrings_from_doxy)
   endif(BUILD_DOC AND DOXYGEN_FOUND)
 
-  add_library(crpropa-swig MODULE ${CMAKE_CURRENT_BINARY_DIR}/crpropa_wrap.cxx)
-  set_target_properties(crpropa-swig PROPERTIES PREFIX "")
-  # disable warnings on automatically generated interface code
-  set_target_properties(crpropa-swig PROPERTIES COMPILE_FLAGS "-w")
-  set_target_properties(crpropa-swig PROPERTIES OUTPUT_NAME "_crpropa")
-  target_link_libraries(crpropa-swig crpropa ${Python_LIBRARIES} ${Python_LIBRARY})
-  add_dependencies(crpropa-swig crpropa-swig-wrapper)
-
-  install(DIRECTORY "${CMAKE_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
+  install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/crpropa.py" DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
   install(TARGETS crpropa-swig LIBRARY DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
+
+  find_program(PYBIND11_STUBGEN_EXECUTABLE NAMES "pybind11-stubgen")
+	if(PYBIND11_STUBGEN_EXECUTABLE)
+		message(STATUS "Found pybind11-stubgen at ${PYBIND11_STUBGEN_EXECUTABLE}")
+		install(CODE "execute_process(COMMAND ${PYBIND11_STUBGEN_EXECUTABLE} --ignore-all-errors -o ${Python_SITELIB} crpropa)")
+    install(CODE "execute_process(COMMAND echo -- Generated python stubs over pybind11-stubgen for crpropa)")
+	endif()
 
 endif(ENABLE_PYTHON AND Python_FOUND)
 
@@ -551,6 +586,9 @@ endif(ENABLE_PYTHON AND Python_FOUND)
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
+
+# makes the binary directory visible to common.h, needed to have a last resort when searching for data
+add_definitions(-DCRPROPA_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
@@ -576,7 +614,9 @@ if(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
   find_package_handle_standard_args(Sphinx
                                     "Failed to find sphinx-build executable"
                                     SPHINX_EXECUTABLE)
-  set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/doc "${CMAKE_CURRENT_BINARY_DIR}/doc-source")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_BINARY_DIR}/xml "${CMAKE_CURRENT_BINARY_DIR}/doc-source/xml")
+  set(SPHINX_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/doc-source")
   set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/doc)
   add_custom_target(doc
                     ${SPHINX_EXECUTABLE} -b html
@@ -593,8 +633,9 @@ endif(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
 # ----------------------------------------------------------------------------
 if(ENABLE_TESTING)
   enable_testing()
-  add_executable(testCore test/testCore.cpp)
-  target_link_libraries(testCore  crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
+
+  add_executable(testCore ${CMAKE_CURRENT_SOURCE_DIR}/test/testCore.cpp)
+  target_link_libraries(testCore crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testCore testCore)
 
   add_executable(testVector3 test/testVector3.cpp)
@@ -670,16 +711,16 @@ if(ENABLE_TESTING)
       add_test(testMagneticLensPythonInterface ${Python_EXECUTABLE} testMagneticLensPythonInterface.py)
     endif(numpyIncludePath AND WITH_GALACTIC_LENSES)
 
-    CONFIGURE_FILE(test/testSimulationExecution.py testSimulationExecution.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testSimulationExecution.py ${CMAKE_CURRENT_BINARY_DIR}/testSimulationExecution.py COPYONLY)
     add_test(testSimulationExecution ${Python_EXECUTABLE} testSimulationExecution.py)
 
-    CONFIGURE_FILE(test/testDiffusionSDE.py testDiffusionSDE.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testDiffusionSDE.py ${CMAKE_CURRENT_BINARY_DIR}/testDiffusionSDE.py COPYONLY)
     add_test(testDiffusionSDE ${Python_EXECUTABLE} testDiffusionSDE.py)
 
-    CONFIGURE_FILE(test/testMomentumDiffusion.py testMomentumDiffusion.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testMomentumDiffusion.py ${CMAKE_CURRENT_BINARY_DIR}/testMomentumDiffusion.py COPYONLY)
     add_test(testMomentumDiffusion ${Python_EXECUTABLE} testMomentumDiffusion.py)
 
-    CONFIGURE_FILE(test/testPythonExtension.py testPythonExtension.py COPYONLY)
+    CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testPythonExtension.py ${CMAKE_CURRENT_BINARY_DIR}/testPythonExtension.py COPYONLY)
     add_test(testPythonExtension ${Python_EXECUTABLE} testPythonExtension.py)
   endif(ENABLE_PYTHON AND Python_FOUND)
 

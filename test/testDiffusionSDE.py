@@ -147,8 +147,8 @@ class DiffusionOneDirection(unittest.TestCase):
     BField = crpropa.UniformMagneticField(ConstMagVec)
 
     precision = 1e-4
-    minStep = 1*crpropa.year
-    maxStep = 10*crpropa.kiloyear
+    minStep = 1*pc
+    maxStep = 10*kpc
     epsilon = 0.
 
     Dif = crpropa.DiffusionSDE(BField, precision, minStep, maxStep, epsilon)
@@ -156,8 +156,10 @@ class DiffusionOneDirection(unittest.TestCase):
 
     def test_Simple(self):
         self.assertEqual(self.Dif.getTolerance(), self.precision)
-        self.assertEqual(self.Dif.getMinimumStep(), self.minStep)
-        self.assertEqual(self.Dif.getMaximumStep(), self.maxStep)
+        self.assertEqual(self.Dif.getMinimumTimeStep(), self.minStep/c_light)
+        self.assertEqual(self.Dif.getMaximumTimeStep(), self.maxStep/c_light)
+        self.assertAlmostEqual(self.Dif.getMinimumStep()/self.minStep, 1.) # rounding errors when converting to timestep
+        self.assertAlmostEqual(self.Dif.getMaximumStep()/self.maxStep, 1.) # rounding errors when converting to timestep
         self.assertEqual(self.Dif.getEpsilon(), self.epsilon)
         self.assertEqual(self.Dif.getAlpha(), 1./3.) # default Kolmogorov diffusion
         self.assertEqual(self.Dif.getScale(), 1.) # default D(4GeV) = 6.1e28 cm^2/s
@@ -171,12 +173,12 @@ class DiffusionOneDirection(unittest.TestCase):
         # check for position
         self.Dif.process(c)
         pos = c.current.getPosition()
-        self.assertAlmostEqual(pos.x/(crpropa.year*c.getVelocity()), 1.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(pos.x/self.minStep, 1.) #AlmostEqual due to rounding error
         self.assertEqual(pos.y, 0.)
         self.assertEqual(pos.z, 0.)
 
         # Step size is increased to maxStep
-        self.assertAlmostEqual(c.getNextStep()/self.maxStep, 1.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(c.getNextStep()*c_light/self.maxStep, 1.) #AlmostEqual due to rounding error
 
     def test_NoBFieldPropagation(self):
 
@@ -184,8 +186,8 @@ class DiffusionOneDirection(unittest.TestCase):
         BField = crpropa.UniformMagneticField(ConstMagVec)
 
         precision = 1e-4
-        minStep = 1*crpropa.year
-        maxStep = 10*crpropa.kiloyear
+        minStep = 1*pc
+        maxStep = 10*kpc
         epsilon = 0.
 
         Dif = crpropa.DiffusionSDE(BField, precision, minStep, maxStep, epsilon)
@@ -197,12 +199,12 @@ class DiffusionOneDirection(unittest.TestCase):
         # check for position
         Dif.process(c)
         pos = c.current.getPosition()
-        self.assertAlmostEqual(pos.x/(crpropa.year*c.getVelocity()), 1.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(pos.x/minStep, 1.) #AlmostEqual due to rounding error
         self.assertEqual(pos.y, 0.)
         self.assertEqual(pos.z, 0.)
 
         # Step size is increased to maxStep
-        self.assertAlmostEqual(c.getNextStep()/minStep, 5.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(c.getNextStep()*c_light/minStep, 5.) #AlmostEqual due to rounding error
 
 
     def test_AdvectivePropagation(self):
@@ -232,7 +234,7 @@ class DiffusionOneDirection(unittest.TestCase):
         self.assertEqual(pos.z, 0.)
 
         # Step size is increased to maxStep
-        self.assertAlmostEqual(c.getNextStep()/minStep, 5.) #AlmostEqual due to rounding error
+        self.assertAlmostEqual(c.getNextStep()*c_light/minStep, 5.) #AlmostEqual due to rounding error
 
     msg1 = "Note that this is a statistical test. It might fail by chance with a probabilty O(0.00001)! You should rerun the test to make sure there is a bug."
 
@@ -384,8 +386,8 @@ class DiffusionOneDirection(unittest.TestCase):
         AdvField = crpropa.UniformAdvectionField(ConstAdvVec)
 
         precision = 1e-4
-        minStep = 1*crpropa.year
-        maxStep = 10*crpropa.kiloyear
+        minStep = 1*pc
+        maxStep = 10*kpc
 
         DifAdv = crpropa.DiffusionSDE(BField, AdvField, precision, minStep, maxStep, epsilon)
 
