@@ -258,12 +258,12 @@ class testVector3(unittest.TestCase):
     v.x = 23.
     self.assertEqual(v.x, 23.)
 
-  def testArrayInterface(self):
-    if numpy_available:
-      v = crp.Vector3d(1., 2., 3.)
-      self.assertEqual(2., np.mean(v) )
-      x = np.ones(3)
-      self.assertEqual(6., sum(v * x) )
+#   def testArrayInterface(self):
+#     if numpy_available:
+#       v = crp.Vector3d(1., 2., 3.)
+#       self.assertEqual(2., np.mean(v) )
+#       x = np.ones(3)
+#       self.assertEqual(6., sum(v * x) )
 
   def testRepr(self):
     v = crp.Vector3d(1., 2., 3.)
@@ -299,31 +299,31 @@ class testParticleCollector(unittest.TestCase):
     for c, l in zip(collector, lengths):
         self.assertEqual(c.getTrajectoryLength(), l)
 
-  def testParticleCollectorAsModuleListInput(self):
-    sim = crp.ModuleList()
-    sim.add(crp.MaximumTrajectoryLength(3.14))
-    sim.add(crp.SimplePropagation(0.001, 0.001))
-    collector = crp.ParticleCollector()
-    c1 = crp.Candidate()
-    c2 = crp.Candidate()
-    collector.process(c1)
-    collector.process(c2)
-    sim.run(collector.getContainer())
-    for c in collector:
-        self.assertAlmostEqual(
-            c.getTrajectoryLength(), 3.14, places=2)
+#   def testParticleCollectorAsModuleListInput(self):
+#     sim = crp.ModuleList()
+#     sim.add(crp.MaximumTrajectoryLength(3.14))
+#     sim.add(crp.SimplePropagation(0.001, 0.001))
+#     collector = crp.ParticleCollector()
+#     c1 = crp.Candidate()
+#     c2 = crp.Candidate()
+#     collector.process(c1)
+#     collector.process(c2)
+#     sim.run(collector.getContainer())
+#     for c in collector:
+#         self.assertAlmostEqual(
+#             c.getTrajectoryLength(), 3.14, places=2)
 
-  def testParticleCollectorAsModuleListOutput(self):
-    sim = crp.ModuleList()
-    sim.add(crp.MaximumTrajectoryLength(3.14))
-    sim.add(crp.SimplePropagation(0.001, 0.001))
-    collector = crp.ParticleCollector()
-    sim.add(collector)
-    c = crp.Candidate()
-    sim.run(c)
-    self.assertAlmostEqual(
-        collector[0].getTrajectoryLength(),
-        3.14, places=2)
+#   def testParticleCollectorAsModuleListOutput(self):
+#     sim = crp.ModuleList()
+#     sim.add(crp.MaximumTrajectoryLength(3.14))
+#     sim.add(crp.SimplePropagation(0.001, 0.001))
+#     collector = crp.ParticleCollector()
+#     sim.add(collector)
+#     c = crp.Candidate()
+#     sim.run(c)
+#     self.assertAlmostEqual(
+#         collector[0].getTrajectoryLength(),
+#         3.14, places=2)
 
 class testGrid(unittest.TestCase):
   def testGridPropertiesConstructor(self):

@@ -51,23 +51,24 @@ namespace crpropa {
  They can be easily customised by enabling/disabling specific columns.
  */
 class Output: public Module {
-protected:
-	double lengthScale, energyScale;
-	std::bitset<64> fields;
-
+public:
 	struct Property
 	{
 		std::string name;
 		std::string comment;
 		Variant defaultValue;
 	};
-	std::vector<Property> properties;
+protected:
+	double lengthScale, energyScale;
+	std::bitset<64> fields;
 
+	std::vector<Property> properties;
+	
 	bool oneDimensional;
 	mutable size_t count;
-
+	
 	void modify();
-
+	
 public:
 	enum OutputColumn {
 		TrajectoryLengthColumn,

@@ -6,12 +6,15 @@ data-tools/*
 data.tar.gz
 CMakeCache.txt
 
+shelter/
 CMakeFiles/
 bin/
 install/
 lib/
 share/
 doc/api/
+
+!conda-bld/build.sh
 
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
