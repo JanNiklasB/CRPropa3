@@ -16,6 +16,8 @@ doc/api/
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
 
+!conda-bld/build.sh
+
 *.png
 *.pyc
 

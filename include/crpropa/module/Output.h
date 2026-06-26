@@ -52,16 +52,18 @@ namespace crpropa {
  They can be easily customised by enabling/disabling specific columns.
  */
 class Output: public Module {
-protected:
-	double lengthScale, energyScale;
-	std::bitset<64> fields;
-
+public:
 	struct Property
 	{
 		std::string name;
 		std::string comment;
 		Variant defaultValue;
 	};
+	
+protected:
+	double lengthScale, energyScale;
+	std::bitset<64> fields;
+	
 	std::vector<Property> properties;
 
 	bool oneDimensional;
