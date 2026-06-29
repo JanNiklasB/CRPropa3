@@ -13,6 +13,7 @@ install/
 lib/
 share/
 doc/api/
+shelter/
 
 !conda-bld/build.sh
 
