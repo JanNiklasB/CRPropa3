@@ -5,11 +5,14 @@ on:
   #     - master
   #     - releases/**
   #   paths:
+  #     - ".github/workflows/create_conda_package_x64.yml"
   #     - "**.cpp"
   #     - "**.h"
   #     - "**.py"
   #     - "**.i"
   #     - "**/CMakeLists.txt"
+  #     - "!plugin-template/**"
+  #     - "!doc/**"
   release:
     types: [published]
   workflow_dispatch:
@@ -54,6 +57,7 @@ jobs:
             --user $accountName \
             --token $token \
             | tee build.log
+          if [ $(find ~/miniconda3/conda-bld/linux-aarch64 -name crpropa* -print -quit) ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
@@ -84,12 +88,13 @@ jobs:
           set -ex
           conda init &> /dev/null
           cd conda-bld
-          conda config --set anaconda_upload yes 
+          conda config --set anaconda_upload yes
           export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \
             | tee build.log
+          if [ $(find /usr/share/miniconda/conda-bld/linux-64 -name crpropa* -print -quit) ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
@@ -126,12 +131,13 @@ jobs:
           source ~/miniconda3/bin/activate
           set -ex
           cd conda-bld
-          conda config --set anaconda_upload yes 
+          conda config --set anaconda_upload yes
           export CRPROPA_VERSION=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]')
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \
             | tee build.log
+          if [ $(find ~/miniconda3/conda-bld/osx-arm64 -name crpropa* -print -quit) ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
