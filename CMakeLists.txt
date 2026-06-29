@@ -4,6 +4,8 @@ project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.2)  # Update for new release
 set(CRPROPA_DATAFILE_VER "2024-04-30")  # Version of data files
 
+add_definitions(-w)
+
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
