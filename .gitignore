@@ -12,6 +12,7 @@ install/
 lib/
 share/
 doc/api/
+shelter/
 
 cmake/CMakeCache.txt
 cmake/CMakeFiles/

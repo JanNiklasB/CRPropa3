@@ -2,8 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.1)  # Update for new release
-
-add_definitions(-w)
+set(CRPROPA_DATAFILE_VER "2024-04-30")  # Version of data files
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -59,7 +58,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 
-
 # ----------------------------------------------------------------------------
 # Version info from Git
 # ----------------------------------------------------------------------------
@@ -80,7 +78,9 @@ endif()
 
 message(STATUS "CRPropa version: ${GIT_DESC} ${GIT_SHA1} ${GIT_REFSPEC}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/crpropa/Version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/crpropa/Version.h" @ONLY)
 list(APPEND CRPROPA_EXTRA_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp")
+list(APPEND CRPROPA_EXTRA_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # ----------------------------------------------------------------------------
 # Dependencies
@@ -241,6 +241,17 @@ if(ENABLE_QUIMBY)
   endif(QUIMBY_FOUND)
 endif(ENABLE_QUIMBY)
 
+# SAGA (optinal for AMR grids)
+find_package(SAGA)
+if(SAGA_FOUND)
+  list(APPEND CRPROPA_EXTRA_INCLUDES ${SAGA_INCLUDE_DIR})
+  list(APPEND CRPROPA_EXTRA_LIBRARIES ${SAGA_LIBRARY})
+  add_definitions (-DCRPROPA_HAVE_SAGA)
+  list(APPEND CRPROPA_SWIG_DEFINES -DCRPROPA_HAVE_SAGA)
+  list(APPEND SWIG_INCLUDE_DIRECTORIES ${SAGA_INCLUDE_DIR}/../python)
+  list(APPEND SWIG_INCLUDE_DIRECTORIES ${SAGA_INCLUDE_DIR})
+endif(SAGA_FOUND)
+
 # muparser (optional for generic source spectra)
 find_package(muParser)
 if(MUPARSER_FOUND)
@@ -311,7 +322,6 @@ endif(APPLE)
 # Download data files (interaction data, masses, decay data ...)
 # ----------------------------------------------------------------------------
 OPTION(DOWNLOAD_DATA "Download CRPropa data files" ON)
-set(CRPROPA_DATAFILE_VER "2024-04-30")
 if(DOWNLOAD_DATA)
   message("-- Downloading data files from sciebo ~ 73 MB")
   file(DOWNLOAD
@@ -442,8 +452,6 @@ if(BUILD_DOC)
 else()
   MESSAGE(STATUS "Build of documentation disabeled. Enable with BUILD_DOC=On")
 endif(BUILD_DOC)
-
-
 
 # ----------------------------------------------------------------------------
 # Python
@@ -583,7 +591,6 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
 
-
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
@@ -594,7 +601,9 @@ add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
+if(DOWNLOAD_DATA)
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
+endif()
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 # ------------------------------------------------------------------
