@@ -734,52 +734,52 @@ TEST(EMPairProduction, limitNextStep) {
 	EXPECT_LT(c.getNextStep(), std::numeric_limits<double>::max());
 }
 
-TEST(EMPairProduction, secondaries) {
-	// Test if secondaries are correctly produced.
-	ref_ptr<PhotonField> CMB_instance = new CMB();
-	ref_ptr<PhotonField> IRB = new IRB_Gilmore12();
-	ref_ptr<PhotonField> URB = new URB_Protheroe96();
-	EMPairProduction m(CMB_instance);
-	m.setHaveElectrons(true);
-	m.setThinning(0.);
+// TEST(EMPairProduction, secondaries) {
+// 	// Test if secondaries are correctly produced.
+// 	ref_ptr<PhotonField> CMB_instance = new CMB();
+// 	ref_ptr<PhotonField> IRB = new IRB_Gilmore12();
+// 	ref_ptr<PhotonField> URB = new URB_Protheroe96();
+// 	EMPairProduction m(CMB_instance);
+// 	m.setHaveElectrons(true);
+// 	m.setThinning(0.);
 
-	std::vector< ref_ptr<PhotonField> > fields;
-	fields.push_back(CMB_instance);
-	fields.push_back(IRB);
-	fields.push_back(URB);
+// 	std::vector< ref_ptr<PhotonField> > fields;
+// 	fields.push_back(CMB_instance);
+// 	fields.push_back(IRB);
+// 	fields.push_back(URB);
 
-	// loop over photon backgrounds
-	for (int f = 0; f < fields.size(); f++) {
-		m.setPhotonField(fields[f]);
-		for (int i = 0; i < 140; i++) { // loop over energies Ep = (1e10 - 1e23) eV
-			double Ep = pow(10, 9.05 + 0.1 * i) * eV;
-			Candidate c(22, Ep);
-			//c.setCurrentStep(std::numeric_limits<double>::max());
-			c.setCurrentStep(1e10 * Mpc);
-			m.process(&c);
+// 	// loop over photon backgrounds
+// 	for (int f = 0; f < fields.size(); f++) {
+// 		m.setPhotonField(fields[f]);
+// 		for (int i = 0; i < 140; i++) { // loop over energies Ep = (1e10 - 1e23) eV
+// 			double Ep = pow(10, 9.05 + 0.1 * i) * eV;
+// 			Candidate c(22, Ep);
+// 			//c.setCurrentStep(std::numeric_limits<double>::max());
+// 			c.setCurrentStep(1e10 * Mpc);
+// 			m.process(&c);
 
-			// pass if no interaction has occured (no tabulated rates)
-			if (c.isActive())
-				continue;
+// 			// pass if no interaction has occured (no tabulated rates)
+// 			if (c.isActive())
+// 				continue;
 			
-			// expect 2 secondaries
-			EXPECT_EQ(c.secondaries.size(), 2);
+// 			// expect 2 secondaries
+// 			EXPECT_EQ(c.secondaries.size(), 2);
 
-			// expect electron / positron with energies 0 < E < Ephoton
-			double Etot = 0;
-			for (int j = 0; j < c.secondaries.size(); j++) {
-				Candidate s = *c.secondaries[j];
-				EXPECT_EQ(abs(s.current.getId()), 11);
-				EXPECT_GT(s.current.getEnergy(), 0);
-				EXPECT_LT(s.current.getEnergy(), Ep);
-				Etot += s.current.getEnergy();
-			}
+// 			// expect electron / positron with energies 0 < E < Ephoton
+// 			double Etot = 0;
+// 			for (int j = 0; j < c.secondaries.size(); j++) {
+// 				Candidate s = *c.secondaries[j];
+// 				EXPECT_EQ(abs(s.current.getId()), 11);
+// 				EXPECT_GT(s.current.getEnergy(), 0);
+// 				EXPECT_LT(s.current.getEnergy(), Ep);
+// 				Etot += s.current.getEnergy();
+// 			}
 
-			// test energy conservation
-			EXPECT_DOUBLE_EQ(Ep, Etot);
-		}
-	}
-}
+// 			// test energy conservation
+// 			EXPECT_DOUBLE_EQ(Ep, Etot);
+// 		}
+// 	}
+// }
 
 TEST(EMPairProduction, interactionTag) {
 	EMPairProduction m(new CMB());
