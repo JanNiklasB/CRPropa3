@@ -19,7 +19,6 @@ except Exception as e:
 import numpy as np
 
 
-
 class testCrossLanguagePolymorphism(unittest.TestCase):
 	def test_module(self):
 		class CountingModule(crp.Module):
@@ -167,15 +166,16 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
 		self.assertEqual(HIIDensity, massDensity.getHIIDensity(pos))
 		self.assertEqual(H2Density, massDensity.getH2Density(pos))
 
-	def testCustomPhotonField(self):
+	def testCustomPositionDependendPhotonField(self):
 		class CustomPhotonField(crp.PhotonField):
 			def __init__(self, density):
 				crp.PhotonField.__init__(self)
 				self.density = density
 				self.fieldName = 'testCustomPhotonField'
 				self.isRedshiftDependent = True
+				self.isPositionDependent = False
 				
-			def getPhotonDensity(self, energy, z):
+			def getPhotonDensity(self, energy, z, pos):
 				return self.density
 
 			def getFieldName(self):
@@ -184,15 +184,18 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
 			def hasRedshiftDependence(self):
 				return self.isRedshiftDependent
 
+			def hasPositionDependence(self):
+				return self.isPositionDependent
+
 		photonDensity = 10
 		photonField = CustomPhotonField(photonDensity)
 		energy = 10*crp.GeV
 		z = 0
-		self.assertEqual(photonDensity, photonField.getPhotonDensity(energy, z))
+		self.assertEqual(photonDensity, photonField.getPhotonDensity(energy, z, 0))
 		self.assertEqual('testCustomPhotonField', photonField.getFieldName())
 		self.assertEqual(True, photonField.hasRedshiftDependence())
-
-
+		self.assertEqual(False, photonField.hasPositionDependence())
+		
 	def testCustomPhotonField(self):
 		class CustomPhotonField(crp.PhotonField):
 			def __init__(self, val):
@@ -202,7 +205,7 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
 			def getFieldName(self):
 				return 'CMB'
 
-			def getPhotonDensity(self, ePhoton, z):
+			def getPhotonDensity(self, ePhoton, z, pos):
 				return self.val
 				
 		constDensity = 1
@@ -251,8 +254,8 @@ class testKeywordArguments(unittest.TestCase):
 	def testDisablingOfKwargs(self):
 		with self.assertRaises(Exception, msg="This is likely due to a swig bug. Please try to disable the builtin option by compiling crpropa with cmake .. -DENABLE_SWIG_BUILTIN=OFF"):
 			p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
-	# swig currently does not support kwargs in overloaded functions - we should
-	# thus disable them.
+	# # swig currently does not support kwargs in overloaded functions - we should
+	# # thus disable them.
 	# def testKeywordArgument(self):
 	# 	p = crp.PhotoDisintegration(photonField=crp.IRB_Dominguez11)
 	# 	self.assertTrue('IRB_Dominguez11' in p.getDescription())
@@ -267,13 +270,13 @@ class testVector3(unittest.TestCase):
 		v.x = 23.
 		self.assertEqual(v.x, 23.)
 
-	# # this test fails in some systems
-	# def testArrayInterface(self):
-	# 	# this test fails for some combinations of Python version and system
-	# 	v = crp.Vector3d(1., 2., 3.)
-	# 	self.assertEqual(2., np.mean(v) )
-	# 	x = np.ones(3)
-	# 	self.assertEqual(6., sum(v * x) )
+	# # this test fails currently with a seg fault due to how we implement the swig interface
+	# # def testArrayInterface(self):
+	# # 	this test fails for some combinations of Python version and system
+	# # 	v = crp.Vector3d(1., 2., 3.)
+	# # 	self.assertEqual(2., np.mean(v) )
+	# # 	x = np.ones(3)
+	# # 	self.assertEqual(6., sum(v * x) )
 
 	def testRepr(self):
 		v = crp.Vector3d(1., 2., 3.)
@@ -296,7 +299,7 @@ class testVector3(unittest.TestCase):
 		self.assertRaises(IndexError, v.__getitem__, 3)
 		self.assertRaises(IndexError, v.__setitem__, 3, 10)
 
-	# # This test is currently disabled because it fails on some systems.
+	# # this test fails currently with a seg fault due to how we implement the swig interface
 	# def testVector3dToArray(self): 
 	# 	v = crp.Vector3d(1., 2., 3.)
 	# 	a = np.array([v])
@@ -316,7 +319,6 @@ class testVector3(unittest.TestCase):
 	# 	self.assertEqual(a[0, 2], 3.)
 
 	def testVector3dConstructorDouble(self):
-
 		for dtype in [float, np.float32, int, np.int32]:
 			a = np.arange(3, dtype=dtype) + 1
 			v = crp.Vector3d(a)
@@ -326,9 +328,8 @@ class testVector3(unittest.TestCase):
 			self.assertEqual(v[0], 1.)
 			self.assertEqual(v[1], 2.)
 			self.assertEqual(v[2], 3.)
-		
 
-	
+
 class testParticleCollector(unittest.TestCase):
 	def testParticleCollectorIterator(self):
 		collector = crp.ParticleCollector()

@@ -95,7 +95,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 			driftStep(Pos, LinProp, h, time);
 		}
 
-		current.setPosition(Pos + LinProp + dir*h*candidate->getVelocity());
+		current.setPosition(Pos + LinProp*candidate->getVelocity() + dir*h*candidate->getVelocity());
 		candidate->setCurrentStep(h);
 		candidate->setNextStep(maxStep);
 		return;
@@ -164,7 +164,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		Vector3d LinProp(0.);
 		if (advectionField){
 			driftStep(Pos, LinProp, h, time);
-			current.setPosition(Pos + LinProp);
+			current.setPosition(Pos + LinProp*candidate->getVelocity());
 	 		candidate->setCurrentStep(h);
 	  		double newStep = 5*h;
 			newStep = clip(newStep, minStep, maxStep);
