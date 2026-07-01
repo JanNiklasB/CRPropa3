@@ -1,6 +1,6 @@
 name: create_conda_package
 on:
-  # push:
+  push:
   #   branches: 
   #     - master
   #     - releases/**
