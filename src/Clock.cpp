@@ -46,7 +46,7 @@ public:
 
 	/// Returns the time in ms since the last call to reset or since
 	/// the btClock was created.
-	double getSecond() {
+	double getTime() {
 		LARGE_INTEGER currentTime;
 		QueryPerformanceCounter(&currentTime);
 		LONGLONG elapsedTime = currentTime.QuadPart - startTime.QuadPart;

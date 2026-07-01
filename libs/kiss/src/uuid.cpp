@@ -29,7 +29,7 @@ uuid uuid::create() {
 		rand_s(ints[3]);
 	}
 #elif _WIN32
-#error "not implemented"
+	std::cerr << "not implemented" << std::endl;
 #else
 	static std::vector<uuid> buffer;
 	if (buffer.size() == 0) {

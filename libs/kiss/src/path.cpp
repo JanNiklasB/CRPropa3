@@ -64,7 +64,7 @@ bool is_directory(const std::string &path) {
 bool list_directory(const std::string &directory,
 		std::vector<std::string> &elements) {
 #ifdef WIN32
-	WIN32_FIND_DATA findData;
+	WIN32_FIND_DATAA findData;
 	HANDLE hFind = FindFirstFileA((directory + "\\*.*").c_str(), &findData);
 	if (hFind == INVALID_HANDLE_VALUE)
 		throw std::runtime_error("Failed to get directory list");
@@ -172,7 +172,7 @@ std::string executable_path() {
         return  std::string(realPathName) + "/";
 	#else
 	char buf[PATH_MAX];
-
+	
 	#ifdef __linux__
 		size_t len = readlink("/proc/self/exe", buf, sizeof(buf)-1);
 	#elif defined(_WIN32)

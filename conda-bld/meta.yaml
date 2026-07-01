@@ -13,9 +13,12 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
-    - {{ compiler('cxx') }}
-    - {{ compiler('fortran') }}
+    - {{ compiler('c') }}  # [not Win32]
+    - {{ compiler('cxx') }}  # [not Win32]
+    - {{ compiler('fortran') }}  # [not Win32]
+    - gcc  # [Win32]
+    - gxx  # [Win32]
+    - gfortran  # [Win32]
     - git
     - cmake
     - ninja
@@ -25,7 +28,7 @@ requirements:
   host:
     # host only requirements
     - zlib
-    - gperftools
+    - gperftools  # [not Win32]
     - pybind11-stubgen
     # crpropa requirements
     - fftw

@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <iostream>
 
+#ifdef WIN32
+#include <ctime>
+#endif
+
 namespace kiss {
 
 std::ostream *Logger::stream = &std::cerr;

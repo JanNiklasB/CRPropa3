@@ -227,7 +227,56 @@ cmake --install .
 
 ### Building on Windows
 
-Currently, we do not officially support Windows, it is advised to install UbuntuWSL and install it there.
+Currently we only support installation over Conda, for a detailed guide on how to install Miniconda see their [documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html).
+Despite muparser being available for windows we can't seem to correctly link against it, so we currently do not support it in the windows version.
+In the following we are providing instructions for building CRPropa only within CMD:
+
+#### Conda
+
+First install miniconda, to do this per command line use (assuming you downloaded it in the current folder)
+
+```sh
+Miniconda3-latest-Windows-x86_64.exe /S /D=C:\Path\To\Install
+```
+
+You can directly activate miniconda with
+
+```sh
+C:\Path\To\Install\condabin\activate.bat
+```
+
+After you created your own environment with `conda create -n YourEnvName` your need to install the crpropa requirements.
+
+```sh
+conda install -c conda-forge gfortran gcc gxx ar git cmake ninja swig zlib fftw hdf5 eigen python numpy pkgconfig
+# muparser
+```
+
+#### Building
+
+To then actually build the project do (the default install location is at ` "C:\Program Files (x86)\CRPropa"`):
+
+```sh
+# clone the repository wherever you want:
+git clone https://github.com/CRPropa/CRPropa3.git
+
+# build the project, you can change any of the above mentioned cmake flags with -D
+# if you are not able to install ninja or problems arise use -G "Unix Makefiles"
+cd CRPropa3
+mkdir build && cd build
+cmake .. \
+  -DCMAKE_INSTALL_PREFIX=\path\to\your\desired\install\location \
+  -DCMAKE_AR=%CONDA_PREFIX%\Library\x86_64-w64-mingw32\bin\ar.exe \
+  -Dgtest_disable_pthreads=ON
+cmake --build . -j
+
+# optionally do the tests to check if everything was build correctly
+ctest --output-on-failure --repeat until-pass:3
+
+# finally install; sudo might be needed
+cmake --install .
+```
+
 
 ## Notes
 
