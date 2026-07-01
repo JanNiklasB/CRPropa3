@@ -182,7 +182,7 @@ if(NOT WIN32)
     set(TCMALLOC ${TCMALLOC_LIBRARY})
     list(APPEND CRPROPA_EXTRA_LIBRARIES profiler)
   endif(GOOGLE_PERFTOOLS_FOUND AND NOT NO_TCMALLOC)
-endif
+endif()
 
 # FFTW3F (optional for turbulent magnetic fields)
 find_package(FFTW3F)
