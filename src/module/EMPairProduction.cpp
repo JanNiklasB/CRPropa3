@@ -147,6 +147,10 @@ public:
 	
 };
 
+double EMPairProduction::getRate(double E, const Vector3d &position, double z) const {
+	return this->interactionRates->getProcessRate(E, position) * pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
+}
+
 void EMPairProduction::performInteraction(Candidate *candidate) const {
 	
 	// scale particle energy instead of background photon energy
@@ -231,13 +235,10 @@ void EMPairProduction::process(Candidate *candidate) const {
 	double E = candidate->current.getEnergy() * (1 + z);
 	Vector3d position = candidate->current.getPosition();
 	
-	double rate = this->interactionRates->getProcessRate(E, position);
-	
+	double rate = getRate(E, position, z);
 	if (rate < 0)
 		return;
 	
-	rate *= pow_integer<2>(1 + z) * photonField->getRedshiftScaling(z);
-
 	// run this loop at least once to limit the step size 
 	double step = candidate->getCurrentStep()*candidate->getVelocity();
 	Random &random = Random::instance();

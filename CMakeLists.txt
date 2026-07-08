@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(CRPropa Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.2.2+)  # Update for new release
+set(CRPROPA_DATAFILE_VER "2024-04-30")  # Version of data files
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -77,7 +78,9 @@ endif()
 
 message(STATUS "CRPropa version: ${GIT_DESC} ${GIT_SHA1} ${GIT_REFSPEC}")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/Version.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp" @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/include/crpropa/Version.h.in" "${CMAKE_CURRENT_BINARY_DIR}/include/crpropa/Version.h" @ONLY)
 list(APPEND CRPROPA_EXTRA_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/src/Version.cpp")
+list(APPEND CRPROPA_EXTRA_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/include")
 
 # ----------------------------------------------------------------------------
 # Dependencies
@@ -123,7 +126,7 @@ if(ENABLE_COVERAGE)
         # generate coverage data
         COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --capture --output-file ${CMAKE_CURRENT_BINARY_DIR}/coverage.info --ignore-errors negative,inconsistent,unused VERBATIM
         # clean external libs
-        COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/eigen3/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
+        COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
         # Generate html output
         COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
         COMMAND echo "Generated coverage report in coverageReport/index.html"
@@ -157,42 +160,6 @@ list(APPEND CRPROPA_EXTRA_INCLUDES libs/HepPID/include)
 add_subdirectory(libs/sophia)
 list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
 list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
-
-# Galactic magnetic lenses
-option(ENABLE_GALACTICMAGNETICLENS "Galactic Magnetic Lens" OFF)
-option(INSTALL_EIGEN "Install provided EIGEN headers" OFF)
-SET(EIGEN_PATH  "" CACHE STRING "Use EIGEN from this path instead of the version shipped with CRPropa")
-SET(WITH_GALACTIC_LENSES FALSE)
-
-if(ENABLE_GALACTICMAGNETICLENS)
-  message(DEPRECATION "Galactic magnetic lens support is deprecated and will be removed in a future release.")
-  SET(WITH_GALACTIC_LENSES TRUE)
-
-  if(EIGEN_PATH)
-    message("Using EIGEN from " ${EIGEN_PATH})
-    list(APPEND CRPROPA_EXTRA_INCLUDES ${EIGEN_PATH})
-  else(EIGEN_PATH)
-    # Eigen redux (provided)
-    message("Using provided EIGEN")
-    list(APPEND CRPROPA_EXTRA_INCLUDES libs/eigen3)
-  endif(EIGEN_PATH)
-  if(INSTALL_EIGEN)
-    install(DIRECTORY libs/eigen3/ DESTINATION include)
-  endif(INSTALL_EIGEN)
-
-  # healpix redux (provided)
-  add_subdirectory(libs/healpix_base)
-  list(APPEND CRPROPA_EXTRA_LIBRARIES healpix_base)
-  list(APPEND CRPROPA_EXTRA_INCLUDES libs/healpix_base/include)
-  install(DIRECTORY libs/healpix_base/include/ DESTINATION include FILES_MATCHING PATTERN "*.h")
-
-  list(APPEND CRPROPA_SWIG_DEFINES -DWITH_GALACTIC_LENSES)
-
-  list(APPEND CRPROPA_EXTRA_SOURCES src/magneticLens/MagneticLens.cpp)
-  list(APPEND CRPROPA_EXTRA_SOURCES src/magneticLens/ModelMatrix.cpp)
-  list(APPEND CRPROPA_EXTRA_SOURCES src/magneticLens/Pixelization.cpp)
-  list(APPEND CRPROPA_EXTRA_SOURCES src/magneticLens/ParticleMapsContainer.cpp)
-endif(ENABLE_GALACTICMAGNETICLENS)
 
 # OpenMP (optional for shared memory multiprocessing)
 option(ENABLE_OPENMP "OpenMP for multithreading" ON)
@@ -311,7 +278,6 @@ endif(APPLE)
 # Download data files (interaction data, masses, decay data ...)
 # ----------------------------------------------------------------------------
 OPTION(DOWNLOAD_DATA "Download CRPropa data files" ON)
-set(CRPROPA_DATAFILE_VER "2024-04-30")
 if(DOWNLOAD_DATA)
   message("-- Downloading data files from sciebo ~ 73 MB")
   file(DOWNLOAD
@@ -493,16 +459,8 @@ if(ENABLE_PYTHON AND Python_FOUND)
   message(STATUS "  headers: ${Python_NumPy_INCLUDE_DIRS} (version ${Python_NumPy_VERSION})")
   elseif(Python_NumPy_FOUND)
   message(STATUS "NumPy: NOT found!")
-  message(STATUS "  CRPropa might work just fine with Python, but features like Galactic lenses will not be available.")
   endif(Python_NumPy_FOUND)
   
-  # deactivate lenses if NumPy version is >= 2.0
-  if(Python_NumPy_VERSION VERSION_GREATER_EQUAL 2.0 AND WITH_GALACTIC_LENSES)
-    set(WITH_GALACTIC_LENSES FALSE CACHE BOOL "" FORCE)
-    set(ENABLE_GALACTICMAGNETICLENS OFF CACHE BOOL "" FORCE)
-    message(WARNING "NumPy version >= 2.0 detected, disabling Galactic lenses support")
-  endif()
-
   if(SWIG_VERSION VERSION_GREATER 4.0)
     # Use swig 4 builtin doxygen instead of external program
     list(APPEND CRPROPA_SWIG_DEFINES -doxygen)
@@ -598,7 +556,9 @@ add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include FILES_MATCHING PATTERN "*.h")
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
+if(DOWNLOAD_DATA)
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data/ DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/ PATTERN ".git" EXCLUDE)
+endif()
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/include/ DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
@@ -704,19 +664,8 @@ if(ENABLE_TESTING)
   target_link_libraries(testCandidateSplitting crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testCandidateSplitting testCandidateSplitting)
 
-  if(WITH_GALACTIC_LENSES)
-    add_executable(testGalacticMagneticLens test/testMagneticLens.cpp)
-    target_link_libraries(testGalacticMagneticLens crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
-    add_test(testGalacticMagneticLens testGalacticMagneticLens)
-  endif(WITH_GALACTIC_LENSES)
-
   # python tests
   if(ENABLE_PYTHON AND Python_FOUND)
-    CONFIGURE_FILE(test/testMagneticLensPythonInterface.py testMagneticLensPythonInterface.py COPYONLY)
-    if(numpyIncludePath AND WITH_GALACTIC_LENSES)
-      add_test(testMagneticLensPythonInterface ${Python_EXECUTABLE} testMagneticLensPythonInterface.py)
-    endif(numpyIncludePath AND WITH_GALACTIC_LENSES)
-
     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/test/testSimulationExecution.py ${CMAKE_CURRENT_BINARY_DIR}/testSimulationExecution.py COPYONLY)
     add_test(testSimulationExecution ${Python_EXECUTABLE} testSimulationExecution.py)
 
