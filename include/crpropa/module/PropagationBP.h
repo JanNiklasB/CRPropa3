@@ -160,7 +160,7 @@ public:
 
 	/** Propagates the particle. Is called once per iteration.
 	 * @param candidate	 The Candidate is a passive object, that holds the information about the state of the cosmic ray and the simulation itself. */
-	void process(Candidate *candidate) const;
+	virtual void process(Candidate *candidate) const;
 
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
@@ -170,7 +170,7 @@ public:
 	 * @param current current particle state
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d pos, Vector3d dir, double dt, double z, ParticleState current) const;
+	virtual Y dY(Vector3d pos, Vector3d dir, double dt, double z, ParticleState current) const;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step

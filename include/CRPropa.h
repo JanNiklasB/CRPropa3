@@ -77,6 +77,8 @@
 #include "crpropa/advectionField/AdvectionField.h"
 #include "crpropa/advectionField/TimeDependentAdvectionField.h"
 
+#include "crpropa/electricField/ElectricField.h"
+
 #include "crpropa/massDistribution/Density.h"
 #include "crpropa/massDistribution/Nakanishi.h"
 #include "crpropa/massDistribution/Cordes.h"
