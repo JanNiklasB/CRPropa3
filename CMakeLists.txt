@@ -90,8 +90,8 @@ list(APPEND CRPROPA_EXTRA_INCLUDES "${CMAKE_CURRENT_BINARY_DIR}/include")
 #     Why is it not recommended use a pre-compiled copy of Google Test?)
 option(ENABLE_TESTING "Build tests and enable test target" ON)
 if(ENABLE_TESTING)
-  include_directories(libs/gtest/include)
-  add_subdirectory(libs/gtest)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest/include)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/gtest)
   if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGTEST_USE_OWN_TR1_TUPLE=1")
   endif(APPLE)
@@ -120,7 +120,7 @@ if(ENABLE_COVERAGE)
     if(ENABLE_TESTING)
       SET(COVERAGE_LIBS "-coverage -lgcov")
       add_custom_target(coverage_clean
-        COMMAND ${LCOV_PATH} --directory . --zerocounters
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters
       )
       add_custom_target(coverage
         # generate coverage data
@@ -128,8 +128,8 @@ if(ENABLE_COVERAGE)
         # clean external libs
         COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
         # Generate html output
-        COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
-        COMMAND echo "Generated coverage report in coverageReport/index.html"
+        COMMAND ${GENHTML_PATH} -o ${CMAKE_CURRENT_BINARY_DIR}/coverageReport ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned VERBATIM
+        COMMAND echo "Generated coverage report in ${CMAKE_CURRENT_BINARY_DIR}/coverageReport/index.html"
       )
     endif(ENABLE_TESTING)
 
@@ -144,22 +144,22 @@ if(ENABLE_COVERAGE)
 endif(ENABLE_COVERAGE)
 
 # kiss (provided)
-add_subdirectory(libs/kiss)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss)
 list(APPEND CRPROPA_EXTRA_LIBRARIES kiss)
-list(APPEND CRPROPA_EXTRA_INCLUDES libs/kiss/include)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include)
 
 # nanoflann (provided)
 list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/include)
 
 # HepID (provided)
-add_subdirectory(libs/HepPID)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID)
 list(APPEND CRPROPA_EXTRA_LIBRARIES HepPID)
-list(APPEND CRPROPA_EXTRA_INCLUDES libs/HepPID/include)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include)
 
 # SOPHIA (provided)
-add_subdirectory(libs/sophia)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
-list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 
 # OpenMP (optional for shared memory multiprocessing)
 option(ENABLE_OPENMP "OpenMP for multithreading" ON)
@@ -222,7 +222,7 @@ endif(MUPARSER_FOUND)
 find_package(ZLIB)
 if(ZLIB_FOUND)
   list(APPEND CRPROPA_EXTRA_INCLUDES ${ZLIB_INCLUDE_DIRS})
-  list(APPEND CRPROPA_EXTRA_INCLUDES "libs/zstream-cpp")
+  list(APPEND CRPROPA_EXTRA_INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/libs/zstream-cpp")
   list(APPEND CRPROPA_EXTRA_LIBRARIES ${ZLIB_LIBRARIES})
   add_definitions (-DCRPROPA_HAVE_ZLIB)
   list(APPEND CRPROPA_SWIG_DEFINES -DCRPROPA_HAVE_ZLIB)
@@ -282,31 +282,34 @@ if(DOWNLOAD_DATA)
   message("-- Downloading data files from sciebo ~ 73 MB")
   file(DOWNLOAD
   https://ruhr-uni-bochum.sciebo.de/public.php/webdav/data-${CRPROPA_DATAFILE_VER}.tar.gz-CHECKSUM
-    ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz-CHECKSUM
+    ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz-CHECKSUM
     USERPWD "3juW9sntQX2IWBS")
-  file(STRINGS ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz-CHECKSUM DATA_CHECKSUM LIMIT_COUNT 1 LENGTH_MINIMUM 32 LENGTH_MAXIMUM 32)
+  file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz-CHECKSUM DATA_CHECKSUM LIMIT_COUNT 1 LENGTH_MINIMUM 32 LENGTH_MAXIMUM 32)
   file(DOWNLOAD
   https://ruhr-uni-bochum.sciebo.de/public.php/webdav/data-${CRPROPA_DATAFILE_VER}.tar.gz
-    ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
+    ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
     USERPWD "3juW9sntQX2IWBS"
     EXPECTED_MD5 "${DATA_CHECKSUM}")
-  message("-- Extracting data file")
 else()
   message("-- Downloading of data file disabled")
 endif(DOWNLOAD_DATA)
-if(EXISTS ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/data ${CMAKE_BINARY_DIR}/data/ WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz)
+  message("-- Extracting data file")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory data-${CRPROPA_DATAFILE_VER}/data data/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 else()
-  message(WARNING "CRPropa data file not found at ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
+  message(WARNING "CRPropa data file not found at ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
 CRPropa should compile, but will likely not work properly! Please install data file manually, or use the automatic download which is enabled by default.")
 endif()
 
 # ----------------------------------------------------------------------------
 # Library and Binary
 # ----------------------------------------------------------------------------
-file(GLOB_RECURSE CRPROPA_INCLUDES RELATIVE ${CMAKE_SOURCE_DIR} include/*.h)
+file(GLOB_RECURSE CRPROPA_INCLUDES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/*.h)
+# set CRPROPA_EXTRA_INCLUDES as cache variable to hand it over when used as subproject
+set(CRPROPA_EXTRA_INCLUDES "${CRPROPA_EXTRA_INCLUDES}" CACHE STRING "The include paths of the extra libraries that are needed." FORCE)
+mark_as_advanced(CRPROPA_EXTRA_INCLUDES)
 include_directories(include ${CRPROPA_EXTRA_INCLUDES})
 
 add_library(crpropa SHARED
@@ -399,7 +402,7 @@ if(BUILD_DOC)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/DoxygenLayout.xml ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml COPYONLY)
     add_custom_target(doxy ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 
-    set_source_files_properties(${CMAKE_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
     add_custom_target(docstrings_from_doxy
       COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libs/doxy2swig/doxy2swig.py ${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml -o ${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i
       DEPENDS doxy
@@ -466,9 +469,9 @@ if(ENABLE_PYTHON AND Python_FOUND)
     list(APPEND CRPROPA_SWIG_DEFINES -doxygen)
   else()
     if(BUILD_DOC AND DOXYGEN_FOUND)
-      LIST(APPEND CRPROPA_SWIG_INPUTS ${CMAKE_BINARY_DIR}/docstrings_from_doxy.i)
+      LIST(APPEND CRPROPA_SWIG_INPUTS ${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i)
       list(APPEND CRPROPA_SWIG_DEFINES -DWITH_DOXYGEN)
-      list(APPEND SWIG_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR})
+      list(APPEND SWIG_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR})
     endif(BUILD_DOC AND DOXYGEN_FOUND)
   endif(SWIG_VERSION VERSION_GREATER 4.0)
 
@@ -535,7 +538,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
   install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/crpropa.py" DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
   install(TARGETS crpropa-swig LIBRARY DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
-  install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
+  install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/swig_interface)
 
   find_program(PYBIND11_STUBGEN_EXECUTABLE NAMES "pybind11-stubgen")
 	if(PYBIND11_STUBGEN_EXECUTABLE)
@@ -586,7 +589,7 @@ if(BUILD_DOC AND DOXYGEN_FOUND AND SPHINX_EXECUTABLE)
   set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/doc)
   add_custom_target(doc
                     ${SPHINX_EXECUTABLE} -b html
-                    -Dbreathe_projects.CRPropa3=${CMAKE_CURRENT_BINARY_DIR}/xml
+                    -Dbreathe_projects.CRPropa3=xml
                     ${SPHINX_SOURCE} ${SPHINX_BUILD}
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     COMMENT "Generating documentation with Sphinx")
@@ -604,63 +607,59 @@ if(ENABLE_TESTING)
   target_link_libraries(testCore crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testCore testCore)
 
-  add_executable(testVector3 test/testVector3.cpp)
+  add_executable(testVector3 ${CMAKE_CURRENT_SOURCE_DIR}/test/testVector3.cpp)
   target_link_libraries(testVector3 crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testVector3 testVector3)
 
-  add_executable(testModuleList test/testModuleList.cpp)
+  add_executable(testModuleList ${CMAKE_CURRENT_SOURCE_DIR}/test/testModuleList.cpp)
   target_link_libraries(testModuleList crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testModuleList testModuleList)
 
-  add_executable(testMagneticField test/testMagneticField.cpp)
+  add_executable(testMagneticField ${CMAKE_CURRENT_SOURCE_DIR}/test/testMagneticField.cpp)
   target_link_libraries(testMagneticField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testMagneticField testMagneticField)
 
-  add_executable(testElectricField test/testElectricField.cpp)
-  target_link_libraries(testElectricField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
-  add_test(testElectricField testElectricField)
-
-  add_executable(testTurbulentField test/testTurbulentField.cpp)
+  add_executable(testTurbulentField ${CMAKE_CURRENT_SOURCE_DIR}/test/testTurbulentField.cpp)
   target_link_libraries(testTurbulentField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testTurbulentField testTurbulentField)
 
-  add_executable(testAdvectionField test/testAdvectionField.cpp)
+  add_executable(testAdvectionField ${CMAKE_CURRENT_SOURCE_DIR}/test/testAdvectionField.cpp)
   target_link_libraries(testAdvectionField crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testAdvectionField testAdvectionField)
 
-  add_executable(testDensity test/testDensity.cpp)
+  add_executable(testDensity ${CMAKE_CURRENT_SOURCE_DIR}/test/testDensity.cpp)
   target_link_libraries(testDensity crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testDensity testDensity)
 
-  add_executable(testPropagation test/testPropagation.cpp)
+  add_executable(testPropagation ${CMAKE_CURRENT_SOURCE_DIR}/test/testPropagation.cpp)
   target_link_libraries(testPropagation crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testPropagation testPropagation)
 
-  add_executable(testBreakCondition test/testBreakCondition.cpp)
+  add_executable(testBreakCondition ${CMAKE_CURRENT_SOURCE_DIR}/test/testBreakCondition.cpp)
   target_link_libraries(testBreakCondition crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testBreakCondition testBreakCondition)
 
-  add_executable(testInteraction test/testInteraction.cpp)
+  add_executable(testInteraction ${CMAKE_CURRENT_SOURCE_DIR}/test/testInteraction.cpp)
   target_link_libraries(testInteraction crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testInteraction testInteraction)
 
-  add_executable(testSource test/testSource.cpp)
+  add_executable(testSource ${CMAKE_CURRENT_SOURCE_DIR}/test/testSource.cpp)
   target_link_libraries(testSource crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testSource testSource)
 
-  add_executable(testOutput test/testOutput.cpp)
+  add_executable(testOutput ${CMAKE_CURRENT_SOURCE_DIR}/test/testOutput.cpp)
   target_link_libraries(testOutput crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testOutput testOutput)
 
-  add_executable(testFunctionalGroups test/testFunctionalGroups.cpp)
+  add_executable(testFunctionalGroups ${CMAKE_CURRENT_SOURCE_DIR}/test/testFunctionalGroups.cpp)
   target_link_libraries(testFunctionalGroups crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testFunctionalGroups testFunctionalGroups)
 
-  add_executable(testAdiabaticCooling test/testAdiabaticCooling.cpp)
+  add_executable(testAdiabaticCooling ${CMAKE_CURRENT_SOURCE_DIR}/test/testAdiabaticCooling.cpp)
   target_link_libraries(testAdiabaticCooling crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testAdiabaticCooling testAdiabaticCooling)
 
-  add_executable(testCandidateSplitting test/testCandidateSplitting.cpp)
+  add_executable(testCandidateSplitting ${CMAKE_CURRENT_SOURCE_DIR}/test/testCandidateSplitting.cpp)
   target_link_libraries(testCandidateSplitting crpropa gtest gtest_main pthread ${COVERAGE_LIBS})
   add_test(testCandidateSplitting testCandidateSplitting)
 
