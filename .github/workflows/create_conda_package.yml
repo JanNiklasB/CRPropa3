@@ -2,7 +2,7 @@ name: create_conda_package
 on:
   push:
     branches: 
-      - master
+      - XPointCRPropaAdjustments
       - releases/**
     paths:
       - ".github/workflows/create_conda_package.yml"
@@ -21,7 +21,7 @@ on:
 
 jobs:
   arm:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout repository
@@ -43,8 +43,8 @@ jobs:
           conda install conda-build anaconda-client -y &> /dev/null
       - name: Build Conda Package
         env:
-          accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
-          token: ${{ secrets.ANACONDA_TOKEN }}
+          accountName: ${{ secrets.ANACONDA_JNB_ACCOUNTNAME }}
+          token: ${{ secrets.ANACONDA_JNB_TOKEN }}
           FAST_WAVES: "OFF"
           SIMD_EXTENSIONS: "none"
         run: |
@@ -54,6 +54,7 @@ jobs:
           cd conda-bld
           conda config --set anaconda_upload yes
           export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
+          if [ ${CRPROPA_VERSION} = "xpointcrpropaadjustments" ]; then export CRPROPA_VERSION=master; fi
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \
@@ -81,8 +82,8 @@ jobs:
           conda install conda-build anaconda-client -y &> /dev/null
       - name: Build Conda Package
         env:
-          accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
-          token: ${{ secrets.ANACONDA_TOKEN }}
+          accountName: ${{ secrets.ANACONDA_JNB_ACCOUNTNAME }}
+          token: ${{ secrets.ANACONDA_JNB_TOKEN }}
           FAST_WAVES: "ON"
           SIMD_EXTENSIONS: "avx+fma"
         run: |
@@ -124,8 +125,8 @@ jobs:
           conda install -c conda-forge conda-build anaconda-client -y &> /dev/null
       - name: Build Conda Package
         env:
-          accountName: ${{ secrets.ANACONDA_ACCOUNTNAME }}
-          token: ${{ secrets.ANACONDA_TOKEN }}
+          accountName: ${{ secrets.ANACONDA_JNB_ACCOUNTNAME }}
+          token: ${{ secrets.ANACONDA_JNB_TOKEN }}
           FAST_WAVES: "OFF"
           SIMD_EXTENSIONS: "none"
         run: |

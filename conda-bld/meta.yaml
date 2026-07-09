@@ -1,5 +1,5 @@
 package:
-  name: crpropa
+  name: xpoint-crpropa
   version: {{ environ.get('CRPROPA_VERSION', 'master') }}
 
 source:
