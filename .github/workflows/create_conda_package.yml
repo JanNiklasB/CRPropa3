@@ -59,7 +59,7 @@ jobs:
             --user $accountName \
             --token $token \
             | tee build.log
-          if [ $(find ~/miniconda3/conda-bld/linux-aarch64 -name "crpropa*" | wc -l) = 5 ]; then echo Success! ; else exit 1; fi
+          if [ $(find ~/miniconda3/conda-bld/linux-aarch64 -name "xpoint-crpropa*" | wc -l) = 5 ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
@@ -68,7 +68,7 @@ jobs:
           path: conda-bld/build.log
 
   x64:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -96,7 +96,7 @@ jobs:
             --user $accountName \
             --token $token \
             | tee build.log
-          if [ $(find /usr/share/miniconda/conda-bld/linux-64 -name "crpropa*" | wc -l) = 5 ]; then echo Success! ; else exit 1; fi
+          if [ $(find /usr/share/miniconda/conda-bld/linux-64 -name "xpoint-crpropa*" | wc -l) = 5 ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
@@ -105,7 +105,7 @@ jobs:
           path: conda-bld/build.log
 
   macos:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: macos-14
     steps:
       - name: Checkout repository
@@ -139,7 +139,7 @@ jobs:
             --user $accountName \
             --token $token \
             | tee build.log
-          if [ $(find ~/miniconda3/conda-bld/osx-arm64 -name "crpropa*" | wc -l ) = 5 ]; then echo Success! ; else exit 1; fi
+          if [ $(find ~/miniconda3/conda-bld/osx-arm64 -name "xpoint-crpropa*" | wc -l ) = 5 ]; then echo Success! ; else exit 1; fi
       - name: Archive Build Logs
         if: always()
         uses: actions/upload-artifact@v7
