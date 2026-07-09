@@ -92,6 +92,7 @@ jobs:
           cd conda-bld
           conda config --set anaconda_upload yes
           export CRPROPA_VERSION=${GITHUB_REF_NAME,,}
+          if [ ${CRPROPA_VERSION} = "xpointcrpropaadjustments" ]; then export CRPROPA_VERSION=master; fi
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \
@@ -135,6 +136,7 @@ jobs:
           cd conda-bld
           conda config --set anaconda_upload yes
           export CRPROPA_VERSION=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]')
+          if [ ${CRPROPA_VERSION} = "xpointcrpropaadjustments" ]; then export CRPROPA_VERSION=master; fi
           conda build -m conda_build_config.yaml -c conda-forge . -k \
             --user $accountName \
             --token $token \
