@@ -1,4 +1,4 @@
-## CRPropa vNext
+## CRPropa 3.3
 
 ### Bug fixes:
 * Fixed the secondariesFirst parameter not actually allowing secondary particles to be propagated before the primary 
