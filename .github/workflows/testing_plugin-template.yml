@@ -80,7 +80,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: "3.3"
+          ref: "3.2.2"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
@@ -192,7 +192,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: "3.3"
+          ref: "3.2.2"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
@@ -319,7 +319,7 @@ jobs:
       - name: Checkout repository 
         uses: actions/checkout@v6
         with:
-          ref: "3.3"
+          ref: "3.2.2"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall 
         run: | 
