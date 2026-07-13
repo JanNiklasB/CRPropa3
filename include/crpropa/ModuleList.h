@@ -93,7 +93,7 @@ public:
 	void run(ref_ptr<candidate_vector_t> candidates, bool recursive = true, bool secondariesFirst = false, bool waitForSecondaries = true);
 	/** Run function
 	 * This function generates count Candidates over the given source.
-	 * Each generated Candidate is then handed over to ModuleList::run(Candidate*)
+	 * Each generated Candidate is then handed over to ModuleList::run(ref_ptr<Candidate>)
 	 * where it is simulated.
 	 * If OpenMP parallelization is activated (default) the count primary Candidates are
 	 * generated and simulated in parallel. 

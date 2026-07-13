@@ -66,7 +66,7 @@ ctest --output-on-failure --repeat until-pass:3
 
 # Compability with older CRPropa versions
 
-To ensure compability with older versions you mostly need to watch out to use the correct override of `Module::process`, so either `Module:process(Candidate*)` for versions older then 3.3 or `Module:process(ref_ptr<Candidate>)` for versions newer then 3.3 .
+To ensure compability with older versions you mostly need to watch out to use the correct override of `Module::process`, so either `Module:process(Candidate*)` for versions older then 3.3.1 or `Module:process(ref_ptr<Candidate>)` for versions newer then 3.3.1 .
 To achieve this you can use pre compile statements:
 
 example.h:
@@ -82,7 +82,7 @@ namespace example {
 
 class Example : public crpropa::Module {
     public:
-        #if CRPROPA_VERSION<=3003000
+        #if CRPROPA_VERSION<3003001
             void process(crpropa::Candidate* candidate) const override;
         #else
             void process(crpropa::ref_ptr<crpropa::Candidate> candidate) const override;
@@ -102,10 +102,10 @@ using namespace crpropa;
 
 namespace example {
 
-#if CRPROPA_VERSION<=3003000
-void Example::process(Candidate* cand) const {
+#if CRPROPA_VERSION<3003001
+void Example::process(Candidate* candidate) const {
 #else
-void Example::process(ref_ptr<Candidate> cand) const {
+void Example::process(ref_ptr<Candidate> candidate) const {
 #endif
     // do stuff here
 }  // end process function
@@ -118,4 +118,37 @@ in `crpropa/Version.h`. It has the following scheme:
 
 ```cpp
 1000000*MajorVersion + 1000*MinorVersion + PatchVersion
+```
+
+## TLDR
+
+1. Add `#include <crpropa/Version.h>` to your header includes.
+2. Replace your process functions of the form
+
+#### Header
+```cpp
+void process(Candidate* candidate) const;
+```
+#### Source
+```cpp
+void ClassName::process(Candidate* candidate) const {
+```
+
+with the following:
+
+#### Header
+```cpp
+#if CRPROPA_VERSION<3003001
+    void process(crpropa::Candidate* candidate) const override;
+#else
+    void process(crpropa::ref_ptr<crpropa::Candidate> candidate) const override;
+#endif
+```
+#### Source
+```cpp
+#if CRPROPA_VERSION<3003001
+void ClassName::process(Candidate* candidate) const {
+#else
+void ClassName::process(ref_ptr<Candidate> candidate) const {
+#endif
 ```

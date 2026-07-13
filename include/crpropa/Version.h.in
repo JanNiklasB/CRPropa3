@@ -3,12 +3,11 @@
 
 #include <string>
 
-#define CRPROPA_VERSION @CRPROPA_NEXT_VERSION@
-
 extern const char g_GIT_SHA1[];
 extern const char g_GIT_REFSPEC[];
 extern const char g_GIT_DESC[];
 
+#define CRPROPA_VERSION @CRPROPA_VERSION_TAG@
 #define CRPROPA_DATA_VERSION "@CRPROPA_DATAFILE_VER@"
 
 /**

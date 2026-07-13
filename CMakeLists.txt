@@ -1,10 +1,17 @@
 cmake_minimum_required(VERSION 3.14)
 
-project(CRPropa Fortran C CXX)
+project(CRPropa VERSION 3.3.0 LANGUAGES Fortran C CXX)
 set(CRPROPA_RELEASE_VERSION 3.3.0+)  # Update for new release
 set(CRPROPA_DATAFILE_VER "2026-07-08")  # Version of data files
-# Format: 1000000*MajorVersion + 1000*MinorVersion + PatchVersion
-set(CRPROPA_NEXT_VERSION 3003000)  # Update for new release
+
+# calculate the version tag for easy in code version check
+math(EXPR CRPROPA_VERSION_TAG "
+  ${CRPropa_VERSION_MAJOR}*1000000 + ${CRPropa_VERSION_MINOR}*1000 + ${CRPropa_VERSION_PATCH}
+")
+# if pre release version add one to CRPROPA_VERSION_TAG
+if(${CRPROPA_RELEASE_VERSION} MATCHES "[\+]$")
+  math(EXPR CRPROPA_VERSION_TAG "${CRPROPA_VERSION_TAG} + 1")
+endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
