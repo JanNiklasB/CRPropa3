@@ -112,6 +112,7 @@ jobs:
           cd plugin-template
           mkdir build
           cd build
+          python ../python/findCRPropa.py
           cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" -DUSE_OWN_CRPROPA=Off
       - name: Build Plugin
         run: |
@@ -336,6 +337,7 @@ jobs:
           FC: ${{ matrix.config.fc }}
           CRPROPA_DATA_PATH: "/Users/runner/work/CRPropa3/CRPropa3/build/data"
         run: |
+          source $GITHUB_WORKSPACE/venv/bin/activate
           mkdir build
           cd build
           cmake .. \
@@ -354,6 +356,7 @@ jobs:
           FC: ${{ matrix.config.fc }}
           CRPROPA_DATA_PATH: "/Users/runner/work/CRPropa3/CRPropa3/build/data"
         run: |
+          source $GITHUB_WORKSPACE/venv/bin/activate
           cd plugin-template
           mkdir build
           cd build
@@ -364,14 +367,16 @@ jobs:
             -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \
             -DUSE_OWN_CRPROPA=Off
 
-      - name: Build CRPropa
+      - name: Build Plugin
         run: |
+          source $GITHUB_WORKSPACE/venv/bin/activate
           cd plugin-template/build
           make
       - name: Run tests
         env:
           CRPROPA_DATA_PATH: "/Users/runner/work/CRPropa3/CRPropa3/plugin-template/build/data"
         run: |
+          source $GITHUB_WORKSPACE/venv/bin/activate
           cd plugin-template/build
           ctest --output-on-failure --repeat until-pass:3
       - name: Archive test results
