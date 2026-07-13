@@ -84,7 +84,10 @@ jobs:
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          sudo apt-get install libmuparser-dev python3-venv python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install numpy
       - name: Install CRPropa
         env:
@@ -94,7 +97,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
+          cmake .. -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
           make
           make install
       - name: Configure Plugin
@@ -188,7 +191,10 @@ jobs:
       - name: Preinstall
         run: |
           sudo apt-get update
-          sudo apt-get install libmuparser-dev python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          sudo apt-get install libmuparser-dev python3-venv python-dev-is-python3 libhdf5-serial-dev libomp5 libomp-dev libfftw3-dev libcfitsio-dev lcov
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install numpy
           pip show numpy
       - name: Install CRPropa
@@ -199,7 +205,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
+          cmake .. -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
           make
           make install
       - name: Configure Plugin
