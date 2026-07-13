@@ -6,10 +6,12 @@ import sys
 
 try:
 	import crpropa
-except ImportError:
+except ImportError as e:
+	sys.stderr.write("Could not import crpropa!\n")
 	sys.exit(-1)
 
 if len(sys.argv) < 2:
+	sys.stderr.write("No argument was given, either use 'swig_interface' or 'install_prefix'.\n")
 	sys.exit(-1)
 
 if sys.argv[1] == 'swig_interface':
@@ -17,4 +19,5 @@ if sys.argv[1] == 'swig_interface':
 elif sys.argv[1] == 'install_prefix':
 	sys.stdout.write(crpropa.getInstallPrefix())
 else:
+	sys.stderr.write("No known argument, either use 'swig_interface' or 'install_prefix'.\n")
 	sys.exit(-1)
