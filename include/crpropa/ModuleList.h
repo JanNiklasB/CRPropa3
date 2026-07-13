@@ -75,31 +75,37 @@ public:
 	 * @param recursive  Whether to also process possible created secondaries
 	 * @param secondariesFirst  Whether to process the secondaries directly after the
 	 * step where they are created or to only process them after the primary is fully finished
+	 * @param waitForSecondaries  Whether to wait for the secondaries to be fully processed 
+	 * before continuing with the primary candidate if secondariesFirst is set to true
 	 */
-	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = false);
+	void run(ref_ptr<Candidate> candidate, bool recursive = true, bool secondariesFirst = true, bool waitForSecondaries = true);
 	/** Run function
 	 * This function calls the run function for a single Candidate on each entry of the given candidate_vector.
 	 * If OpenMP parallelization is activated (default) the execution of the run function for each member
-	 * of candidate_vector is parallelized. However, the secondaries are still processed in order.
+	 * of candidate_vector is parallelized. 
 	 * @param candidates  Candidate vector
 	 * @param recursive  Whether to also process possible created secondaries
 	 * @param secondariesFirst  Whether to process the secondaries directly after the
 	 * step where they are created or to only process them after the primary is fully finished
+	 * @param waitForSecondaries  Whether to wait for the secondaries to be fully processed 
+	 * before continuing with the primary candidate if secondariesFirst is set to true
 	 */
-	void run(ref_ptr<candidate_vector_t> candidates, bool recursive = true, bool secondariesFirst = false);
+	void run(ref_ptr<candidate_vector_t> candidates, bool recursive = true, bool secondariesFirst = false, bool waitForSecondaries = true);
 	/** Run function
 	 * This function generates count Candidates over the given source.
 	 * Each generated Candidate is then handed over to ModuleList::run(Candidate*)
 	 * where it is simulated.
 	 * If OpenMP parallelization is activated (default) the count primary Candidates are
-	 * generated and simulated in parallel. However, the secondaries are still processed in order.
+	 * generated and simulated in parallel. 
 	 * @param source  The source to generate Candidates from
 	 * @param count  The number of Candidates to simulate
 	 * @param recursive  Whether to also process possible created secondaries
 	 * @param secondariesFirst  Whether to process the secondaries directly after the
 	 * step where they are created or to only process them after the primary is fully finished
+	 * @param waitForSecondaries  Whether to wait for the secondaries to be fully processed 
+	 * before continuing with the primary candidate if secondariesFirst is set to true
 	 */
-	void run(ref_ptr<SourceInterface> source, size_t count, bool recursive = true, bool secondariesFirst = false);
+	void run(ref_ptr<SourceInterface> source, size_t count, bool recursive = true, bool secondariesFirst = false, bool waitForSecondaries = true);
 
 	/// @return Returns the description string for all modules
 	std::string getDescription() const;

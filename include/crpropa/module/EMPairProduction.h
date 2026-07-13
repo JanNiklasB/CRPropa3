@@ -44,7 +44,7 @@ public:
 	 @param haveElectrons	if true, add secondary electrons as candidates
 	 @param thinning		weighted sampling of secondaries (0: all particles are tracked; 1: maximum thinning)
 	 @param limit			step size limit as fraction of mean free path
-	 @param surface    suface to enclose the grid nodes to be loaded
+	 @param surface  		Grid will be confined to `surface->distance(pos)<0`, so for example inside a closed surface
 	 */
 	EMPairProduction(ref_ptr<PhotonField> photonField, bool haveElectrons = false, double thinning = 0, double limit = 0.1, ref_ptr<Surface> surface = nullptr);
 
@@ -64,8 +64,10 @@ public:
 	 */
 	void setThinning(double thinning);
 
-	/** Apply a surface that confine the position dependent photon field
-	 * @param surface closed surface to confine the grid to be  uploaded */
+	/** Apply a surface that confine the position dependent photon field region.
+	 * The rates are initialized only for distances smaller then 0, so `surface->distance(pos)<0`
+	 * @param surface Grid will be confined to `surface->distance(pos)<0`, so for example inside a closed surface
+	 */
 	void setSurface(ref_ptr<Surface> surface);
 	ref_ptr<Surface> getSurface() const;
 		
@@ -95,6 +97,16 @@ public:
 	 * @param path The name of the file/folder containing the interaction rates
 	 */
 	void initCumulativeRate(std::string path);
+
+	/**
+	 * Get the interaction rate for a given energy, position, and redshift.
+	 * For now, this function uses a redshift scaling factor for the interaction rate.
+	 * Future releases will include a more accurate treatment of the redshift evolution of the photon field.
+	 * @param E Energy of the primary particle
+	 * @param position Position of the primary particle
+	 * @param z Redshift of the primary particle
+	 */
+	double getRate(double E, const Vector3d &position = Vector3d(0.), double z = 0) const;
 		
 	void performInteraction(ref_ptr<Candidate> candidate) const;
 	void process(ref_ptr<Candidate> candidate) const;

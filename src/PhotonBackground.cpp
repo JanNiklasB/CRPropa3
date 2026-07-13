@@ -200,7 +200,7 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, ref_
 		throw std::runtime_error("Could not find any files in " + dirE + "!\n");
 	
 	for (auto const& dir_entry : dirsE) {
-		std::vector<double> vE = readPhotonEnergy(dir_entry);
+		std::vector<double> vE = readPhotonEnergy(concat_path(dirE, dir_entry));
 		
 		this->photonEnergies = vE;
 		break;
@@ -244,13 +244,14 @@ TabularSpatialPhotonField::TabularSpatialPhotonField(std::string fieldName, ref_
 		
 		Vector3d vPos(x, y, z);
 		
-		if (getSurface() and !getSurface()->isInside(vPos))
+		// Continue when not "inside" surface
+		if (getSurface() && getSurface()->distance(vPos)>=0)
 			continue;
 		
 		photonDict[iFile] = vPos;
 		iFile = iFile + 1;
 		
-		std::vector<double> vD = readPhotonDensity(dir_entry);
+		std::vector<double> vD = readPhotonDensity(concat_path(dirD, dir_entry));
 		this->photonDensity.push_back(vD);
 	}
 	
