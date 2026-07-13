@@ -112,8 +112,7 @@ jobs:
           cd plugin-template
           mkdir build
           cd build
-          python -c "import crpropa"
-          cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" -DUSE_OWN_CRPROPA=Off
+          cmake .. -DCRPropa_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" -DUSE_OWN_CRPROPA=Off
       - name: Build Plugin
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
@@ -213,7 +212,7 @@ jobs:
           source $GITHUB_WORKSPACE/venv/bin/activate
           mkdir build
           cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
+          cmake .. -DCRPropa_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none"
           make -j
           make install
       - name: Configure Plugin
@@ -362,6 +361,7 @@ jobs:
           cd build
 
           cmake .. \
+            -DCRPropa_INSTALL_PREFIX=$GITHUB_WORKSPACE/venv \
             -DENABLE_PYTHON=True \
             -DENABLE_TESTING=On \
             -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} \

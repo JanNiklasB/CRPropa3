@@ -541,7 +541,6 @@ if(ENABLE_PYTHON AND Python_FOUND)
       LINK_FLAGS "-flat_namespace -undefined suppress"
     )
   else()
-    message(${CMAKE_INSTALL_FULL_LIBDIR})
     set_target_properties(crpropa-swig PROPERTIES
       BUILD_RPATH "$<TARGET_FILE_DIR:crpropa>"
       INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}"
