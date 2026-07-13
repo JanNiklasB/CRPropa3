@@ -80,7 +80,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: "3.2.2"
+          ref: "3.3"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
@@ -109,6 +109,7 @@ jobs:
           FC: ${{ matrix.config.fc }}
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template
           mkdir build
           cd build
@@ -116,11 +117,13 @@ jobs:
       - name: Build Plugin
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template/build
           make
       - name: Run tests
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template/build
           ctest --output-on-failure --repeat until-pass:3
       - name: Archive test results
@@ -192,7 +195,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
         with:
-          ref: "3.2.2"
+          ref: "3.3"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
@@ -222,6 +225,7 @@ jobs:
           FC: ${{ matrix.config.fc }}
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template
           mkdir build
           cd build
@@ -229,11 +233,13 @@ jobs:
       - name: Build Plugin
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template/build
           make
       - name: Run tests
         run: |
           source $GITHUB_WORKSPACE/venv/bin/activate
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/venv/lib
           cd plugin-template/build
           ctest --output-on-failure --repeat until-pass:3
       - name: Archive test results
@@ -319,7 +325,7 @@ jobs:
       - name: Checkout repository 
         uses: actions/checkout@v6
         with:
-          ref: "3.2.2"
+          ref: "3.3"
           repository: "CRPropa/CRPropa3"
       - name: Preinstall 
         run: | 
