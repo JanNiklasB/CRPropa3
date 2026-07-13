@@ -113,7 +113,6 @@ jobs:
           mkdir build
           cd build
           python -c "import crpropa"
-          python ../python/findCRPropa.py
           cmake .. -DENABLE_PYTHON=True -DENABLE_TESTING=On -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" -DUSE_OWN_CRPROPA=Off
       - name: Build Plugin
         run: |
