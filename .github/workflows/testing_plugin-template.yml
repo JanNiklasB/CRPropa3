@@ -81,6 +81,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: "3.3"
+          repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
           sudo apt-get update
@@ -192,6 +193,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: "3.3"
+          repository: "CRPropa/CRPropa3"
       - name: Preinstall
         run: |
           sudo apt-get update
@@ -318,6 +320,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: "3.3"
+          repository: "CRPropa/CRPropa3"
       - name: Preinstall 
         run: | 
           brew install hdf5 fftw cfitsio muparser libomp swig 
