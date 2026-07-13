@@ -6,7 +6,7 @@ import sys
 
 try:
 	import crpropa
-except ImportError as e:
+except ImportError:
 	sys.exit(-1)
 
 if len(sys.argv) < 2:
