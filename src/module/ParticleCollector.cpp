@@ -99,9 +99,9 @@ ParticleCollector::const_iterator ParticleCollector::end() const {
 
 void ParticleCollector::getTrajectory(ref_ptr<ModuleList> mlist, std::size_t i, ref_ptr<Module> output) const {
 	ref_ptr<Candidate> c_tmp = container[i]->clone();
-	
+
 	c_tmp->restart();
-	
+
 	mlist->add(output);
 	mlist->run(c_tmp);
 	mlist->remove(mlist->size()-1);

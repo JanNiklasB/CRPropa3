@@ -76,9 +76,6 @@ public:
 	void tryStep(const Y &y, Y &out, Y &error, double t,
 			ParticleState &p, double z) const;
 
-	/** Set a specific magnetic field
-	 * @param field	 specific magnetic field 
-	 */
 	void setField(ref_ptr<MagneticField> field);
 	void setTolerance(double tolerance);
 	void setMinimumStep(double minStep);

@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <ctime>
 
-#include "H5Ipublic.h"
+#include <H5Ipublic.h>
 
 namespace crpropa {
 

@@ -121,7 +121,7 @@ public:
 
 	/** Merge other maps, add pdfs */
 	void merge(ref_ptr<const EmissionMap> other);
-	
+
 	/** Merge maps from file */
 	void merge(const std::string &filename);
 

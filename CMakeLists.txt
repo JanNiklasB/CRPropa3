@@ -134,7 +134,7 @@ if(ENABLE_COVERAGE)
     if(ENABLE_TESTING)
       set(COVERAGE_LIBS "-coverage -lgcov")
       add_custom_target(coverage_clean
-        COMMAND ${LCOV_PATH} --directory . --zerocounters
+        COMMAND ${LCOV_PATH} --directory ${CMAKE_CURRENT_BINARY_DIR} --zerocounters
       )
       add_custom_target(coverage
         # generate coverage data
@@ -142,8 +142,8 @@ if(ENABLE_COVERAGE)
         # clean external libs
         COMMAND ${LCOV_PATH} --remove ${CMAKE_CURRENT_BINARY_DIR}/coverage.info "/usr/include/*" "/usr/lib/*" "*/libs/gtest/*" "*/libs/zstream-cpp/*" "*/build/*" -o ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned --ignore-errors negative,inconsistent,unused VERBATIM
         # Generate html output
-        COMMAND ${GENHTML_PATH} -o coverageReport coverage.info.cleaned VERBATIM
-        COMMAND echo "Generated coverage report in coverageReport/index.html"
+        COMMAND ${GENHTML_PATH} -o ${CMAKE_CURRENT_BINARY_DIR}/coverageReport ${CMAKE_CURRENT_BINARY_DIR}/coverage.info.cleaned VERBATIM
+        COMMAND echo "Generated coverage report in ${CMAKE_CURRENT_BINARY_DIR}/coverageReport/index.html"
       )
     endif(ENABLE_TESTING)
 
@@ -158,7 +158,7 @@ if(ENABLE_COVERAGE)
 endif(ENABLE_COVERAGE)
 
 # kiss (provided)
-add_subdirectory(libs/kiss)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss)
 list(APPEND CRPROPA_EXTRA_LIBRARIES kiss)
 list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/kiss/include)
 list(APPEND CRPROPA_BUNDLED_LIBRARY_TARGETS kiss)
@@ -169,16 +169,16 @@ list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/in
 list(APPEND CRPROPA_BUNDLED_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/nanoflann/include)
 
 # HepID (provided)
-add_subdirectory(libs/HepPID)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID)
 list(APPEND CRPROPA_EXTRA_LIBRARIES HepPID)
 list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include)
 list(APPEND CRPROPA_BUNDLED_LIBRARY_TARGETS HepPID)
 list(APPEND CRPROPA_BUNDLED_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/libs/HepPID/include)
 
 # SOPHIA (provided)
-add_subdirectory(libs/sophia)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 list(APPEND CRPROPA_EXTRA_LIBRARIES sophia gfortran)
-list(APPEND CRPROPA_EXTRA_INCLUDES libs/sophia)
+list(APPEND CRPROPA_EXTRA_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/libs/sophia)
 
 # OpenMP (optional for shared memory multiprocessing)
 option(ENABLE_OPENMP "OpenMP for multithreading" On)
@@ -305,14 +305,14 @@ if(DOWNLOAD_DATA)
     ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz
     USERPWD "Nag8KQLoCjpG5es"
     EXPECTED_MD5 "${DATA_CHECKSUM}")
-  message("-- Extracting data file")
 else()
   message("-- Downloading of data file disabled")
 endif(DOWNLOAD_DATA)
-if(EXISTS ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/data ${CMAKE_BINARY_DIR}/data/ WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz)
+  message("-- Extracting data file")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E tar xzf data-${CRPROPA_DATAFILE_VER}.tar.gz WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory data-${CRPROPA_DATAFILE_VER}/data data/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+  execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory data-${CRPROPA_DATAFILE_VER}/ WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 else()
   message(WARNING "CRPropa data file not found at ${CMAKE_CURRENT_BINARY_DIR}/data-${CRPROPA_DATAFILE_VER}.tar.gz CRPropa should compile, but will likely not work properly! Please install data file manually, or use the automatic download which is enabled by default.")
 endif()
@@ -415,7 +415,7 @@ if(BUILD_DOC)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/DoxygenLayout.xml ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml COPYONLY)
     add_custom_target(doxy ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 
-    set_source_files_properties(${CMAKE_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i PROPERTIES GENERATED true )
     add_custom_target(docstrings_from_doxy
       COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/libs/doxy2swig/doxy2swig.py ${CMAKE_CURRENT_BINARY_DIR}/xml/index.xml -o ${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i
       DEPENDS doxy
@@ -484,7 +484,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
     if(BUILD_DOC AND DOXYGEN_FOUND)
       list(APPEND CRPROPA_SWIG_INPUTS ${CMAKE_CURRENT_BINARY_DIR}/docstrings_from_doxy.i)
       list(APPEND CRPROPA_SWIG_DEFINES -DWITH_DOXYGEN)
-      list(APPEND SWIG_INCLUDE_DIRECTORIES ${CMAKE_BINARY_DIR})
+      list(APPEND SWIG_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR})
     endif(BUILD_DOC AND DOXYGEN_FOUND)
   endif(SWIG_VERSION VERSION_GREATER 4.0)
 
@@ -497,7 +497,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
     if(SWIG_VERSION VERSION_LESS 4.0.2)
         message(WARNING, "The SWIG builtin option should not be used with SWIG version below 4.0.2 due to https://github.com/swig/swig/issues/1595")
     endif()
-  else(ENABLE_SWIG_BUILTIN)
+  else()
     set(BUILTIN "")
   endif(ENABLE_SWIG_BUILTIN)
 
@@ -549,7 +549,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
 
   install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/python/crpropa" DESTINATION "${Python_INSTALL_PACKAGE_DIR}")
   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/crpropa.py" DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
-  install(TARGETS crpropa-swig LIBRARY DESTINATION "${Python_INSTALL_PACKAGE_DIR}/crpropa")
+  install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/crpropa/swig_interface)
   install(FILES ${CRPROPA_SWIG_INPUTS} DESTINATION share/crpropa/swig_interface)
 
 endif(ENABLE_PYTHON AND Python_FOUND)
@@ -557,6 +557,9 @@ endif(ENABLE_PYTHON AND Python_FOUND)
 # ----------------------------------------------------------------------------
 # Install
 # ----------------------------------------------------------------------------
+
+# makes the binary directory visible to common.h, needed to have a last resort when searching for data
+add_definitions(-DCRPROPA_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 add_definitions(-DCRPROPA_INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 install(TARGETS crpropa ${CRPROPA_BUNDLED_LIBRARY_TARGETS}
 	RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin

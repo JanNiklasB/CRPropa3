@@ -15,8 +15,8 @@ namespace crpropa {
 
 /**
  @class ParticleCollector
-@brief A helper ouput mechanism to keep candidates in-memory and directly transfer them to Python
-*/
+ @brief A helper ouput mechanism to keep candidates in-memory and directly transfer them to Python
+ */
 class ParticleCollector: public Module {
 protected:
 	typedef std::vector<ref_ptr<Candidate> > tContainer;
