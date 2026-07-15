@@ -149,11 +149,13 @@ public:
 
 	/** Default Constructor */
 	ref_ptr() : _ptr(0) {}
+	#ifndef SWIG 
 	/** Constructor from reference
 	 * Use this constructor if you want to use a stack pointer,
 	 * so every pointer not created with a new operator.
 	 */
 	ref_ptr(T& ref) : _ptr(&ref) {}
+	#endif
 	/** Constructor from pointer
 	 * Should not be used with stack pointer,
 	 * so every pointer not created with a new operator.
@@ -198,6 +200,7 @@ public:
 		removeReferenceIf(tmp_ptr);
 		return *this;
 	}
+	#ifndef SWIG
 	/** Assign operator for stack references */
 	inline ref_ptr& operator =(T& ref){
 		if (_ptr == &ref)
@@ -205,6 +208,7 @@ public:
 		_ptr = &ref;
 		return *this;
 	}
+	#endif
 
 	operator T*() const {
 		return _ptr;
