@@ -2,6 +2,8 @@
 #define CRPROPA_REFERENCED_H
 
 #include <cstddef>
+#include <type_traits>
+#include <iostream>
 
 #ifdef DEBUG
 #include <iostream>
@@ -105,6 +107,34 @@ inline void intrusive_ptr_release(Referenced* p) {
 	p->removeReference();
 }
 
+// helper Reference class functions, which function to use is decided at compile time!
+template<class T>
+typename std::enable_if_t<std::is_base_of<Referenced, T>::value>
+inline addReferenceIf(T* ptr) noexcept {
+	if (ptr) ptr->addReference();
+}
+template<class T>
+typename std::enable_if_t<!std::is_base_of<Referenced, T>::value>
+inline addReferenceIf(T* ptr) noexcept {}
+
+template<class T>
+typename std::enable_if_t<std::is_base_of<Referenced, T>::value>
+inline removeReferenceIf(T* ptr) noexcept {
+	if (ptr) ptr->removeReference();
+}
+template<class T>
+typename std::enable_if_t<!std::is_base_of<Referenced, T>::value>
+inline removeReferenceIf(T* ptr) noexcept {}
+
+template<class T>
+typename std::enable_if_t<std::is_base_of<Referenced, T>::value>
+inline removeReferenceNoDeleteIf(T* ptr) noexcept {
+	if (ptr) ptr->removeReferenceNoDelete();
+}
+template<class T>
+typename std::enable_if_t<!std::is_base_of<Referenced, T>::value>
+inline removeReferenceNoDeleteIf(T* ptr) noexcept {}
+
 /**
  @class ref_ptr
  @brief Referenced pointer
@@ -115,27 +145,23 @@ public:
 	typedef T element_type;
 
 	ref_ptr() :
-			_ptr(0) {
+			_ptr(0){
 	}
 	ref_ptr(T* ptr) :
 			_ptr(ptr) {
-		if (_ptr)
-			_ptr->addReference();
+		addReferenceIf(_ptr);
 	}
 	ref_ptr(const ref_ptr& rp) :
 			_ptr(rp._ptr) {
-		if (_ptr)
-			_ptr->addReference();
+		addReferenceIf(_ptr);
 	}
 	template<class Other> ref_ptr(const ref_ptr<Other>& rp) :
 			_ptr(rp._ptr) {
-		if (_ptr)
-			_ptr->addReference();
+		addReferenceIf(_ptr);
 	}
 
 	~ref_ptr() {
-		if (_ptr)
-			_ptr->removeReference();
+		removeReferenceIf(_ptr);
 		_ptr = 0;
 	}
 
@@ -154,10 +180,8 @@ public:
 			return *this;
 		T* tmp_ptr = _ptr;
 		_ptr = ptr;
-		if (_ptr)
-			_ptr->addReference();
-		if (tmp_ptr)
-			tmp_ptr->removeReference();
+		addReferenceIf(_ptr);
+		removeReferenceIf(tmp_ptr);
 		return *this;
 	}
 
@@ -184,8 +208,7 @@ public:
 
 	T* release() {
 		T* tmp = _ptr;
-		if (_ptr)
-			_ptr->removeReferenceNoDelete();
+		removeReferenceNoDeleteIf(_ptr);
 		_ptr = 0;
 		return tmp;
 	}
@@ -203,10 +226,8 @@ private:
 			return;
 		T* tmp_ptr = _ptr;
 		_ptr = rp._ptr;
-		if (_ptr)
-			_ptr->addReference();
-		if (tmp_ptr)
-			tmp_ptr->removeReference();
+		addReferenceIf(_ptr);
+		removeReferenceIf(tmp_ptr);
 	}
 
 	template<class Other> friend class ref_ptr;
