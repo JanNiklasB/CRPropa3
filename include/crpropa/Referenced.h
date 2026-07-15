@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <type_traits>
-#include <iostream>
 
 #ifdef DEBUG
 #include <iostream>
@@ -138,43 +137,58 @@ inline removeReferenceNoDeleteIf(T* ptr) noexcept {}
 /**
  @class ref_ptr
  @brief Referenced pointer
+
+ This class manages the memory of objects that inherit the class Referenced.
+ Every other object is not managed but instead treated as raw pointer and should
+ be managed by the original variable owner.
  */
 template<class T>
 class ref_ptr {
 public:
 	typedef T element_type;
 
-	ref_ptr() :
-			_ptr(0){
-	}
-	ref_ptr(T* ptr) :
-			_ptr(ptr) {
+	/** Default Constructor */
+	ref_ptr() : _ptr(0) {}
+	/** Constructor from reference
+	 * Use this constructor if you want to use a stack pointer,
+	 * so every pointer not created with a new operator.
+	 */
+	ref_ptr(T& ref) : _ptr(&ref) {}
+	/** Constructor from pointer
+	 * Should not be used with stack pointer,
+	 * so every pointer not created with a new operator.
+	 */
+	ref_ptr(T* ptr) : _ptr(ptr) {
 		addReferenceIf(_ptr);
 	}
+	/** Constructor from ref_ptr with same template type */
 	ref_ptr(const ref_ptr& rp) :
 			_ptr(rp._ptr) {
 		addReferenceIf(_ptr);
 	}
+	/** Constructor from ref_ptr with other template type, must be convertable */
 	template<class Other> ref_ptr(const ref_ptr<Other>& rp) :
 			_ptr(rp._ptr) {
 		addReferenceIf(_ptr);
 	}
 
+	/** destructor */
 	~ref_ptr() {
 		removeReferenceIf(_ptr);
 		_ptr = 0;
 	}
 
+	/** Assign operator for ref_ptr with same template type */
 	ref_ptr& operator =(const ref_ptr& rp) {
 		assign(rp);
 		return *this;
 	}
-
+	/** Assign operator for ref_ptr with other template type, must be convertable */
 	template<class Other> ref_ptr& operator =(const ref_ptr<Other>& rp) {
 		assign(rp);
 		return *this;
 	}
-
+	/** Assign operator for pointer, do not assign stack pointer */
 	inline ref_ptr& operator =(T* ptr) {
 		if (_ptr == ptr)
 			return *this;
@@ -182,6 +196,13 @@ public:
 		_ptr = ptr;
 		addReferenceIf(_ptr);
 		removeReferenceIf(tmp_ptr);
+		return *this;
+	}
+	/** Assign operator for stack references */
+	inline ref_ptr& operator =(T& ref){
+		if (_ptr == &ref)
+			return *this;
+		_ptr = &ref;
 		return *this;
 	}
 
