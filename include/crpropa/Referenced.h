@@ -26,51 +26,53 @@ namespace crpropa {
  Candidate, Module, MagneticField and Source inherit from this class
  */
 class Referenced {
-public:
+	public:
 
-	inline Referenced() :
+	constexpr Referenced() noexcept :
 			_referenceCount(0) {
 	}
 
-	inline Referenced(const Referenced&) :
+	constexpr Referenced(const Referenced&) noexcept :
 			_referenceCount(0) {
 	}
 
-	inline Referenced& operator =(const Referenced&) {
+	constexpr Referenced& operator =(const Referenced&) noexcept {
 		return *this;
 	}
 
-	inline size_t addReference() const {
+	inline size_t addReference() const noexcept {
 		int newRef;
-#if defined(OPENMP_3_1)
-		#pragma omp atomic capture
-		{newRef = _referenceCount++;}
-#elif defined(__GNUC__)
-		newRef = __sync_add_and_fetch(&_referenceCount, 1);
-#else
-		#pragma omp critical(newRef)
-		{newRef = _referenceCount++;}
-#endif
+		#if defined(OPENMP_3_1)
+			#pragma omp atomic capture
+			{newRef = _referenceCount++;}
+		#elif defined(__GNUC__)
+			newRef = __sync_add_and_fetch(&_referenceCount, 1);
+		#else
+			#pragma omp critical(newRef)
+			{newRef = _referenceCount++;}
+		#endif
 		return newRef;
 	}
 
+	#ifdef DEBUG
 	inline size_t removeReference() const {
-#ifdef DEBUG
 		if (_referenceCount == 0)
 			std::cerr
 					<< "WARNING: Remove reference from Object with NO references: "
 					<< typeid(*this).name() << std::endl;
-#endif
+	#else
+	inline size_t removeReference() const noexcept {
+	#endif
 		int newRef;
-#if defined(OPENMP_3_1)
-		#pragma omp atomic capture
-		{newRef = _referenceCount--;}
-#elif defined(__GNUC__)
-		newRef = __sync_sub_and_fetch(&_referenceCount, 1);
-#else
-		#pragma omp critical(newRef)
-		{newRef = _referenceCount--;}
-#endif
+		#if defined(OPENMP_3_1)
+			#pragma omp atomic capture
+			{newRef = _referenceCount--;}
+		#elif defined(__GNUC__)
+			newRef = __sync_sub_and_fetch(&_referenceCount, 1);
+		#else
+			#pragma omp critical(newRef)
+			{newRef = _referenceCount--;}
+		#endif
 
 		if (newRef == 0) {
 			delete this;
@@ -78,22 +80,22 @@ public:
 		return newRef;
 	}
 
-	int removeReferenceNoDelete() const {
+	inline int removeReferenceNoDelete() const noexcept {
 		return --_referenceCount;
 	}
 
-	inline size_t getReferenceCount() const {
+	inline size_t getReferenceCount() const noexcept {
 		return _referenceCount;
 	}
 
-protected:
+	protected:
 
 	virtual inline ~Referenced() {
-#ifdef DEBUG
+		#ifdef DEBUG
 		if (_referenceCount)
 			std::cerr << "WARNING: Deleting Object with references: "
 					<< typeid(*this).name() << std::endl;
-#endif
+		#endif
 	}
 
 	mutable size_t _referenceCount;
@@ -148,97 +150,94 @@ public:
 	typedef T element_type;
 
 	/** Default Constructor */
-	ref_ptr() : _ptr(0) {}
+	constexpr ref_ptr() noexcept : _ptr(0) {}
 	#ifndef SWIG 
 	/** Constructor from reference
 	 * Use this constructor if you want to use a stack pointer,
 	 * so every pointer not created with a new operator.
 	 */
-	ref_ptr(T& ref) : _ptr(&ref) {}
+	inline ref_ptr(T& ref) noexcept : _ptr(&ref) {}
 	#endif
 	/** Constructor from pointer
 	 * Should not be used with stack pointer,
 	 * so every pointer not created with a new operator.
 	 */
-	ref_ptr(T* ptr) : _ptr(ptr) {
+	inline ref_ptr(T* ptr) noexcept : _ptr(ptr) {
 		addReferenceIf(_ptr);
 	}
 	/** Constructor from ref_ptr with same template type */
-	ref_ptr(const ref_ptr& rp) :
-			_ptr(rp._ptr) {
+	inline ref_ptr(const ref_ptr& rp) noexcept : _ptr(rp._ptr) {
 		addReferenceIf(_ptr);
 	}
 	/** Constructor from ref_ptr with other template type, must be convertable */
-	template<class Other> ref_ptr(const ref_ptr<Other>& rp) :
-			_ptr(rp._ptr) {
+	template<class Other> inline ref_ptr(const ref_ptr<Other>& rp) noexcept : _ptr(rp._ptr) {
 		addReferenceIf(_ptr);
 	}
 
 	/** destructor */
-	~ref_ptr() {
+	inline ~ref_ptr() noexcept {
 		removeReferenceIf(_ptr);
 		_ptr = 0;
 	}
 
 	/** Assign operator for ref_ptr with same template type */
-	ref_ptr& operator =(const ref_ptr& rp) {
+	inline ref_ptr& operator =(const ref_ptr& rp) noexcept {
 		assign(rp);
 		return *this;
 	}
 	/** Assign operator for ref_ptr with other template type, must be convertable */
-	template<class Other> ref_ptr& operator =(const ref_ptr<Other>& rp) {
+	template<class Other> inline ref_ptr& operator =(const ref_ptr<Other>& rp) noexcept {
 		assign(rp);
 		return *this;
 	}
 	/** Assign operator for pointer, do not assign stack pointer */
-	inline ref_ptr& operator =(T* ptr) {
-		if (_ptr == ptr)
-			return *this;
-		T* tmp_ptr = _ptr;
-		_ptr = ptr;
-		addReferenceIf(_ptr);
-		removeReferenceIf(tmp_ptr);
+	inline ref_ptr& operator =(T* ptr) noexcept {
+		if (_ptr != ptr) {
+			T* tmp_ptr = _ptr;
+			_ptr = ptr;
+			addReferenceIf(_ptr);
+			removeReferenceIf(tmp_ptr);
+		}
 		return *this;
 	}
 	#ifndef SWIG
 	/** Assign operator for stack references */
-	inline ref_ptr& operator =(T& ref){
-		if (_ptr == &ref)
-			return *this;
-		_ptr = &ref;
+	inline ref_ptr& operator =(T& ref) noexcept {
+		if (_ptr != &ref)
+			_ptr = &ref;
 		return *this;
 	}
 	#endif
 
-	operator T*() const {
+	inline operator T*() const noexcept {
 		return _ptr;
 	}
 
-	T& operator*() const {
+	inline T& operator*() const noexcept {
 		return *_ptr;
 	}
-	T* operator->() const {
+	inline T* operator->() const noexcept {
 		return _ptr;
 	}
-	T* get() const {
+	inline T* get() const {
 		return _ptr;
 	}
 
-	bool operator!() const {
+	inline bool operator!() const noexcept {
 		return _ptr == 0;
 	} // not required
-	bool valid() const {
+	inline bool valid() const noexcept {
 		return _ptr != 0;
 	}
 
-	T* release() {
+	inline T* release() noexcept {
 		T* tmp = _ptr;
 		removeReferenceNoDeleteIf(_ptr);
 		_ptr = 0;
 		return tmp;
 	}
 
-	void swap(ref_ptr& rp) {
+	inline void swap(ref_ptr& rp) noexcept {
 		T* tmp = _ptr;
 		_ptr = rp._ptr;
 		rp._ptr = tmp;
@@ -246,13 +245,13 @@ public:
 
 private:
 
-	template<class Other> void assign(const ref_ptr<Other>& rp) {
-		if (_ptr == rp._ptr)
-			return;
-		T* tmp_ptr = _ptr;
-		_ptr = rp._ptr;
-		addReferenceIf(_ptr);
-		removeReferenceIf(tmp_ptr);
+	template<class Other> inline void assign(const ref_ptr<Other>& rp) noexcept {
+		if (_ptr != rp._ptr) {
+			T* tmp_ptr = _ptr;
+			_ptr = rp._ptr;
+			addReferenceIf(_ptr);
+			removeReferenceIf(tmp_ptr);
+		}
 	}
 
 	template<class Other> friend class ref_ptr;
