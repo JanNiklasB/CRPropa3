@@ -98,7 +98,7 @@ public:
 	 * @param length  Trajectory length in meter
 	 */
 	void setTrajectoryLength(double length);
-	/** Returns current trajectory length */
+	/** Returns current trajectory length, this is tracked alongsite time by multiplying the velocity */
 	double getTrajectoryLength() const;
 	
 	/** Returns absolute of current velocity
@@ -152,7 +152,6 @@ public:
 	 */
 	void setTime(double t);
 	/** Returns the time of the candidate.
-	 * The time is tracked alongside TrajectoryLength by dividing the current TrajecoryLength by c
 	 * @return Current time in seconds
 	 */
 	double getTime() const;
