@@ -72,7 +72,7 @@ Optionally CRPropa can be compiled with the following dependencies to enable cer
 - `muparser`: to define the source spectrum through a mathematical formula
 - `doxygen`: to build a `doxygen` documentation
 - `lcov`, `genhtml`: to build coverage report with `cmake --build /path/to/your/buildfolder --target coverage` (requires executed tests over `ctest`)
-- `sphinx`, `sphinx_rtd_theme`, `m2r2`, `nbsphinx`, `lxml_html_clean`, `breathe`, `pandoc`, `exhale`: to build this documentation from the `doxygen` generated documentation with `cmake --build /path/to/your/buildfolder --target doc` and possibly include the coverage report by copying the by `coverage` generated `coverageReport` to `doc/pages/coverageReport` and then do `cmake --build /path/to/your/buildfolder --target coverage`. You might want to install the mentioned packages over `pip` rather than `conda` since there is a known [bug](https://github.com/sphinx-doc/sphinx/issues/12239).
+- `sphinx`, `sphinxawesome_theme`, `m2r2`, `nbsphinx`, `lxml_html_clean`, `breathe`, `pandoc`, `exhale`: to build this documentation from the `doxygen` generated documentation with `cmake --build /path/to/your/buildfolder --target doc` and possibly include the coverage report by copying the by `coverage` generated `coverageReport` to `doc/pages/coverageReport` and then do `cmake --build /path/to/your/buildfolder --target coverage`. You might want to install the mentioned packages over `pip` rather than `conda` since there is a known [bug](https://github.com/sphinx-doc/sphinx/issues/12239).
 - `hdf5`: to enable the option to generate binary output
 
 ### CMake Flag Documentation
