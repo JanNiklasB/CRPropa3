@@ -1,6 +1,7 @@
 ## CRPropa vNext
 
 ### Bug fixes:
+* Fixed solving issues when attempting to install `matplotlib==3.11.0`, `python==3.14.6`, and `crpropa==3.3` together 
 
 ### New features:
 
