@@ -3,10 +3,21 @@
 ### Bug fixes:
 
 ### New features:
+* Velocities can now be smaller then light speed
+* Added electric fields (for now only uniform electric field)
+* Modified `PropagationBP` so it can also accelerate particles over a given electric field
+* Added `ObserverSpacialEvolution` that observes the Candidate at different lengths instead of times
+* Added `MaximumTime` break condition that rejects the Candidate when a given time is reached
+* Added `ParticleState::setCharge`, `ParticleState::setMass` and `ParticleState::getBeta`
 
 ### Interface changes:
+* CRPropa now uses explicit time as steps instead of length steps
+* `ObserverTimeEvolution` now assumes explicit times instead of length (for old behaviour see `ObserverSpacialEvolution`)
+* Added overloads to propagators that take time steps instead of length steps
+* Length steps in propagator constructors are now directly converted to times by dividing by `c_light` to preserve old behaviour
 
 ### Features that are deprecated and will be removed after this release
+* Propagation constructors will only accept minimum and maximum times instead of length and will take them in the the same order it takes length steps now
 
 ### Removed features
 
