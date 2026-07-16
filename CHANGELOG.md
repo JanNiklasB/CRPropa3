@@ -1,6 +1,7 @@
 ## CRPropa vNext
 
 ### Bug fixes:
+* Double free error can now be prevented by handing over stack objects as reference to `ref_ptr<Obj>` instead as pointer
 
 ### New features:
 
