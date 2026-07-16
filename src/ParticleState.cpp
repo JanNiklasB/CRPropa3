@@ -99,7 +99,7 @@ Vector3d ParticleState::getVelocity() const {
 	Vector3d velocity;
 	if (pmass==0) 
 		velocity = direction*c_light;
-	else if (getLorentzFactor()==1)  // can happen if if gamma-1 < numericalPrecission
+	else if (getLorentzFactor()<2)  // can happen if if gamma-1 < numericalPrecission
 		velocity = direction * sqrt(energy*2/pmass);  // non relativistic case
 	else
 		velocity = direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
