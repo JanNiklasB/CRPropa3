@@ -19,7 +19,7 @@ requirements:
     - git
     - cmake
     - ninja
-    - swig
+    - swig >4
     - pkgconfig
   
   host:
@@ -28,7 +28,7 @@ requirements:
     - gperftools
     - pybind11-stubgen
     # crpropa requirements
-    - fftw
+    - fftw >=3
     - hdf5
     - muparser
     - eigen
@@ -38,7 +38,7 @@ requirements:
 
   run:
     # crpropa requirements
-    - fftw
+    - fftw >=3
     - hdf5
     - muparser
     - eigen
