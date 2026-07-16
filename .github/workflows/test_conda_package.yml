@@ -1,16 +1,16 @@
 name: test_conda_package
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/test_conda_package.yml"
-      - "**.cpp"
-      - "**.h"
-      - "**.py"
-      - "**.i"
-      - "**/CMakeLists.txt"
-      - "conda-build/*"
-      - "!plugin-template/**"
-      - "!doc/**"
+  # pull_request:
+  #   paths:
+  #     - ".github/workflows/test_conda_package.yml"
+  #     - "**.cpp"
+  #     - "**.h"
+  #     - "**.py"
+  #     - "**.i"
+  #     - "**/CMakeLists.txt"
+  #     - "conda-build/*"
+  #     - "!plugin-template/**"
+  #     - "!doc/**"
   workflow_dispatch:
   
 

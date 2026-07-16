@@ -1,21 +1,22 @@
 name: crpropa-testing_plugin-template
 on:
-  push:
-    paths:
-      - ".github/workflows/testing_plugin-template.yml"
-      - "plugin-template/**.cpp"
-      - "plugin-template/**.h"
-      - "plugin-template/**.py"
-      - "plugin-template/**.i"
-      - "plugin-template/**/CMakeLists.txt"
-  pull_request:
-    paths:
-      - ".github/workflows/testing_plugin-template.yml"
-      - "plugin-template/**.cpp"
-      - "plugin-template/**.h"
-      - "plugin-template/**.py"
-      - "plugin-template/**.i"
-      - "plugin-template/**/CMakeLists.txt"
+  # push:
+  #   paths:
+  #     - ".github/workflows/testing_plugin-template.yml"
+  #     - "plugin-template/**.cpp"
+  #     - "plugin-template/**.h"
+  #     - "plugin-template/**.py"
+  #     - "plugin-template/**.i"
+  #     - "plugin-template/**/CMakeLists.txt"
+  # pull_request:
+  #   paths:
+  #     - ".github/workflows/testing_plugin-template.yml"
+  #     - "plugin-template/**.cpp"
+  #     - "plugin-template/**.h"
+  #     - "plugin-template/**.py"
+  #     - "plugin-template/**.i"
+  #     - "plugin-template/**/CMakeLists.txt"
+  workflow_dispatch:
 
 jobs:
   x64:

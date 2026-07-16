@@ -1,19 +1,19 @@
 name: create_conda_package
 on:
   push:
-    branches: 
-      - master
-      - releases/**
-    paths:
-      - ".github/workflows/create_conda_package.yml"
-      - "**.cpp"
-      - "**.h"
-      - "**.py"
-      - "**.i"
-      - "**/CMakeLists.txt"
-      - "conda-build/*"
-      - "!plugin-template/**"
-      - "!doc/**"
+    # branches: 
+    #   - master
+    #   - releases/**
+    # paths:
+    #   - ".github/workflows/create_conda_package.yml"
+    #   - "**.cpp"
+    #   - "**.h"
+    #   - "**.py"
+    #   - "**.i"
+    #   - "**/CMakeLists.txt"
+    #   - "conda-build/*"
+    #   - "!plugin-template/**"
+    #   - "!doc/**"
   release:
     types: [published]
   workflow_dispatch:
@@ -21,7 +21,7 @@ on:
 
 jobs:
   arm:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: ubuntu-22.04-arm
     steps:
       - name: Checkout repository
@@ -67,7 +67,7 @@ jobs:
           path: conda-bld/build.log
 
   x64:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
@@ -104,7 +104,7 @@ jobs:
           path: conda-bld/build.log
 
   macos:
-    if: github.repository=='CRPropa/CRPropa3'
+    if: github.repository=='JanNiklasB/CRPropa3'
     runs-on: macos-14
     steps:
       - name: Checkout repository

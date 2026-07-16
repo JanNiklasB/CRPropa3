@@ -1,25 +1,26 @@
 name: crpropa-testing_OSX
 on:
-  push:
-    paths:
-      - ".github/workflows/testing_OSX.yml"
-      - "**.cpp"
-      - "**.h"
-      - "**.py"
-      - "**.i"
-      - "**/CMakeLists.txt"
-      - "!plugin-template/**"
-      - "!doc/**"
-  pull_request:
-    paths:
-      - ".github/workflows/testing_OSX.yml"
-      - "**.cpp"
-      - "**.h"
-      - "**.py"
-      - "**.i"
-      - "**/CMakeLists.txt"
-      - "!plugin-template/**"
-      - "!doc/**"
+  # push:
+  #   paths:
+  #     - ".github/workflows/testing_OSX.yml"
+  #     - "**.cpp"
+  #     - "**.h"
+  #     - "**.py"
+  #     - "**.i"
+  #     - "**/CMakeLists.txt"
+  #     - "!plugin-template/**"
+  #     - "!doc/**"
+  # pull_request:
+  #   paths:
+  #     - ".github/workflows/testing_OSX.yml"
+  #     - "**.cpp"
+  #     - "**.h"
+  #     - "**.py"
+  #     - "**.i"
+  #     - "**/CMakeLists.txt"
+  #     - "!plugin-template/**"
+  #     - "!doc/**"
+  workflow_dispatch:
 
 
 jobs:
