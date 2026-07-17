@@ -13,7 +13,6 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sphinxawesome_theme
 
 
 # -- Project information -----------------------------------------------------
@@ -47,7 +46,8 @@ extensions = [
     'sphinx.ext.githubpages',
     'm2r2',
     'nbsphinx',
-    'IPython.sphinxext.ipython_console_highlighting'
+    'IPython.sphinxext.ipython_console_highlighting',
+    'sphinx_wagtail_theme'
 ]
 
 
@@ -99,7 +99,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinxawesome_theme'
+html_theme = 'sphinx_wagtail_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

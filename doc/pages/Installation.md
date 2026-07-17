@@ -72,7 +72,7 @@ Optionally CRPropa can be compiled with the following dependencies to enable cer
 - `muparser`: to define the source spectrum through a mathematical formula
 - `doxygen`: to build a `doxygen` documentation
 - `lcov`, `genhtml`: to build coverage report with `cmake --build /path/to/your/buildfolder --target coverage` (requires executed tests over `ctest`)
-- `sphinx`, `sphinxawesome_theme`, `m2r2`, `nbsphinx`, `lxml_html_clean`, `breathe`, `pandoc`, `exhale`: to build this documentation from the `doxygen` generated documentation with `cmake --build /path/to/your/buildfolder --target doc` and possibly include the coverage report by copying the by `coverage` generated `coverageReport` to `doc/pages/coverageReport` and then do `cmake --build /path/to/your/buildfolder --target coverage`. You might want to install the mentioned packages over `pip` rather than `conda` since there is a known [bug](https://github.com/sphinx-doc/sphinx/issues/12239).
+- `sphinx`, `sphinx-wagtail-theme`, `m2r2`, `nbsphinx`, `lxml_html_clean`, `breathe`, `pandoc`, `exhale`: to build this documentation from the `doxygen` generated documentation with `cmake --build /path/to/your/buildfolder --target doc` and possibly include the coverage report by copying the by `coverage` generated `coverageReport` to `doc/pages/coverageReport` and then do `cmake --build /path/to/your/buildfolder --target coverage`. You might want to install the mentioned packages over `pip` rather than `conda` since there is a known [bug](https://github.com/sphinx-doc/sphinx/issues/12239).
 - `hdf5`: to enable the option to generate binary output
 
 ### CMake Flag Documentation
@@ -230,13 +230,16 @@ Currently, we do not officially support Windows, it is advised to install Ubuntu
 ## Notes
 
 - Sometimes CMake has difficulties finding the correct `python` and `numpy` header and executables, to help CMake finding those define the following environment variables before using `cmake`:
+
 ```sh
 export PYTHON_EXECUTABLE=$(which python)
 export PYTHON_INCLUDE_DIR=$(${PYTHON_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_paths()['include'])")
 export NUMPY_INCLUDE_DIR=$(${PYTHON_EXECUTABLE} -c "import numpy; print(numpy.get_include())")
 export PYTHON_INSTALL_PACKAGE_DIR=$(${PYTHON_EXECUTABLE} -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
 ```
+
 And hand them over to `cmake` as CMake-Variables so `find_python` can recognize them:
+
 ```sh
 cmake .. \
   -DPython_EXECUTABLE=${PYTHON_EXECUTABLE} \
@@ -244,9 +247,11 @@ cmake .. \
   -DPython_NumPy_INCLUDE_DIRS=${NUMPY_INCLUDE_DIR} \
   -DPython_INSTALL_PACKAGE_DIR=${PYTHON_INSTALL_PACKAGE_DIR}
 ```
+
 - To do the coverage report first install `lcov` and `genhtml`, then do the tests with `ctest` and built the coverage target with `cmake --build /path/to/your/buildfolder --target coverage`.
 - It is generally advised to use `ninja` instead of the default `make`, use it with the `-G Ninja` flag for `cmake`, you can install it over `pip`, `conda` or your package manager
 - You might want to generate some python stubs to get code recommendation from tools like `pylance`, for that install `pybind11-stubgen` over `pip`, `conda` or your package manager and then do:
+
 ```sh
 pybind11-stubgen -o $(python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])") crpropa
 ```
