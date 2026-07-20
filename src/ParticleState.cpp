@@ -119,8 +119,8 @@ std::string ParticleState::getDescription() const {
 	ss << "E = " << energy / EeV << " EeV, ";
 	ss << "x = " << position / Mpc << " Mpc, ";
 	ss << "dir = " << direction << ", ";
-	ss << "p = " << getMomentum() << "kg*m/s, ";
-	ss << "v = " << getVelocity() << "m/s, " ;
+	ss << "p = " << getMomentum() << " kg*m/s, ";
+	ss << "v = " << getVelocity() << " m/s, " ;
 	return ss.str();
 }
 
