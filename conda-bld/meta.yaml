@@ -34,6 +34,11 @@ requirements:
     # python requirements
     - python
     - numpy >=1.26,<3
+    # add the following only in build step not as run requirement
+    # so we ensure that we do not build against incompatible python versions
+    - matplotlib
+    - astropy
+    - scipy
 
   run:
     # crpropa requirements
