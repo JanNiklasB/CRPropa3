@@ -80,9 +80,12 @@ Vector3d ParticleState::getVelocity() const {
 }
 
 Vector3d ParticleState::getMomentum() const {
-	if (pmass==0 or getLorentzFactor()==INFINITY)
+	if (pmass==0)
 		return direction*energy/c_light;
-	return getLorentzFactor()*pmass*getVelocity();
+	else if (getLorentzFactor()<1.001)
+		return pmass*getVelocity();
+	else
+		return getLorentzFactor()*pmass*getVelocity();
 }
 
 std::string ParticleState::getDescription() const {
