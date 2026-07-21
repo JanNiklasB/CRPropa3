@@ -24,28 +24,12 @@ void ParticleState::setPosition(const Vector3d &pos) {
 	position = pos;
 }
 
-const Vector3d &ParticleState::getPosition() const {
-	return position;
-}
-
 void ParticleState::setDirection(const Vector3d &dir) {
 	direction = dir.getUnitVector();
 }
 
-const Vector3d &ParticleState::getDirection() const {
-	return direction;
-}
-
 void ParticleState::setEnergy(double newEnergy) {
 	energy = std::max(0., newEnergy);
-}
-
-double ParticleState::getEnergy() const {
-	return energy;
-}
-
-double ParticleState::getRigidity() const {
-	return fabs(energy / charge);
 }
 
 void ParticleState::setId(int newId) {
@@ -60,20 +44,8 @@ void ParticleState::setId(int newId) {
 	}
 }
 
-int ParticleState::getId() const {
-	return id;
-}
-
-double ParticleState::getMass() const {
-	return pmass;
-}
-
 void ParticleState::setMass(double Mass) {
 	pmass = Mass;
-}
-
-double ParticleState::getCharge() const {
-	return charge;
 }
 
 void ParticleState::setCharge(int ChargeNumber) {
@@ -99,7 +71,7 @@ Vector3d ParticleState::getVelocity() const {
 	Vector3d velocity;
 	if (pmass==0) 
 		velocity = direction*c_light;
-	else if (getLorentzFactor()<2)  // can happen if if gamma-1 < numericalPrecission
+	else if (getLorentzFactor()<1.001)  // can happen if if gamma-1 < numericalPrecission
 		velocity = direction * sqrt(energy*2/pmass);  // non relativistic case
 	else
 		velocity = direction * c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
