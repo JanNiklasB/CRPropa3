@@ -3,6 +3,7 @@
 ### Bug fixes:
 
 ### New features:
+* Velocities can now be smaller then light speed
 * Added `ObserverSpacialEvolution` that observes the Candidate at different lengths instead of times
 * Added `MaximumTime` break condition that rejects the Candidate when a given time is reached
 

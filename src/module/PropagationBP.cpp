@@ -18,9 +18,13 @@ namespace crpropa {
 	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double dt, 
 		double z, ParticleState &current) const {
 
-		// get some variables that are always needed
-		Vector3d B = getFieldAtPosition(pos, z);
 		Vector3d vel = dir*current.getVelocity().getR();
+			
+		// do nothing if velocity is zero to avoid dividing by zero in getUnitVector
+		if (vel==Vector3(0))
+			return Y(pos, dir);
+			
+		Vector3d B = getFieldAtPosition(pos, z);
 		double q = current.getCharge();
 		// lorentz factor is between 1 and infinity (but never actually infinity)
 		double gamma = current.getLorentzFactor();

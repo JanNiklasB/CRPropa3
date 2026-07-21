@@ -93,8 +93,14 @@ void PropagationCK::process(Candidate *candidate) const {
 	ParticleState &current = candidate->current;
 	candidate->previous = current;
 
+	// we solve for the direction with CK but will respect the velocity over the lorentz force
 	Y yIn(current.getPosition(), current.getDirection());
 	double step = maxStep;
+
+	// if particle has no velocity it is not effected by the magnetic field:
+	if (candidate->getVelocity() == 0) {
+		return;
+	}
 
 	// rectilinear propagation for neutral particles
 	if (current.getCharge() == 0) {

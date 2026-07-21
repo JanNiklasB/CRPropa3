@@ -105,6 +105,11 @@ public:
 	 */
 	double getLorentzFactor() const;
 
+	/** Get Beta = (v/c)^2 
+	 @returns Beta
+	*/
+	double getBeta() const;
+
 	/** Get velocity: direction times the speed of light.
 	 @returns Velocity of particle [m/s]
 	 */

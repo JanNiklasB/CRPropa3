@@ -195,7 +195,10 @@ void EMPairProduction::performInteraction(Candidate *candidate) const {
 	
 	// sample electron / positron energy
 	static PPSecondariesEnergyDistribution interpolation;
-	double Ee = interpolation.sample(E, s);
+	// The two particles must exist after the interaction, if we want to sample the
+	// kinetic energy for the EMPair we first must substract the particle masses
+	// and then add it again to converve energy
+	double Ee = interpolation.sample(E-2*mec2, s) + mec2;
 	double Ep = E - Ee;
 	double f = Ep / E;
 	
