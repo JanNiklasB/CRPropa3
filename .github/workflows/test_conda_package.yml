@@ -135,5 +135,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: "Anaconda_x64_Packages"
+          name: "Anaconda_macos_Packages"
           path: ~/miniconda3/conda-bld/osx-arm64/crpropa*
