@@ -34,7 +34,7 @@ void ParticleState::setEnergy(double newEnergy) {
 
 void ParticleState::setId(int newId) {
 	id = newId;
-	pmass = particleMass(id);
+	setMass(particleMass(id));
 	if (isNucleus(id)) {
 		charge = chargeNumber(id) * eplus;
 		if (id < 0)
@@ -42,6 +42,14 @@ void ParticleState::setId(int newId) {
 	} else {
 		charge = HepPID::charge(id) * eplus;
 	}
+}
+
+void ParticleState::setMass(double Mass) {
+	pmass = Mass;
+}
+
+void ParticleState::setCharge(int ChargeNumber) {
+	charge = ChargeNumber * eplus;
 }
 
 double ParticleState::getLorentzFactor() const {
