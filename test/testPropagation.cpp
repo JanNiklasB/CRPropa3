@@ -584,7 +584,8 @@ TEST(testPropagationBP, zeroFieldTimeStep) {
 
 	PropagationBP propa(
 		1. * kiloyear, 
-		new UniformMagneticField(Vector3d(0, 0, 0))
+		new UniformMagneticField(Vector3d(0, 0, 0)),
+		new UniformElectricField(Vector3d(0, 0, 0))
 	);
 	
 	double minStep = 0.01 * kpc/c.getVelocity();
@@ -609,6 +610,7 @@ TEST(testPropagationBP, zeroField) {
 
 	PropagationBP propa(
 		new UniformMagneticField(Vector3d(0, 0, 0)), 
+		new UniformElectricField(Vector3d(0, 0, 0)),
 		1 * kpc
 	);
 	
@@ -675,6 +677,7 @@ TEST(testPropagationBP, constructorTimeStep) {
 	// Test construction and parameters
 	// default values:
 	ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(0, 0, 1 * nG));
+	ref_ptr<ElectricField> eField = new UniformElectricField(Vector3d(0, 0, 1 * volt));
 	double minStep = 1.;
 	double maxStep = 100.;
 	double tolerance = 0.01;
@@ -682,7 +685,7 @@ TEST(testPropagationBP, constructorTimeStep) {
 	{  // check default constructor (only supports length steps)
 		PropagationBP propa;
 
-		EXPECT_FALSE(propa.getField().valid());
+		EXPECT_FALSE(propa.getBField().valid());
 		EXPECT_EQ(1 * kiloparsec / c_light, propa.getMinimumTimeStep());
 		EXPECT_EQ(1 * kiloparsec / c_light, propa.getMaximumTimeStep());
 	}
@@ -692,7 +695,7 @@ TEST(testPropagationBP, constructorTimeStep) {
 
 		EXPECT_EQ(minStep, propa.getMinimumTimeStep());
 		EXPECT_EQ(minStep, propa.getMaximumTimeStep());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
 	}
 
 	{  // test B-Field only constructor
@@ -701,7 +704,26 @@ TEST(testPropagationBP, constructorTimeStep) {
 		EXPECT_EQ(minStep, propa.getMinimumTimeStep());
 		EXPECT_EQ(maxStep, propa.getMaximumTimeStep());
 		EXPECT_EQ(tolerance, propa.getTolerance());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
+	}
+
+	{  // test fixed step constructor with B-Field and E-Field
+		PropagationBP propa(minStep, bField, eField);
+
+		EXPECT_EQ(minStep, propa.getMinimumTimeStep());
+		EXPECT_EQ(minStep, propa.getMaximumTimeStep());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
+	}
+
+	{  // test B-Field + E-Field constructor
+		PropagationBP propa(tolerance, minStep, maxStep, bField, eField);
+
+		EXPECT_EQ(minStep, propa.getMinimumTimeStep());
+		EXPECT_EQ(maxStep, propa.getMaximumTimeStep());
+		EXPECT_EQ(tolerance, propa.getTolerance());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
 	}
 
 	{	// test update of parameter
@@ -712,16 +734,19 @@ TEST(testPropagationBP, constructorTimeStep) {
 		double maxStep = 10.;
 		double tolerance = 0.0001;
 		ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG));
+		ref_ptr<ElectricField> eField = new UniformElectricField(Vector3d(10 * volt, 0, 1 * volt));
 		
 		propa.setMinimumTimeStep(minStep);
 		propa.setMaximumTimeStep(maxStep);
 		propa.setTolerance(tolerance);
-		propa.setField(bField);
+		propa.setBField(bField);
+		propa.setEField(eField);
 
 		EXPECT_EQ(minStep, propa.getMinimumTimeStep());
 		EXPECT_EQ(maxStep, propa.getMaximumTimeStep());
 		EXPECT_EQ(tolerance, propa.getTolerance());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
 	}
 }
 
@@ -730,6 +755,7 @@ TEST(testPropagationBP, constructor) {
 	// Test construction and parameters
 	// default values:
 	ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(0, 0, 1 * nG));
+	ref_ptr<ElectricField> eField = new UniformElectricField(Vector3d(0, 0, 1 * volt));
 	double minStep = 1.;
 	double maxStep = 100.;
 	double tolerance = 0.01;
@@ -737,7 +763,7 @@ TEST(testPropagationBP, constructor) {
 	{  // check default constructor
 		PropagationBP propa;
 
-		EXPECT_FALSE(propa.getField().valid());
+		EXPECT_FALSE(propa.getBField().valid());
 		EXPECT_EQ(1 * kiloparsec, propa.getMinimumStep());
 		EXPECT_EQ(1 * kiloparsec, propa.getMaximumStep());
 	}
@@ -747,7 +773,7 @@ TEST(testPropagationBP, constructor) {
 
 		EXPECT_EQ(minStep, propa.getMinimumStep());
 		EXPECT_EQ(minStep, propa.getMaximumStep());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
 	}
 
 	{  // test B-Field only constructor
@@ -756,7 +782,26 @@ TEST(testPropagationBP, constructor) {
 		EXPECT_EQ(minStep, propa.getMinimumStep());
 		EXPECT_EQ(maxStep, propa.getMaximumStep());
 		EXPECT_EQ(tolerance, propa.getTolerance());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
+	}
+
+	{  // test fixed step constructor with B-Field and E-Field
+		PropagationBP propa(bField, eField, minStep);
+
+		EXPECT_EQ(minStep, propa.getMinimumStep());
+		EXPECT_EQ(minStep, propa.getMaximumStep());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
+	}
+
+	{  // test B-Field + E-Field constructor
+		PropagationBP propa(bField, eField, tolerance, minStep, maxStep);
+
+		EXPECT_EQ(minStep, propa.getMinimumStep());
+		EXPECT_EQ(maxStep, propa.getMaximumStep());
+		EXPECT_EQ(tolerance, propa.getTolerance());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
 	}
 
 	{	// test update of parameter
@@ -767,16 +812,19 @@ TEST(testPropagationBP, constructor) {
 		double maxStep = 10.;
 		double tolerance = 0.0001;
 		ref_ptr<MagneticField> bField = new UniformMagneticField(Vector3d(10 * nG, 0, 1 * nG));
+		ref_ptr<ElectricField> eField = new UniformElectricField(Vector3d(10 * volt, 0, 1 * volt));
 		
 		propa.setMinimumStep(minStep);
 		propa.setMaximumStep(maxStep);
 		propa.setTolerance(tolerance);
-		propa.setField(bField);
+		propa.setBField(bField);
+		propa.setEField(eField);
 
 		EXPECT_EQ(minStep, propa.getMinimumStep());
 		EXPECT_EQ(maxStep, propa.getMaximumStep());
 		EXPECT_EQ(tolerance, propa.getTolerance());
-		EXPECT_EQ(bField, propa.getField());
+		EXPECT_EQ(bField, propa.getBField());
+		EXPECT_EQ(eField, propa.getEField());
 	}
 }
 
@@ -809,6 +857,29 @@ TEST(testPropagationBP, reduceTimeStep) {
 		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getNextStep());  // stay at minimum step because of large r due to small tolerance
 	}
 
+	{  // test with B-Field and E-Field:
+		Candidate c(p);
+		PropagationBP propa(
+			1. * kiloyear, 
+			new UniformMagneticField(Vector3d(0, 0, 100 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 100 * volt))
+		);
+
+		double minStep = 0.1 * kpc / c.getVelocity();
+		double maxStep = 1 * Gpc / c.getVelocity();
+		propa.setMinimumTimeStep(minStep);
+		propa.setMaximumTimeStep(maxStep);
+		// small tolerance leads to large values of r
+		propa.setTolerance(1e-15);
+		c.setNextStep(propa.getMaximumTimeStep());
+
+		propa.process(&c);
+
+		// adaptive algorithm should propagate particle with minimum step size due to the low value for the tolerance
+		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getCurrentStep());  // perform minimum step because of large r due to small tolerance
+		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getNextStep());  // stay at minimum step because of large r due to small tolerance
+	}
+
 	{  // test with low energy:
 		ParticleState p;
 		p.setId(nucleusId(1, 1));
@@ -819,7 +890,8 @@ TEST(testPropagationBP, reduceTimeStep) {
 		Candidate c(p);
 		PropagationBP propa(
 			1. * kiloyear, 
-			new UniformMagneticField(Vector3d(0, 0, 100 * milli * tesla))
+			new UniformMagneticField(Vector3d(0, 0, 100 * milli * tesla)),
+			new UniformElectricField(Vector3d(0, 0, 100 * volt))
 		);
 
 		double minStep = 0.1 * meter / p.getVelocity().getR();
@@ -866,6 +938,29 @@ TEST(testPropagationBP, reduceStep) {
 		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getNextStep());  // stay at minimum step because of large r due to small tolerance
 	}
 
+	{  // test with B-Field and E-Field:
+		Candidate c(p);
+		PropagationBP propa(
+			new UniformMagneticField(Vector3d(0, 0, 100 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 100 * volt)),
+			1. * kpc
+		);
+
+		double minStep = 0.1 * kpc;
+		double maxStep = 1 * Gpc;
+		propa.setMinimumStep(minStep);
+		propa.setMaximumStep(maxStep);
+		// small tolerance leads to large values of r
+		propa.setTolerance(1e-15);
+		c.setNextStep(propa.getMaximumTimeStep());
+
+		propa.process(&c);
+
+		// adaptive algorithm should propagate particle with minimum step size due to the low value for the tolerance
+		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getCurrentStep());  // perform minimum step because of large r due to small tolerance
+		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getNextStep());  // stay at minimum step because of large r due to small tolerance
+	}
+
 	{  // test with low energy:
 		ParticleState p;
 		p.setId(nucleusId(1, 1));
@@ -876,6 +971,7 @@ TEST(testPropagationBP, reduceStep) {
 		Candidate c(p);
 		PropagationBP propa(
 			new UniformMagneticField(Vector3d(0, 0, 100 * milli * tesla)),
+			new UniformElectricField(Vector3d(0, 0, 100 * volt)),
 			1. * kpc
 		);
 
@@ -926,6 +1022,31 @@ TEST(testPropagationBP, increaseTimeStep) {
 		EXPECT_DOUBLE_EQ(maxStep, c.getNextStep());
 	}
 
+	{  // test for E-Field + B-Field
+		Candidate c(p);
+		PropagationBP propa(
+			1 * kiloyear, 
+			new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 1 * volt))
+		);
+		
+		double minStep = 0.001 * pc/c.getVelocity();
+		double maxStep = 3.125 * pc/c.getVelocity();
+		propa.setMinimumTimeStep(minStep);
+		propa.setMaximumTimeStep(maxStep);
+		// large tolerance leads to small values of r. Consequently, the step size can be increased.
+		propa.setTolerance(0.9);
+
+		// each step the step size can be increased by a factor of 5.
+		for (int i = 1; i < 6; i++){
+			propa.process(&c);
+			EXPECT_DOUBLE_EQ(minStep*pow(5, i), c.getNextStep());
+		}
+		// after 5 steps the maxStep is reached. The current step is, however, less.
+		EXPECT_DOUBLE_EQ(maxStep/5., c.getCurrentStep());
+		EXPECT_DOUBLE_EQ(maxStep, c.getNextStep());
+	}
+
 	{  // test with low energy
 		ParticleState p;
 		p.setId(nucleusId(1, 1));
@@ -936,7 +1057,8 @@ TEST(testPropagationBP, increaseTimeStep) {
 		
 		PropagationBP propa(
 			1 * kiloyear, 
-			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla))
+			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla)),
+			new UniformElectricField(Vector3d(0, 0, 1 * milli*volt))
 		);
 		
 		double minStep = 0.001 * cm/c.getVelocity();
@@ -990,6 +1112,31 @@ TEST(testPropagationBP, increaseStep) {
 		EXPECT_DOUBLE_EQ(propa.getMaximumTimeStep(), c.getNextStep());
 	}
 
+	{  // test with B-Field and E-Field:
+		Candidate c(p);
+		PropagationBP propa(
+			new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 1 * volt)),
+			1 * kiloparsec
+		);
+		
+		double minStep = 0.001 * pc;
+		double maxStep = 3.125 * pc;
+		propa.setMinimumStep(minStep);
+		propa.setMaximumStep(maxStep);
+		// large tolerance leads to small values of r. Consequently, the step size can be increased.
+		propa.setTolerance(0.9);
+
+		// each step the step size can be increased by a factor of 5.
+		for (int i = 1; i < 6; i++){
+			propa.process(&c);
+			EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep()*pow(5, i), c.getNextStep());
+		}
+		// after 5 steps the maxStep is reached. The current step is, however, less.
+		EXPECT_DOUBLE_EQ(propa.getMaximumTimeStep()/5., c.getCurrentStep());
+		EXPECT_DOUBLE_EQ(propa.getMaximumTimeStep(), c.getNextStep());
+	}
+
 	{  // test with low energy
 		ParticleState p;
 		p.setId(nucleusId(1, 1));
@@ -1000,7 +1147,8 @@ TEST(testPropagationBP, increaseStep) {
 		
 		PropagationBP propa(
 			1 * kiloyear, 
-			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla))
+			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla)),
+			new UniformElectricField(Vector3d(0, 0, 1 * milli*volt))
 		);
 		
 		double minStep = 0.001 * cm/c.getVelocity();
@@ -1047,6 +1195,26 @@ TEST(testPropagationBP, protonTimeStep) {
 		EXPECT_DOUBLE_EQ(5 * step, c.getNextStep());  // acceleration by factor 5
 	}
 
+	{  // test with B-Field and E-Field:
+		PropagationBP propa(
+			new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 1 * volt)),
+			1 * kpc
+		);
+		Candidate c(p);
+		c.setNextStep(0);
+
+		double step = 0.001 * kpc/c.getVelocity();
+		propa.setMinimumTimeStep(step);
+		propa.setMaximumTimeStep(10*step);
+		propa.setTolerance(0.00001);
+
+		propa.process(&c);
+
+		EXPECT_DOUBLE_EQ(step, c.getCurrentStep());  // perform step
+		EXPECT_DOUBLE_EQ(5 * step, c.getNextStep());  // acceleration by factor 5
+	}
+
 	{  // test with low energy:
 
 		ParticleState p;
@@ -1057,7 +1225,8 @@ TEST(testPropagationBP, protonTimeStep) {
 
 		PropagationBP propa(
 			1 * kiloyear, 
-			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla))
+			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla)),
+			new UniformElectricField(Vector3d(0, 0, 1 * milli*volt))
 		);
 		Candidate c(p);
 		c.setNextStep(0);
@@ -1099,6 +1268,27 @@ TEST(testPropagationBP, proton) {
 		EXPECT_DOUBLE_EQ(5 * propa.getMinimumTimeStep(), c.getNextStep());  // acceleration by factor 5
 	}
 
+	{  // test with B-Field and E-Field:
+		PropagationBP propa(
+			new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+			new UniformElectricField(Vector3d(0, 0, 1 * volt)),
+			1 * kpc
+		);
+		Candidate c(p);
+		c.setNextStep(0);
+		
+		double step = 0.001 * kpc;
+		propa.setMinimumStep(step);
+		propa.setMaximumStep(10*step);
+		propa.setTolerance(0.00001);
+
+		propa.process(&c);
+
+		// divide by c_light since propagator does internal conversion over 1/c_light
+		EXPECT_DOUBLE_EQ(propa.getMinimumTimeStep(), c.getCurrentStep());  // perform step
+		EXPECT_DOUBLE_EQ(5 * propa.getMinimumTimeStep(), c.getNextStep());  // acceleration by factor 5
+	}
+
 	{  // test with low energy:
 
 		ParticleState p;
@@ -1109,7 +1299,8 @@ TEST(testPropagationBP, proton) {
 
 		PropagationBP propa(
 			1 * kiloyear, 
-			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla))
+			new UniformMagneticField(Vector3d(0, 0, 1 * nano*tesla)),
+			new UniformElectricField(Vector3d(0, 0, 1 * milli*volt))
 		);
 		Candidate c(p);
 		c.setNextStep(0);
@@ -1137,6 +1328,7 @@ TEST(testPropagationBP, neutronTimeStep) {
 	Candidate c(p);
 	PropagationBP propa(
 		new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+		new UniformElectricField(Vector3d(0, 0, 1 * volt)),
 		1 * kpc
 	);
 	
@@ -1164,6 +1356,7 @@ TEST(testPropagationBP, neutron) {
 	Candidate c(p);
 	PropagationBP propa(
 		new UniformMagneticField(Vector3d(0, 0, 1 * nG)),
+		new UniformElectricField(Vector3d(0, 0, 1 * volt)),
 		1 * kpc
 	);
 	
@@ -1357,6 +1550,169 @@ TEST(testPropagationBP, fixedStepOptimization) {
 	EXPECT_DOUBLE_EQ(c1.current.getPosition().y, c2.current.getPosition().y);
 	EXPECT_DOUBLE_EQ(c1.current.getPosition().z, c2.current.getPosition().z);
 }
+
+
+// Test that the velocity is added correctly in the relativistic limit and non relativistic limit
+TEST(testPropagationBP, relativisticLimit) {
+	double step = 1. * microsecond;
+	Vector3d Field(0, 0, 100 * volt);
+	PropagationBP propa(
+		step,
+		NULL,  // no B-Field so we only change the velocity through the E-Field
+		new UniformElectricField(Field)
+	);
+	
+	{  // relativistic limit
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(100 * EeV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+
+		Candidate c(p);
+		propa.process(&c);
+
+		double gamma = p.getLorentzFactor();
+		double m = p.getMass()*gamma;
+		Vector3d acc = eplus*Field/2./m*step;
+		Vector3d vel = p.getVelocity();
+
+		// calculate the velocity manually (without B-Field) relativistic
+		Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
+			( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+		vel = 1/(1 + acc.dot(v_minus)/c_squared)*
+			( acc/gamma + v_minus + 1/c_squared*gamma/(1+gamma)*acc.dot(v_minus)*v_minus );
+			
+		// can have small differences since we convert to energy in between
+		EXPECT_NEAR(vel.getR(), c.getVelocity(), vel.getR()*1.e-6);
+		
+		// also compare Energy:
+		double rm = p.getMass();  // rest mass
+		double rm2 = rm*rm;
+		double v2 = vel.getR2();
+		double Energy = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared;
+
+		EXPECT_EQ(Energy, c.current.getEnergy());
+	}
+
+	{  // non relativistic limit
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(1 * eV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+
+		Candidate c(p);
+		propa.process(&c);
+
+		double m = p.getMass()*p.getLorentzFactor();
+		Vector3d acc = eplus*Field/m*step;
+		Vector3d vel = p.getVelocity();
+
+		// calculate the velocity manually (without B-Field) classically
+		vel += acc;
+		
+		// can have small differences since we convert to energy in between
+		EXPECT_NEAR(vel.getR(), c.getVelocity(), vel.getR()*1.e-6);
+		
+		// also compare Energy:
+		double Energy = m*vel.getR2()/2;
+		EXPECT_DOUBLE_EQ(Energy, c.current.getEnergy());
+	}
+}
+
+
+// Test propagation with only an E-Field
+TEST(testPropagationBP, EFieldOnly) {
+	double step = 1 * second;
+	Vector3d Field(0, 0, 1 * volt);
+	PropagationBP propa(
+		step,
+		NULL,
+		new UniformElectricField(Field)
+	);
+
+	{  // high energy
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(100 * EeV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+		Candidate c(p);
+
+		propa.process(&c);
+
+		// we expect the velocity to be very close to c_light at this energy
+		// so the electric field should have nearly no effect:
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+		EXPECT_NEAR(c_light*step, c.current.getPosition().z, c_light*step*1.e-6);
+	}
+
+	{  // low energy
+		ParticleState p;
+		p.setId(nucleusId(1, 1));
+		p.setEnergy(1 * eV);
+		p.setPosition(Vector3d(0, 0, 0));
+		p.setDirection(Vector3d(0, 0, 1));
+		Candidate c(p);
+
+		propa.process(&c);
+
+		double vel = p.getVelocity().getR();
+		double m = p.getMass()*p.getLorentzFactor();
+		double acc = eplus*Field.getR()/m*step;
+
+		// calculate one leapfrog step manually:
+		double distance = vel*step/2;
+		vel += acc;
+		distance += vel*step/2;
+
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+		EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+		EXPECT_NEAR(distance, c.current.getPosition().z, distance*1.e-6);
+	}
+}
+
+
+// Tests acceleration of particle at rest
+TEST(testPropagationBP, restAcceleration) {
+	double step = 1 * microsecond;
+	Vector3d Field(0, 0, 1 * volt);
+	PropagationBP propa(
+		step,
+		NULL,
+		new UniformElectricField(Field)
+	);
+
+	ParticleState p;
+	p.setId(nucleusId(1, 1));
+	p.setEnergy(0);
+	p.setPosition(Vector3d(0, 0, 0));
+	p.setDirection(Vector3d(1, 0, 0));
+	Candidate c(p);
+
+	propa.process(&c);
+
+	// particle velocity is zero, so gamma=1
+	double m = p.getMass();
+	Vector3d acc = eplus*Field/m*step;
+
+	// calculate one leapfrog step manually:
+	Vector3d vel = acc;
+	double distance = vel.getR()*step/2;
+
+	EXPECT_DOUBLE_EQ(0, c.current.getPosition().x);
+	EXPECT_DOUBLE_EQ(0, c.current.getPosition().y);
+	EXPECT_NEAR(distance, c.current.getPosition().z, distance*1.e-6);
+	EXPECT_DOUBLE_EQ(0, c.current.getVelocity().x);
+	EXPECT_DOUBLE_EQ(0, c.current.getVelocity().y);
+	EXPECT_NEAR(vel.z, c.current.getVelocity().z, vel.z*1.e-3);
+	// also compare Energy:
+	double Energy = m*vel.getR2()/2;
+	EXPECT_DOUBLE_EQ(Energy, c.current.getEnergy());
+}
+
 
 int main(int argc, char **argv) {
 	::testing::InitGoogleTest(&argc, argv);

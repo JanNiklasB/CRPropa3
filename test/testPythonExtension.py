@@ -90,6 +90,25 @@ class testCrossLanguagePolymorphism(unittest.TestCase):
 		self.assertEqual(fieldAtPos, propCK.getFieldAtPosition(pos, z))
 		self.assertEqual(fieldAtPos, propSDE.getMagneticFieldAtPosition(pos, z))
 
+	def testCustomElectricField(self):
+		class CustomElectricField(crp.ElectricField):
+			def __init__(self, val):
+				crp.ElectricField.__init__(self)
+				self.val = val
+				
+			def getField(self, position):
+				return crp.Vector3d(self.val)
+
+			def getField(self, position, z):
+				return crp.Vector3d(self.val)
+
+		field = CustomElectricField(crp.gauss)
+		propBP = crp.PropagationBP(None, field, 1e-4, 1*crp.Mpc, 1*crp.Mpc)
+		pos = crp.Vector3d(-1, 0, 0)
+		z = 0
+		fieldAtPos = field.getField(pos, z)
+		self.assertEqual(fieldAtPos, propBP.getEFieldAtPosition(pos, z))
+
 	def testCustomAdvectionField(self):
 		class CustomAdvectionField(crp.AdvectionField):
 			def __init__(self, val):
@@ -336,8 +355,7 @@ class testParticleCollector(unittest.TestCase):
 		collector.process(c2)
 		sim.run(collector.getContainer())
 		for c in collector:
-			self.assertAlmostEqual(
-				c.getTrajectoryLength(), 3.14, places=2)
+			self.assertAlmostEqual(c.getTrajectoryLength(), 3.14, places=2)
 
 	def testParticleCollectorAsModuleListOutput(self):
 		sim = crp.ModuleList()

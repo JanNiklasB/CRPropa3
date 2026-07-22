@@ -382,6 +382,7 @@ add_library(crpropa SHARED
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/UF23Field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/KST24Field.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/magneticField/CMZField.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/electricField/ElectricField.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/AdvectionField.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/advectionField/TimeDependentAdvectionField.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/src/massDistribution/ConstantDensity.cpp
