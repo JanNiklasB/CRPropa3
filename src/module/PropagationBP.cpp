@@ -12,77 +12,83 @@ namespace crpropa {
 
 		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
 
-		error = errorEstimation(out.x , outCompare.x , h);
+		error = errorEstimation(out.x , outCompare.x , h*particle.getVelocity().getR());
 	}
 
 	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double dt, 
 		double z, ParticleState current) const {
 
-		// get E and B field at particle position
+		// get some variables that are always needed
 		Vector3d B = getBFieldAtPosition(pos, z);
-		Vector3d E = getEFieldAtPosition(pos, z);
-
-		// if the velocity and the electric field are zero nothing would happen
-		if ((E.getR2()==0) && (current.getVelocity().getR2()==0))
-			return Y(pos, dir);
-
-		// get some needed candidate features
 		Vector3d vel = dir*current.getVelocity().getR();
 		double q = current.getCharge();
 		// lorentz factor is between 1 and infinity (but never actually infinity)
 		double gamma = current.getLorentzFactor();
 		double m = gamma*current.getMass();
 
-		// we first do a half leapfrog step
+		// do a half leapfrog step
 		pos += vel * dt / 2.;
 
 		// Boris help vectors:
 		Vector3d t = B * q / 2. / m * dt;
 		Vector3d s = t * 2. / (1. + t.dot(t));
 
-		// if the E field is 0 we only need to do the classical boris push
-		// since we are not changing the absolute value of the candidates velocity
-		if (E.getR2()==0){
+		// first check if E-Field exists, if not do B-Field only Boris Push
+		if (EField.valid()) {
+			// get E-Field (E-Field is now guaranteed to be valid)
+			Vector3d E = EField->getField(pos, z);
+
+			// if the E field is 0 we only need to do the classical boris push
+			// since we are not changing the absolute value of the candidates velocity
+			if (E==Vector3(0)){
+				// Boris push
+				
+				// if the velocity and the electric field are zero nothing would happen
+				if (vel==Vector3(0))
+					return Y(pos, dir);
+
+				Vector3d v_prime = vel + vel.cross(t);
+				vel = vel + v_prime.cross(s);  // final velocity
+			} else {  // otherwise we need to respect the electic field and relativity
+				// half acceleration (once done before BP once after)
+				Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
+
+				// differentiate the case for performance improvement:
+				// (the relativistic case goes towards the non-relativistic case)
+				if (abs(1/gamma - 1) <= 1.e-3){
+					Vector3d v_minus = vel + acc;
+					Vector3d v_prime = v_minus + v_minus.cross(t);
+					v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+					vel = v_prime + acc;  // final velocity
+
+					// Energy change can only happen when a electric field is present:
+					deltaE = m*vel.getR2()/2 - current.getEnergy();
+
+				} else {  // relativistic
+					Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
+							( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
+					Vector3d v_prime = v_minus + v_minus.cross(t);
+					v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
+					vel = 1/(1 + acc.dot(v_prime)/c_squared)*
+						( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
+					
+					// Energy change can only happen when a electric field is present:
+					double rm = current.getMass();  // rest mass
+					// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
+					deltaE = sqrt(m*m*vel.getR2()*c_squared + rm*rm*c_squared*c_squared) - rm*c_squared - current.getEnergy();
+				}
+				
+
+				// final velocity might be zero after the the influence of the electric field
+				// if that is the case, we know vel must point in the same direction as -acc.
+				// since it also has no influence on the next leap frog step we return here:
+				if (vel==Vector3(0))
+					return Y(pos, (acc*-1).getUnitVector());
+			}
+		} else {
 			// Boris push
 			Vector3d v_prime = vel + vel.cross(t);
 			vel = vel + v_prime.cross(s);  // final velocity
-		} else {  // otherwise we need to respect the electic field and relativity
-			// half acceleration (once done before BP once after)
-			Vector3d acc = q*E/2./m*dt;  // it is assumed the velocity change is non relativistic
-
-			// differentiate the case for performance improvement:
-			// (the relativistic case goes towards the non-relativistic case)
-			if (abs(1/gamma - 1) <= 1.e-3){
-				Vector3d v_minus = vel + acc;
-				Vector3d v_prime = v_minus + v_minus.cross(t);
-				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
-				vel = v_prime + acc;  // final velocity
-
-				// Energy change can only happen when a electric field is present:
-				deltaE = m*vel.getR2()/2 - current.getEnergy();
-
-			} else {  // relativistic
-				Vector3d v_minus = 1/(1 + acc.dot(vel)/c_squared)*
-						( acc/gamma + vel + 1/c_squared*gamma/(1+gamma)*acc.dot(vel)*vel );
-				Vector3d v_prime = v_minus + v_minus.cross(t);
-				v_prime = v_minus + v_prime.cross(s);  // v_prime -> v_plus
-				vel = 1/(1 + acc.dot(v_prime)/c_squared)*
-					( acc/gamma + v_prime + 1/c_squared*gamma/(1+gamma)*acc.dot(v_prime)*v_prime );  // final velocity
-				
-				// Energy change can only happen when a electric field is present:
-				double rm = current.getMass();  // rest mass
-				double rm2 = rm*rm;
-				double v2 = vel.getR2();
-				// dE = E'_kin - E_kin = sqrt(p'^2*c^2 + m^2*c^4) - m*c^2 - E_kin
-				deltaE = sqrt(m*m*v2*c_squared + rm2*c_squared*c_squared) - rm*c_squared - current.getEnergy();
-			}
-			
-
-			// final velocity might be zero after the the influence of the electric field
-			// if that is the case, we know vel must point in the same direction as -acc.
-			// since it also has no influence on the next leap frog step we return here:
-			if (vel.getR2() == 0)
-				return Y(pos, (acc*-1).getUnitVector());
 		}
 
 		// the other half leapfrog step (only happens if vel!=0)
@@ -171,11 +177,10 @@ namespace crpropa {
 		Y yIn(current.getPosition(), current.getDirection());
 
 		// calculate charge of particle
-		double q = current.getCharge();
 		double step = maxStep;
 
 		// rectilinear propagation for neutral particles
-		if (q == 0) {
+		if (current.getCharge() == 0) {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
 			current.setPosition(yIn.x + yIn.u * candidate->getVelocity() * step);
 			candidate->setCurrentStep(step);
@@ -224,7 +229,8 @@ namespace crpropa {
 		current.setDirection(yOut.u);
 		candidate->setCurrentStep(step);
 		candidate->setNextStep(newStep);
-		candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
+		if (deltaE>0)
+			candidate->current.setEnergy(candidate->current.getEnergy() + deltaE);
 		deltaE = 0;
 	}
 
@@ -245,40 +251,23 @@ namespace crpropa {
 	}
 
 	Vector3d PropagationBP::getBFieldAtPosition(Vector3d pos, double z) const{
-		Vector3d B(0, 0, 0);
-		try {
-			// check if field is valid and use the field vector at the
-			// position pos with the redshift z
-			if (BField.valid())
-				B = BField->getField(pos, z);
-		} catch (std::exception &e) {
-			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
-					<< e.what();
-		}	
-		return B;
+		if (BField.valid())
+			return BField->getField(pos, z);
+		else
+			return Vector3d(0.);
 	}
 
 	Vector3d PropagationBP::getEFieldAtPosition(Vector3d pos, double z) const{
-		Vector3d E(0, 0, 0);
-		try {
-			// check if field is valid and use the field vector at the
-			// position pos with the redshift z
-			if (EField.valid())
-				E = EField->getField(pos, z);
-		} catch (std::exception &e) {
-			KISS_LOG_ERROR 	<< "PropagationBP: Exception in PropagationBP::getFieldAtPosition.\n"
-					<< e.what();
-		}	
-		return E;
+		if (EField.valid())
+			return EField->getField(pos, z);
+		else
+			return Vector3d(0.);
 	}
 
 	double PropagationBP::errorEstimation(const Vector3d x1, const Vector3d x2, double step) const {
 		// compare the position after one step with the position after two steps with step/2.
-		Vector3d diff = (x1 - x2);
-
-		double S = diff.getR() / (step * (1 - 1/4.) );	// 1/4 = (1/2)²  number of steps for x1 divided by number of steps for x2 to the power of p (order)
-
-		return S;
+		// 1/4 = (1/2)²  number of steps for x1 divided by number of steps for x2 to the power of p (order)
+		return (x1 - x2).getR() / (step * (1 - 1/4.) );
 	}
 
 	void PropagationBP::setTolerance(double tol) {

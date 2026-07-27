@@ -95,7 +95,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 			driftStep(Pos, LinProp, h, time);
 		}
 
-		current.setPosition(Pos + LinProp*candidate->getVelocity() + dir*h*candidate->getVelocity());
+		current.setPosition(Pos + LinProp + dir*h*candidate->getVelocity());
 		candidate->setCurrentStep(h);
 		candidate->setNextStep(maxStep);
 		return;
@@ -126,7 +126,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 	Vector3d DirOut = Vector3d(0.);
 
 
-	double propStep = TStep * sqrt(h);
+	double propStep = TStep * sqrt(h) / c_light;
 	size_t counter = 0;
 	double r=42.; //arbitrary number larger than one
 
@@ -144,12 +144,12 @@ void DiffusionSDE::process(Candidate *candidate) const {
 
 
 	size_t stepNumber = pow(2, counter-1);
-	double allowedStep = TStep * sqrt(h) / stepNumber;
+	double allowedTime = TStep * sqrt(h) / stepNumber / c_light;
 	Vector3d Start = PosIn;
 	Vector3d PosOut = Vector3d(0.);
 	Vector3d PosErr = Vector3d(0.);
 	for (size_t j=0; j<stepNumber; j++) {
-		tryStep(Start, PosOut, PosErr, z, allowedStep);
+		tryStep(Start, PosOut, PosErr, z, allowedTime);
 		Start = PosOut;
 	}
 
@@ -164,7 +164,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 		Vector3d LinProp(0.);
 		if (advectionField){
 			driftStep(Pos, LinProp, h, time);
-			current.setPosition(Pos + LinProp*candidate->getVelocity());
+			current.setPosition(Pos + LinProp);
 	 		candidate->setCurrentStep(h);
 	  		double newStep = 5*h;
 			newStep = clip(newStep, minStep, maxStep);
@@ -257,7 +257,7 @@ void DiffusionSDE::process(Candidate *candidate) const {
 }
 
 
-void DiffusionSDE::tryStep(const Vector3d &PosIn, Vector3d &POut, Vector3d &PosErr,double z, double propStep) const {
+void DiffusionSDE::tryStep(const Vector3d &PosIn, Vector3d &POut, Vector3d &PosErr, double z, double propStep) const {
 
 	Vector3d k[] = {Vector3d(0.),Vector3d(0.),Vector3d(0.),Vector3d(0.),Vector3d(0.),Vector3d(0.)};
 	POut = PosIn;
@@ -271,7 +271,7 @@ void DiffusionSDE::tryStep(const Vector3d &PosIn, Vector3d &POut, Vector3d &PosE
 		// update k_i = direction of the regular magnetic mean field
 		Vector3d BField = getMagneticFieldAtPosition(y_n, z);
 
-		k[i] = BField.getUnitVector();
+		k[i] = BField.getUnitVector() * c_light;
 
 		POut += k[i] * b[i] * propStep;
 		PosErr +=  (k[i] * (b[i] - bs[i])) * propStep / kpc;

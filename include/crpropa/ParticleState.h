@@ -47,7 +47,7 @@ public:
 	/** Get position of particle.
 	 @returns Position vector of particle. If cosmological effects are included, the coordinates are comoving.
 	 */
-	const Vector3d &getPosition() const;
+	inline const Vector3d &getPosition() const { return position; }
 
 	/** Set direction unit vector, non unit-vectors are normalized
 	 @param dir	vector containing the direction of motion of the particle
@@ -56,7 +56,7 @@ public:
 	/** Get direction unit vector
 	 @returns Normalized vector containing direction of motion of particle.
 	 */
-	const Vector3d &getDirection() const;
+	inline const Vector3d &getDirection() const { return direction; }
 
 	/** Set kinetic energy of particle.
 	 @param newEnergy	energy to be assigned to particle [in Joules]
@@ -65,11 +65,11 @@ public:
 	/** Get kinetic energy of particle.
 	 @returns Energy of particle [in Joules]
 	 */
-	double getEnergy() const;
+	inline double getEnergy() const { return energy; }
 	/** Get rigidity of particle, defined as E/(Z*e).
 	 @returns Rigidity of the particle [in Volts]
 	 */
-	double getRigidity() const;
+	inline double getRigidity() const { return fabs(energy / charge); }
 
 	/** Set particle ID.
 	 This follows the PDG numbering scheme:
@@ -80,7 +80,7 @@ public:
 	/** Get particle ID
 	 @returns Particle ID (in PDG format).
 	 */
-	int getId() const;
+	inline int getId() const { return id; }
 
 	std::string getDescription() const;
 
@@ -89,7 +89,7 @@ public:
 	/** Get electrical charge of the particle.
 	 @returns Charge of the particle [in Coulombs]
 	 */
-	double getCharge() const;
+	inline double getCharge() const { return charge; }
 	/** Sets the charge manually, use with caution!
 	 @param ChargeNumber the charge number, set negative for negative charges 
 	 */
@@ -97,7 +97,7 @@ public:
 	/** Get mass of the particle.
 	 @returns Mass of the particle [kg]
 	 */
-	double getMass() const;
+	inline double getMass() const { return pmass; }
 	/** Sets the particle mass manually, use with caution!
 	 @param Mass particle mass
 	 */

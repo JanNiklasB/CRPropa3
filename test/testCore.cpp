@@ -94,7 +94,7 @@ TEST(ParticleState, momentum) {
 		particle.setDirection(v);
 		double energy = 10*eV;
 		particle.setEnergy(10 * eV);
-		EXPECT_TRUE(particle.getMomentum() == particle.getLorentzFactor()*particle.getMass()*particle.getVelocity());
+		EXPECT_TRUE(particle.getMomentum() == particle.getMass()*particle.getVelocity());
 	}
 }
 

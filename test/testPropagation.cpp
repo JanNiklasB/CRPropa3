@@ -1487,7 +1487,7 @@ TEST(testPropagationBP, fixedTimeStepOptimization) {
 
 	// particle 2 with different min and max steps. The tolerance is chosen such that particle 2 will be
 	// propagated with the same step as particle 1, however not using the optimization for fixed step sizes
-	double tolerance = 1;
+	double tolerance = 0.001;
 	PropagationBP propa2(tolerance, fixed_step, 1.1*fixed_step, new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1));
 	ParticleState p2;
 	p2.setId(nucleusId(1, 1));
@@ -1529,7 +1529,7 @@ TEST(testPropagationBP, fixedStepOptimization) {
 
 	// particle 2 with different min and max steps. The tolerance is chosen such that particle 2 will be
 	// propagated with the same step as particle 1, however not using the optimization for fixed step sizes
-	double tolerance = 1;
+	double tolerance = 0.001;
 	PropagationBP propa2(new PlaneWaveTurbulence(TurbulenceSpectrum(gauss, pc, 100*pc), 10, 1), tolerance, fixed_step, 1.1*fixed_step);
 	ParticleState p2;
 	p2.setId(nucleusId(1, 1));

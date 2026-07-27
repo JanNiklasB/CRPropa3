@@ -1,15 +1,48 @@
 ## CRPropa vNext
 
 ### Bug fixes:
-* Fixed the secondariesFirst parameter not actually allowing secondary particles to be propagated before the primary
-* threshold calculation in PhotoPionProduction
+* Double free error can now be prevented by handing over stack objects as reference to `ref_ptr<Obj>` instead as pointer
+* Fixed solving issues when attempting to install `matplotlib==3.11.0`, `python==3.14.6`, and `crpropa==3.3` together 
+
+### New features:
+* Velocities can now be smaller then light speed
+* Added electric fields (for now only uniform electric field)
+* Modified `PropagationBP` so it can also accelerate particles over a given electric field
+* Added `ObserverSpacialEvolution` that observes the Candidate at different lengths instead of times
+* Added `MaximumTime` break condition that rejects the Candidate when a given time is reached
+* Added `ParticleState::setCharge`, `ParticleState::setMass` and `ParticleState::getBeta`
+
+### Interface changes:
+* CRPropa now uses explicit time as steps instead of length steps
+* `ObserverTimeEvolution` now assumes explicit times instead of length (for old behaviour see `ObserverSpacialEvolution`)
+* Added overloads to propagators that take time steps instead of length steps
+* Length steps in propagator constructors are now directly converted to times by dividing by `c_light` to preserve old behaviour
+
+### Features that are deprecated and will be removed after this release
+* Propagation constructors will only accept minimum and maximum times instead of length and will take them in the the same order it takes length steps now
+
+### Removed features
+* Removed `Clock.h` (can be replaced with `std::chrono::high_resolution_clock` from `chrono.h`)
+* Removed `AssocVector.h` (can be replaced with `std::unordered_map` from `unordered_map.h`)
+
+### New plugins and resources linked on the webpages
+
+
+## CRPropa 3.3
+
+### Bug fixes:
+* Fixed the secondariesFirst parameter not actually allowing secondary particles to be propagated before the primary 
+* Threshold calculation in PhotoPionProduction
+* Bug fixed when generating python binding for variants with some specific compilers (e.g., clang-llvm 21).
 
 ### New features:
 
 * Improved plugin-template and added test to ensure the template is working
 * Added position-dependent photon fields
 * Secondaries are now distributed over multiple threads if OpenMP parallelisation is enabled
+* Advanced CMake finder for CRPropa, to be used with plugins.
 * Exposed `getRate` function for electromagnetic interactions
+
 
 ### Interface changes:
 
