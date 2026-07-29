@@ -25,8 +25,8 @@ const double cash_karp_bs[] = {
 	2825. / 27648., 0., 18575. / 48384., 13525. / 55296., 277. / 14336., 1. / 4.
 };
 
-void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
-		ParticleState &particle, double z) const {
+void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double dt,
+		double z, const ParticleState &particle) const {
 	std::vector<Y> k;
 	k.reserve(6);
 
@@ -38,26 +38,24 @@ void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 
 		Y y_n = y;
 		for (size_t j = 0; j < i; j++)
-			y_n += k[j] * a[i * 6 + j] * h;
+			y_n += k[j] * a[i * 6 + j];
 
 		// update k_i
-		k[i] = dYdt(y_n, particle, z);
+		k[i] = dY(y_n.x, y_n.u, dt, z, particle);
 
-		out += k[i] * b[i] * h;
-		error += k[i] * (b[i] - bs[i]) * h;
+		out += k[i] * b[i];
+		error += k[i] * (b[i] - bs[i]);
 	}
 }
 
-PropagationCK::Y PropagationCK::dYdt(const Y &y, ParticleState &p, double z) const {
-	// normalize direction vector to prevent numerical losses
-	Vector3d velocity = y.u.getUnitVector() * c_light;
-	
+PropagationCK::Y PropagationCK::dY(Vector3d pos, Vector3d dir, double dt, double z, const ParticleState &p) const {
 	// get B field at particle position
-	Vector3d B = getFieldAtPosition(y.x, z);
+	Vector3d B = getFieldAtPosition(pos, z);
 
 	// Lorentz force: du/dt = q*c/E * (v x B)
-	Vector3d dudt = p.getCharge() * c_light / p.getEnergy() * velocity.cross(B);
-	return Y(velocity, dudt);
+	// so dir = du/dt*h/|v| = q*c/E * (dir x B)
+	Vector3d dudt = p.getCharge() * c_light / p.getEnergy() * dir.cross(B);
+	return Y(dir*c_light*dt, dudt*dt);
 }
 
 PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
@@ -99,7 +97,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	// if minStep is the same as maxStep the adaptive algorithm with its error
 	// estimation is not needed and the computation time can be saved:
 	if (minStep == maxStep){
-		tryStep(yIn, yOut, yErr, step / c_light, current, z);
+		tryStep(yIn, yOut, yErr, step / c_light, z, current);
 	} else {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
 		newStep = step;
@@ -107,7 +105,7 @@ void PropagationCK::process(Candidate *candidate) const {
 
 		// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 		while (true) {
-			tryStep(yIn, yOut, yErr, step / c_light, current, z);
+			tryStep(yIn, yOut, yErr, step / c_light, z, current);
 			r = yErr.u.getR() / tolerance;  // ratio of absolute direction error and tolerance
 			if (r > 1) {  // large direction error relative to tolerance, try to decrease step size
 				if (step == minStep)  // already minimum step size
@@ -130,7 +128,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	}
 
 	current.setPosition(yOut.x);
-	current.setDirection(yOut.u.getUnitVector());
+	current.setDirection(yOut.u);
 	candidate->setCurrentStep(step);
 	candidate->setNextStep(newStep);
 }

@@ -1,7 +1,7 @@
 #ifndef CRPROPA_PROPAGATIONBP_H
 #define CRPROPA_PROPAGATIONBP_H
 
-#include "crpropa/Module.h"
+#include "crpropa/module/Propagation.h"
 #include "crpropa/Units.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "kiss/logger.h"
@@ -23,35 +23,7 @@ namespace crpropa {
  Additionally a minimum and maximum size for the steps can be set.
  For neutral particles a rectilinear propagation is applied and a next step of the maximum step size proposed.
  */
-class PropagationBP: public Module {
-
-public:
-	class Y {
-	public:
-		Vector3d x, u; /*< phase-point: position and direction */
-
-		Y() {
-		}
-
-		Y(const Vector3d &x, const Vector3d &u) :
-				x(x), u(u) {
-		}
-
-		Y(double f) :
-				x(Vector3d(f, f, f)), u(Vector3d(f, f, f)) {
-		}
-
-		Y operator *(double f) const {
-			return Y(x * f, u * f);
-		}
-
-		Y &operator +=(const Y &y) {
-			x += y.x;
-			u += y.u;
-			return *this;
-		}
-	};
-
+class PropagationBP: public Propagation {
 private:
 	ref_ptr<MagneticField> field;
 	double tolerance; /** target relative error of the numerical integration */
@@ -80,13 +52,12 @@ public:
 	/** Calculates the new position and direction of the particle based on the solution of the Lorentz force
 	 * @param pos	current position of the candidate
 	 * @param dir	current direction of the candidate
-	 * @param step	current step size of the candidate
+	 * @param step	current lengthstep size of the candidate
 	 * @param z		current redshift is needed to calculate the magnetic field
-	 * @param q		current charge of the candidate
-	 * @param m		current mass of the candidate
+	 * @param current current particle state
 	 * @return	  return the new calculated position and direction of the candidate 
 	 */
-	Y dY(Vector3d  pos, Vector3d  dir, double step, double z, double q, double m) const;
+	virtual Y dY(Vector3d pos, Vector3d dir, double step, double z, const ParticleState &current) const override;
 
 	/** comparison of the position after one step with the position after two steps with step/2.
 	 * @param x1	position after one step of size step
@@ -108,12 +79,10 @@ public:
 	 * @param out	   position and direction of candidate after the step
 	 * @param error	 error for the current step
 	 * @param h		 current step size
-	 * @param p		 current particle state
 	 * @param z		 current red shift
-	 * @param q		 current charge of the candidate 
-	 * @param m		 current mass of the candidate
+	 * @param p		 current particle state
 	 */
-	void tryStep(const Y &y, Y &out, Y &error, double h, ParticleState &p, double z, double q, double m) const;
+	void tryStep(const Y &y, Y &out, Y &error, double h, double z, const ParticleState &p) const override;
 
 	/** Set functions for the parameters of the class PropagationBP */
 

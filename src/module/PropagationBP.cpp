@@ -5,27 +5,28 @@
 #include <vector>
 
 namespace crpropa {
-	void PropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
-			ParticleState &particle, double z, double q, double m) const {
-		out = dY(y.x, y.u, h, z, q, m);  // 1 step with h
 
-		Y outHelp = dY(y.x, y.u, h/2, z, q, m);  // 2 steps with h/2
-		Y outCompare = dY(outHelp.x, outHelp.u, h/2, z, q, m);
+	void PropagationBP::tryStep(const Y &y, Y &out, Y &error, double h,
+			double z, const ParticleState &particle) const {
+		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
+
+		Y outHelp = dY(y.x, y.u, h/2, z, particle);  // 2 steps with h/2
+		Y outCompare = dY(outHelp.x, outHelp.u, h/2, z, particle);
 
 		error = errorEstimation(out.x , outCompare.x , h);
 	}
 
-
-	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double step,
-			double z, double q, double m) const {
+	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, 
+		double step, double z, const ParticleState &current) const {
 		// half leap frog step in the position
 		pos += dir * step / 2.;
 
 		// get B field at particle position
 		Vector3d B = getFieldAtPosition(pos, z);
+		double m = current.getEnergy()/c_squared;
 
 		// Boris help vectors
-		Vector3d t = B * q / 2 / m * step / c_light;
+		Vector3d t = B * current.getCharge() / 2 / m * step / c_light;
 		Vector3d s = t * 2 / (1 + t.dot(t));
 		Vector3d v_help;
 
@@ -82,12 +83,11 @@ namespace crpropa {
 		Y yOut, yErr;
 		double newStep = step;
 		double z = candidate->getRedshift();
-		double m = current.getEnergy()/(c_light * c_light);
 
 		// if minStep is the same as maxStep the adaptive algorithm with its error
 		// estimation is not needed and the computation time can be saved:
 		if (minStep == maxStep){
-			yOut = dY(yIn.x, yIn.u, step, z, q, m);
+			yOut = dY(yIn.x, yIn.u, step, z, current);
 		} else {
 			step = clip(candidate->getNextStep(), minStep, maxStep);
 			newStep = step;
