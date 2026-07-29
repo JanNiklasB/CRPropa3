@@ -346,6 +346,10 @@
 %feature("director") crpropa::Observer;
 %feature("director") crpropa::ObserverFeature;
 %include "crpropa/module/Observer.h"
+
+%feature("director") crpropa::Propagation;
+%include "crpropa/module/Propagation.h"
+
 %include "crpropa/module/SimplePropagation.h"
 %include "crpropa/module/PropagationCK.h"
 %include "crpropa/module/PropagationBP.h"
