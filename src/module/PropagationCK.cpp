@@ -44,18 +44,20 @@ void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double dt,
 		k[i] = dY(y_n.x, y_n.u, dt, z, particle);
 
 		out += k[i] * b[i];
-		error += k[i] * (b[i] - bs[i]);
+		error += k[i] * (b[i] - bs[i]) * particle.getVelocity().getR() * dt;
 	}
 }
 
 PropagationCK::Y PropagationCK::dY(Vector3d pos, Vector3d dir, double dt, double z, const ParticleState &p) const {
+	Vector3d velocity = dir * p.getVelocity().getR();
+
 	// get B field at particle position
 	Vector3d B = getFieldAtPosition(pos, z);
 
 	// Lorentz force: du/dt = q*c/E * (v x B)
 	// so dir = du/dt*h/|v| = q*c/E * (dir x B)
 	Vector3d dudt = p.getCharge() * c_light / p.getEnergy() * dir.cross(B);
-	return Y(dir*c_light*dt, dudt*dt);
+	return Y(velocity*dt, dudt*dt);
 }
 
 PropagationCK::PropagationCK(ref_ptr<MagneticField> field, double tolerance,
@@ -101,7 +103,7 @@ void PropagationCK::process(Candidate *candidate) const {
 	} else {
 		step = clip(candidate->getNextStep(), minStep, maxStep);
 		newStep = step;
-		double r = 42;  // arbitrary value
+		double r;  // arbitrary value
 
 		// try performing step until the target error (tolerance) or the minimum/maximum step size has been reached
 		while (true) {
