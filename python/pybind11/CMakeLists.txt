@@ -8,10 +8,22 @@ set_target_properties(
 	PROPERTIES 
 	IMPORTED_LOCATION "${CRPropa_BINARY_DIR}/libcrpropa.so"
 )
+# get crpropa defines:
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/getCRPropaDefines.sh ${CMAKE_CURRENT_BINARY_DIR}/getCRPropaDefines.sh @ONLY)
+execute_process(
+	COMMAND sh ${CMAKE_CURRENT_BINARY_DIR}/getCRPropaDefines.sh
+	OUTPUT_VARIABLE CRPROPA_DEFINES
+)
+# STRING(REGEX REPLACE ";" "\\\\;" CRPROPA_DEFINES "${CRPROPA_DEFINES}")
+STRING(REGEX REPLACE "\n" ";" CRPROPA_DEFINES "${CRPROPA_DEFINES}")
+foreach(DEFINE ${CRPROPA_DEFINES})
+	add_definitions(${DEFINE})
+endforeach()
+
 
 set(Python_FIND_VIRTUALENV "FIRST")
 set(Python_FIND_STRATEGY "LOCATION")
-find_package(Python 3.0 COMPONENTS Interpreter Development NumPy)
+find_package(Python 3.0 COMPONENTS Interpreter Development NumPy REQUIRED)
 
 # build it on pybind11:
 find_package(pybind11)
@@ -49,15 +61,14 @@ list(TRANSFORM SOURCES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/bindings/)
 
 # add pybind modules:
 pybind11_add_module(
-	crpropa_pybind SHARED 
-	${CMAKE_CURRENT_SOURCE_DIR}/src/Vector3.cpp
-	
+	crpropa_pybind SHARED
 	${SOURCES}
 )
 
 target_include_directories(
 	crpropa_pybind PUBLIC
 	pybind11::headers
+	${Python_NumPy_INCLUDE_DIRS}
 	${CRPropa_SOURCE_DIR}/include
 	${CRPROPA_EXTRA_INCLUDES}
 )
@@ -70,7 +81,7 @@ target_link_libraries(
 set_target_properties(
 	crpropa_pybind 
 	PROPERTIES 
-	LIBRARY_OUTPUT_DIRECTORY "${CRPropa_BINARY_DIR}/crpropa-pybind"
+	LIBRARY_OUTPUT_DIRECTORY "${CRPropa_BINARY_DIR}/crpropa_pybind"
 	OUTPUT_NAME "crpropa"
 	PREFIX "" SUFFIX ".so"
 )
@@ -78,7 +89,7 @@ set_target_properties(
 # move __init__.py and other needed files to build folder for tests and usage without installation
 file(
 	COPY
-	"${CRPropa_SOURCE_DIR}/python/crpropa/"
+	"${CRPropa_SOURCE_DIR}/python/pybind11/crpropa_pybind/"
 	DESTINATION
-	"${CRPropa_BINARY_DIR}/crpropa-pybind"
+	"${CRPropa_BINARY_DIR}/crpropa_pybind"
 )

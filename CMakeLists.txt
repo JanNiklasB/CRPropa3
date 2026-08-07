@@ -540,22 +540,21 @@ if(ENABLE_PYTHON AND Python_FOUND)
   
   option(ENABLE_PYBIND11 "Creates crpropa-pybind package which has automatic generated bindings (requires pybind11 and RosettaCommons/binder)" OFF)
   if(ENABLE_PYBIND11)
-    add_definitions(-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/python/pybind11/generatePreCMakeCache.sh ${CMAKE_CURRENT_BINARY_DIR}/generatePreCMakeCache.sh @ONLY)
 
     add_custom_target(crpropa-pybind11-precache
       COMMAND sh ${CMAKE_CURRENT_BINARY_DIR}/generatePreCMakeCache.sh
+      DEPENDS crpropa
     )
     add_custom_target(crpropa-pybind11-config
       COMMAND cmake -G ${CMAKE_GENERATOR} -S ${CMAKE_CURRENT_SOURCE_DIR}/python/pybind11 -B ${CMAKE_CURRENT_BINARY_DIR}/bindings_build -C ${CMAKE_CURRENT_BINARY_DIR}/binder_pre_chache_script.cmake
       DEPENDS crpropa-pybind11-precache
     )
-    add_custom_target(crpropa-pybind11-build
+    add_custom_target(crpropa-pybind11-build ALL
       COMMAND cmake --build ${CMAKE_CURRENT_BINARY_DIR}/bindings_build
       DEPENDS crpropa-pybind11-config
     )
-  
-    add_dependencies(crpropa crpropa-pybind11-build)
   endif(ENABLE_PYBIND11)
 
   if(BUILD_DOC AND DOXYGEN_FOUND)

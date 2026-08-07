@@ -6,7 +6,13 @@ crpropa_binary_dir=@CRPropa_BINARY_DIR@
 crpropa_source_dir=@CRPropa_SOURCE_DIR@
 
 rm -rf $working_dir/bindings && mkdir $working_dir/bindings
-grep -rh "#include" $crpropa_source_dir/include/* | sed -E "s/#include\s+\"/#include </g" | sed -E s/\"/\>/g | sed -E "s/\s+$//g" | sort -u | grep crpropa > $working_dir/includes_for_bindings.h
+grep -rh "#include" $crpropa_source_dir/include/* \
+	| sed -E "s/#include\s+\"/#include </g" \
+	| sed -E s/\"/\>/g \
+	| sed -E "s/\s+$//g" \
+	| sort -u \
+	| grep crpropa \
+	> $working_dir/includes_for_bindings.h
 binder \
 	--root-module crpropa \
 	--prefix $working_dir/bindings/ \
