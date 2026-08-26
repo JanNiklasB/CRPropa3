@@ -1,1 +1,1 @@
-from crpropa import *
+from .crpropa.crpropa import *
