@@ -14,9 +14,6 @@ share/
 doc/api/
 .vscode/
 
-!final_doc/
-!conda-bld/build.sh
-
 cmake/CMakeCache.txt
 cmake/CMakeFiles/
 
@@ -29,3 +26,7 @@ cmake/CMakeFiles/
 *.ipynb_checkpoints
 *.idea
 .DS_Store
+
+!final_doc/
+!conda-bld/build.sh
+!python/pybind11/CMakeLists.txt
