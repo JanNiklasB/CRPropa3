@@ -251,13 +251,13 @@ class testVector3(unittest.TestCase):
 		v.x = 23.
 		self.assertEqual(v.x, 23.)
 
-	# # this test fails currently with a seg fault due to how we implement the swig interface
-	# # def testArrayInterface(self):
-	# # 	this test fails for some combinations of Python version and system
-	# # 	v = crp.Vector3d(1., 2., 3.)
-	# # 	self.assertEqual(2., np.mean(v) )
-	# # 	x = np.ones(3)
-	# # 	self.assertEqual(6., sum(v * x) )
+	# this test fails currently with a seg fault due to how we implement the swig interface
+	def testArrayInterface(self):
+		# this test fails for some combinations of Python version and system
+		v = crp.Vector3d(1., 2., 3.)
+		self.assertEqual(2., np.mean(v) )
+		x = np.ones(3)
+		self.assertEqual(6., sum(v * x) )
 
 	def testRepr(self):
 		v = crp.Vector3d(1., 2., 3.)
@@ -280,24 +280,24 @@ class testVector3(unittest.TestCase):
 		self.assertRaises(IndexError, v.__getitem__, 3)
 		self.assertRaises(IndexError, v.__setitem__, 3, 10)
 
-	# # this test fails currently with a seg fault due to how we implement the swig interface
-	# def testVector3dToArray(self): 
-	# 	v = crp.Vector3d(1., 2., 3.)
-	# 	a = np.array([v])
-	# 	self.assertEqual(a.shape, (1, 3))
-	# 	self.assertEqual(a.dtype, float)
-	# 	self.assertEqual(a[0, 0], 1.)
-	# 	self.assertEqual(a[0, 1], 2.)
-	# 	self.assertEqual(a[0, 2], 3.)
+	# this test fails currently with a seg fault due to how we implement the swig interface
+	def testVector3dToArray(self): 
+		v = crp.Vector3d(1., 2., 3.)
+		a = np.array([v])
+		self.assertEqual(a.shape, (1, 3))
+		self.assertEqual(a.dtype, float)
+		self.assertEqual(a[0, 0], 1.)
+		self.assertEqual(a[0, 1], 2.)
+		self.assertEqual(a[0, 2], 3.)
 		
-	# def testVector3fToArray(self): 
-	# 	v = crp.Vector3f(1., 2., 3.)
-	# 	a = np.array([v])
-	# 	self.assertEqual(a.shape, (1, 3))
-	# 	self.assertEqual(a.dtype, np.float32)
-	# 	self.assertEqual(a[0, 0], 1.)
-	# 	self.assertEqual(a[0, 1], 2.)
-	# 	self.assertEqual(a[0, 2], 3.)
+	def testVector3fToArray(self): 
+		v = crp.Vector3f(1., 2., 3.)
+		a = np.array([v])
+		self.assertEqual(a.shape, (1, 3))
+		self.assertEqual(a.dtype, np.float32)
+		self.assertEqual(a[0, 0], 1.)
+		self.assertEqual(a[0, 1], 2.)
+		self.assertEqual(a[0, 2], 3.)
 
 	def testVector3dConstructorDouble(self):
 		for dtype in [float, np.float32, int, np.int32]:
