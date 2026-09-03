@@ -231,24 +231,34 @@ Currently we only support installation over Conda, for a detailed guide on how t
 Despite muparser being available for windows we can't seem to correctly link against it, so we currently do not support it in the windows version.
 In the following we are providing instructions for building CRPropa only within CMD:
 
+You will need the Microsoft Visual C++ Redistributables and build tools:
+
+```bat
+winget install --id=Microsoft.VCRedist.2005.x86 -e  && winget install --id=Microsoft.VCRedist.2005.x64 -e  && winget install --id=Microsoft.VCRedist.2008.x86 -e  && winget install --id=Microsoft.VCRedist.2008.x64 -e  && winget install --id=Microsoft.VCRedist.2010.x86 -e  && winget install --id=Microsoft.VCRedist.2010.x64 -e  && winget install --id=Microsoft.VCRedist.2012.x86 -e  && winget install --id=Microsoft.VCRedist.2012.x64 -e  && winget install --id=Microsoft.VCRedist.2013.x86 -e  && winget install --id=Microsoft.VCRedist.2013.x64 -e  && winget install --id=Microsoft.VCRedist.2015+.x86 -e  && winget install --id=Microsoft.VCRedist.2015+.x64 -e
+winget install -e --id Microsoft.VisualStudio.2022.BuildTools
+winget install Microsoft.VisualStudio.2022.Community
+```
+
+You might be able to compile CRPropa without it over [Mingw-64(](https://www.mingw-w64.org/)
+
 #### Conda
 
 First install miniconda, to do this per command line use (assuming you downloaded it in the current folder)
 
-```sh
+```bat
 Miniconda3-latest-Windows-x86_64.exe /S /D=C:\Path\To\Install
 ```
 
 You can directly activate miniconda with
 
-```sh
+```bat
 C:\Path\To\Install\condabin\activate.bat
 ```
 
 After you created your own environment with `conda create -n YourEnvName` your need to install the crpropa requirements.
 
-```sh
-conda install -c conda-forge gfortran gcc gxx ar git cmake ninja swig zlib fftw hdf5 eigen python numpy pkgconfig
+```bat
+conda install -c conda-forge gfortran gcc gxx git cmake ninja swig zlib fftw hdf5 eigen python numpy pkgconfig
 # muparser
 ```
 
@@ -256,7 +266,7 @@ conda install -c conda-forge gfortran gcc gxx ar git cmake ninja swig zlib fftw 
 
 To then actually build the project do (the default install location is at ` "C:\Program Files (x86)\CRPropa"`):
 
-```sh
+```bat
 # clone the repository wherever you want:
 git clone https://github.com/CRPropa/CRPropa3.git
 
@@ -264,10 +274,7 @@ git clone https://github.com/CRPropa/CRPropa3.git
 # if you are not able to install ninja or problems arise use -G "Unix Makefiles"
 cd CRPropa3
 mkdir build && cd build
-cmake .. \
-  -DCMAKE_INSTALL_PREFIX=\path\to\your\desired\install\location \
-  -DCMAKE_AR=%CONDA_PREFIX%\Library\x86_64-w64-mingw32\bin\ar.exe \
-  -Dgtest_disable_pthreads=ON
+cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=\path\to\your\desired\install\location -DCMAKE_AR=%CONDA_PREFIX%\Library\x86_64-w64-mingw32\bin\ar.exe -Dgtest_disable_pthreads=ON
 cmake --build . -j
 
 # optionally do the tests to check if everything was build correctly
@@ -276,6 +283,7 @@ ctest --output-on-failure --repeat until-pass:3
 # finally install; sudo might be needed
 cmake --install .
 ```
+cmake .. -G Ninja -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX% -DCMAKE_AR=%CONDA_PREFIX%\Library\x86_64-w64-mingw32\bin\ar.exe -Dgtest_disable_pthreads=ON -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=clang++-19 -DCMAKE_FORTRAN_COMPILER=gfortran
 
 
 ## Notes
