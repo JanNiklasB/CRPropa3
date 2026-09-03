@@ -22,7 +22,7 @@ requirements:
     - git
     - cmake
     - ninja
-    - swig
+    - swig >4
     - pkgconfig
   
   host:
@@ -31,20 +31,23 @@ requirements:
     - gperftools  # [not Win32]
     - pybind11-stubgen
     # crpropa requirements
-    - fftw
+    - fftw >3
     - hdf5
     - muparser
-    - eigen
     # python requirements
     - python
     - numpy >=1.26,<3
+    # add the following only in build step not as run requirement
+    # so we ensure that we do not build against incompatible python versions
+    - matplotlib
+    - astropy
+    - scipy
 
   run:
     # crpropa requirements
-    - fftw
+    - fftw >3
     - hdf5
     - muparser
-    - eigen
     # cmake required for tests
     - cmake
     # python requirements
