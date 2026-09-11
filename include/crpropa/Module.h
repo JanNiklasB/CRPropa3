@@ -49,7 +49,15 @@ public:
 	inline void process(ref_ptr<Candidate> candidate) const {
 		process(candidate.get());
 	}
+	#ifndef SWIG
+	/// Insertion operator for all Modules
+	friend std::ostream& operator<<(std::ostream& os, const Module& obj) {
+		os << obj.getDescription();
+		return os;
+	}
+	#endif
 };
+
 
 
 /**

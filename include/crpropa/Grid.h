@@ -144,7 +144,16 @@ public:
 			<< "\n";
 		return ss.str();
 	}
+
+	#ifndef SWIG
+	/// Insertion operator for all Grids
+	friend std::ostream& operator<<(std::ostream& os, const GridProperties obj) {
+		os << obj.getDescription();
+		return os;
+	}
+	#endif
 };
+
 
 /**
  @class Grid
