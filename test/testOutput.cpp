@@ -232,7 +232,7 @@ TEST(ParticleCollector, getTrajectory) {
 	trajectory->setClone(true);
 
 	ref_ptr<ModuleList> sim = new ModuleList();
-	sim->add(new SimplePropagation(1, 1));
+	sim->add(new SimplePropagation(true, 1/c_light, 1/c_light));
 
 	ref_ptr<Observer> obs = new Observer();
 	obs->add(new Observer1D());
