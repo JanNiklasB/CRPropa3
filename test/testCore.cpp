@@ -61,7 +61,7 @@ TEST(ParticleState, velocity) {
 		Vector3d v(1, 1, 0);
 		particle.setDirection(v);
 		particle.setEnergy(100*EeV);
-		EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light*sqrt(1-1/pow(particle.getLorentzFactor(), 2)));
+		EXPECT_TRUE(particle.getVelocity() == v.getUnitVector() * c_light*sqrt(1-1/pow_integer<2>(particle.getLorentzFactor())));
 	}
 }
 
@@ -364,7 +364,7 @@ TEST(common, interpolate) {
 TEST(common, interpolateEquidistant) {
 	std::vector<double> yD(100);
 	for (int i = 0; i < 100; i++) {
-		yD[i] = pow(1 + i * 2. / 99., 2);
+		yD[i] = pow_integer<2>(1 + i * 2. / 99.);
 	}
 
 	// interpolated value should be close to computed
@@ -381,8 +381,8 @@ TEST(common, interpolateEquidistant) {
 TEST(common, pow_integer) {
 	EXPECT_EQ(pow_integer<0>(1.23), 1);
 	EXPECT_FLOAT_EQ(pow_integer<1>(1.234), 1.234);
-	EXPECT_FLOAT_EQ(pow_integer<2>(1.234), pow(1.234, 2));
-	EXPECT_FLOAT_EQ(pow_integer<3>(1.234), pow(1.234, 3));
+	EXPECT_FLOAT_EQ(pow_integer<2>(1.234), pow_integer<2>(1.234));
+	EXPECT_FLOAT_EQ(pow_integer<3>(1.234), pow_integer<3>(1.234));
 }
 
 TEST(common, gaussInt) {

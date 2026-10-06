@@ -1514,7 +1514,7 @@ TEST(SynchrotronRadiation, energyLoss) {
 	c.setNextStep(step/c.getVelocity());
 	lf = c.current.getLorentzFactor();
 	Rg = 1 * GeV / charge / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction.  
-	dEdx = 1. / 6 / M_PI / epsilon0 * pow(lf * lf - 1, 2) * pow(charge / Rg, 2); // Jackson p. 770 (14.31)
+	dEdx = 1. / 6 / M_PI / epsilon0 * pow_integer<2>(lf * lf - 1) * pow_integer<2>(charge / Rg); // Jackson p. 770 (14.31)
 	dE = dEdx * step;
 	sync.process(&c);
 	EXPECT_NEAR(1 * GeV - c.current.getEnergy(), dE, 0.01 * dE);
@@ -1525,7 +1525,7 @@ TEST(SynchrotronRadiation, energyLoss) {
 	c.setNextStep(step/c.getVelocity());
 	lf = c.current.getLorentzFactor();
 	Rg = 100 * GeV / charge / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction.  
-	dEdx = 1. / 6 / M_PI / epsilon0 * pow(lf * lf - 1, 2) * pow(charge / Rg, 2); // Jackson p. 770 (14.31)
+	dEdx = 1. / 6 / M_PI / epsilon0 * pow_integer<2>(lf * lf - 1) * pow_integer<2>(charge / Rg); // Jackson p. 770 (14.31)
 	dE = dEdx * step;
 	sync.process(&c);
 	EXPECT_NEAR(100 * GeV - c.current.getEnergy(), dE, 0.01 * dE);
@@ -1536,7 +1536,7 @@ TEST(SynchrotronRadiation, energyLoss) {
 	c.setNextStep(step/c.getVelocity());
 	lf = c.current.getLorentzFactor();
 	Rg = 10 * TeV / charge / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction.  
-	dEdx = 1. / 6 / M_PI / epsilon0 * pow(lf * lf - 1, 2) * pow(charge / Rg, 2); // Jackson p. 770 (14.31)
+	dEdx = 1. / 6 / M_PI / epsilon0 * pow_integer<2>(lf * lf - 1) * pow_integer<2>(charge / Rg); // Jackson p. 770 (14.31)
 	dE = dEdx * step;
 	sync.process(&c);
 	EXPECT_NEAR(10 * TeV - c.current.getEnergy(), dE, 0.01 * dE);
@@ -1547,7 +1547,7 @@ TEST(SynchrotronRadiation, energyLoss) {
 	c.setNextStep(step/c.getVelocity());
 	lf = c.current.getLorentzFactor();
 	Rg = 1 * PeV / charge / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction.  
-	dEdx = 1. / 6 / M_PI / epsilon0 * pow(lf * lf - 1, 2) * pow(charge / Rg, 2); // Jackson p. 770 (14.31)
+	dEdx = 1. / 6 / M_PI / epsilon0 * pow_integer<2>(lf * lf - 1) * pow_integer<2>(charge / Rg); // Jackson p. 770 (14.31)
 	dE = dEdx * step;
 	sync.process(&c);
 	EXPECT_NEAR(1 * PeV - c.current.getEnergy(), dE, 0.01 * dE);
@@ -1566,7 +1566,7 @@ TEST(SynchrotronRadiation, PhotonEnergy) {
 
 	double lf = c.current.getLorentzFactor();
 	double Rg = E / eplus / c_light / (brms * sqrt(2. / 3) ); // factor 2/3 for avg magnetic field direction. 
-	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow(lf, 3) / Rg;
+	double Ecrit = 3. / 4 * h_planck / M_PI * c_light * pow_integer<3>(lf) / Rg;
 
 	sync.process(&c);
 	EXPECT_TRUE(c.secondaries.size() > 0);	// must have secondaries

@@ -232,7 +232,7 @@ void NuclearDecay::betaDecay(Candidate *candidate, bool isBetaPlus) const {
 	double cdf = 0;
 	for (int i = 0; i <= 50; i++) {
 		double E = me + i / 50. * Q;
-		cdf += E * sqrt(E * E - me * me) * pow(Q + me - E, 2);
+		cdf += E * sqrt(E * E - me * me) * pow_integer<2>(Q + me - E);
 		energies.push_back(E);
 		densities.push_back(cdf);
 	}

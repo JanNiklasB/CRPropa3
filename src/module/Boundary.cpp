@@ -302,9 +302,9 @@ CylindricalBoundary::CylindricalBoundary(Vector3d o, double h, double r) :
 
 void CylindricalBoundary::process(Candidate *c) const {
 	Vector3d d = c->current.getPosition() - origin;
-	double R2 = pow(d.x, 2.)+pow(d.y, 2.);
+	double R2 = pow_integer<2>(d.x)+pow_integer<2>(d.y);
 	double Z = fabs(d.z);
-	if ( R2 < pow(radius, 2.) and Z < height/2.) {
+	if ( R2 < pow_integer<2>(radius) and Z < height/2.) {
 		if(limitStep) {
 			c->limitNextStep((std::min(radius - pow(R2, 0.5), height/2. - Z) + margin)/c->getVelocity());	
 		}
