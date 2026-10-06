@@ -3,6 +3,8 @@
 
 #include <string>
 #include <vector>
+#include <cmath>
+
 /**
  @file
  @brief Common helper functions
