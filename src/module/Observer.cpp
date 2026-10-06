@@ -160,7 +160,7 @@ std::string ObserverTracking::getDescription() const {
 // Observer1D --------------------------------------------------------------
 DetectionState Observer1D::checkDetection(Candidate *candidate) const {
 	double x = candidate->current.getPosition().x;
-	if (x > 0) {
+	if (x > 0 || !isclose(x, 0)) {
 		// Limits the next step size to prevent candidates from overshooting in case of non-detection
 		candidate->limitNextStep(x/candidate->getVelocity());
 		return NOTHING;

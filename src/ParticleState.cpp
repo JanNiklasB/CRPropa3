@@ -38,7 +38,7 @@ void ParticleState::setEnergy(double newEnergy) {
 	if (pmass==0) 
 		speed = c_light;
 	else if (getLorentzFactor()<RelativisticLimit)  // can happen if if gamma-1 < numericalPrecission
-		speed =  sqrt(energy*2./pmass);  // non relativistic case
+		speed = sqrt(energy*2./pmass);  // non relativistic case
 	else
 		speed = c_light*sqrt(1.-1./pow_integer<2>(getLorentzFactor()));
 }
