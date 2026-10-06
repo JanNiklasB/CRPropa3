@@ -225,7 +225,6 @@ TEST(ParticleCollector, getTrajectory) {
 	p.setPosition(Vector3d(10, 0, 0));
 	p.setDirection(Vector3d(-1, 0, 0));
 	ref_ptr<Candidate> c = new Candidate(p);
-	std::cout << c->getDescription() << std::endl;
 
 	ref_ptr<ParticleCollector> output = new ParticleCollector();
 	ref_ptr<ParticleCollector> trajectory = new ParticleCollector();
@@ -240,21 +239,15 @@ TEST(ParticleCollector, getTrajectory) {
 	sim->add(obs);
 
 	sim->run(c);
-	std::cout << c->getDescription() << std::endl;
-	std::cout << output->begin()->get()->getDescription() << std::endl;
 
 	c->restart();
-	std::cout << c->getDescription() << std::endl;
 	output->getTrajectory(sim, 0, trajectory);
-	std::cout << c->getDescription() << std::endl;
 
 	Vector3d pos;
 	int i = 0;
 
-
 	for (ParticleCollector::iterator itr = trajectory->begin();
 	     itr != trajectory->end(); ++itr) {
-		std::cout << itr->get()->current.getDescription() << std::endl;
 		pos = (*(itr->get())).current.getPosition();
 		pos_x[i] = pos.getX();
 		++i;
