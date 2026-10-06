@@ -35,7 +35,7 @@ class ParticleState {
 private:
 	int id; ///< particle ID (Particle Data Group numbering scheme)
 	double energy; ///< total energy
-	double speed = crpropa::c_light; ///< total scalar velocity
+	double speed; ///< total scalar velocity
 	Vector3d position; ///< position vector in comoving coordinates
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass

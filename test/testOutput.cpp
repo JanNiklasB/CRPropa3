@@ -243,11 +243,14 @@ TEST(ParticleCollector, getTrajectory) {
 	std::cout << c->getDescription() << std::endl;
 	std::cout << output->begin()->get()->getDescription() << std::endl;
 
+	c->restart();
+	std::cout << c->getDescription() << std::endl;
 	output->getTrajectory(sim, 0, trajectory);
 	std::cout << c->getDescription() << std::endl;
 
 	Vector3d pos;
 	int i = 0;
+
 
 	for (ParticleCollector::iterator itr = trajectory->begin();
 	     itr != trajectory->end(); ++itr) {

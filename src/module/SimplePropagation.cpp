@@ -30,9 +30,7 @@ void SimplePropagation::process(Candidate *c) const {
 	double dt = clip(c->getNextStep(), minStep, maxStep);
 	c->setCurrentStep(dt);
 	Vector3d pos = c->current.getPosition();
-	Vector3d dir = c->current.getDirection();
-	double vel = c->getVelocity();
-	c->current.setPosition(pos + dir * vel * dt);
+	c->current.setPosition(pos + c->current.getVelocity() * dt);
 	c->setNextStep(maxStep);
 }
 
