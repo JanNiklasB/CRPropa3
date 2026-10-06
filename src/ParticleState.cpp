@@ -16,7 +16,7 @@ void setRelativisticLimit(double limit){
 	RelativisticLimit = limit;
 }
 
-ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0), energy(0.), position(0.), direction(0.), pmass(0.), charge(0.)
+ParticleState::ParticleState(int id, double E, Vector3d pos, Vector3d dir): id(0), energy(0.), speed(c_light), position(0.), direction(0.), pmass(0.), charge(0.)
 {
 	setId(id);
 	setEnergy(E);
