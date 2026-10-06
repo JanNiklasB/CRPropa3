@@ -240,7 +240,6 @@ TEST(ParticleCollector, getTrajectory) {
 
 	sim->run(c);
 
-	c->restart();
 	output->getTrajectory(sim, 0, trajectory);
 
 	Vector3d pos;
