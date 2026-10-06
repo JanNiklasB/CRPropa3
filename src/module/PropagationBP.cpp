@@ -12,7 +12,7 @@ namespace crpropa {
 
 		out = dY(y.x, y.u, h, z, particle);  // 1 step with h
 
-		error = errorEstimation(out.x , outCompare.x , h*particle.getVelocity().getR());
+		error = errorEstimation(out.x , outCompare.x , h*particle.getSpeed());
 	}
 
 	PropagationBP::Y PropagationBP::dY(Vector3d pos, Vector3d dir, double dt, 

@@ -34,6 +34,13 @@ void ParticleState::setDirection(const Vector3d &dir) {
 
 void ParticleState::setEnergy(double newEnergy) {
 	energy = std::max(0., newEnergy);
+
+	if (pmass==0) 
+		speed = c_light;
+	else if (getLorentzFactor()<RelativisticLimit)  // can happen if if gamma-1 < numericalPrecission
+		speed =  sqrt(energy*2./pmass);  // non relativistic case
+	else
+		speed = c_light*sqrt(1.-1./pow_integer<2>(getLorentzFactor()));
 }
 
 void ParticleState::setId(int newId) {
@@ -57,15 +64,6 @@ double ParticleState::getLorentzFactor() const {
 void ParticleState::setLorentzFactor(double lf) {
 	lf = std::max(0., lf); // prevent negative Lorentz factors
 	setEnergy((lf-1) * pmass * c_squared);
-}
-
-double ParticleState::getSpeed() const {
-	if (pmass==0) 
-		return c_light;
-	else if (getLorentzFactor()<RelativisticLimit)  // can happen if if gamma-1 < numericalPrecission
-		return sqrt(energy*2/pmass);  // non relativistic case
-	else
-		return c_light*sqrt(1-1/pow(getLorentzFactor(), 2));
 }
 
 Vector3d ParticleState::getVelocity() const {
