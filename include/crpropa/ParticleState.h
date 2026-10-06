@@ -2,6 +2,7 @@
 #define CRPROPA_PARTICLE_STATE_H
 
 #include "crpropa/Vector3.h"
+#include "Units.h"
 
 namespace crpropa {
 /**
@@ -34,7 +35,7 @@ class ParticleState {
 private:
 	int id; ///< particle ID (Particle Data Group numbering scheme)
 	double energy; ///< total energy
-	double speed = c_light; ///< total scalar velocity
+	double speed = crpropa::c_light; ///< total scalar velocity
 	Vector3d position; ///< position vector in comoving coordinates
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass
