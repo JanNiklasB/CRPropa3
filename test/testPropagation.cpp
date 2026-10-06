@@ -32,7 +32,7 @@ TEST(testSimplePropagation, timeStep) {
 	EXPECT_EQ(Vector3d(0,  1, 0), c.created.getDirection());
 	EXPECT_EQ(Vector3d(0,  0, 0), c.previous.getPosition());
 	EXPECT_EQ(Vector3d(0,  1, 0), c.previous.getDirection());
-	EXPECT_EQ(Vector3d(0, 20*p.getVelocity().getR(), 0), c.current.getPosition());
+	EXPECT_EQ(Vector3d(0, 20*p.getSpeed(), 0), c.current.getPosition());
 	EXPECT_EQ(Vector3d(0,  1, 0), c.current.getDirection());
 }
 
@@ -822,8 +822,8 @@ TEST(testPropagationBP, reduceTimeStep) {
 			new UniformMagneticField(Vector3d(0, 0, 100 * milli * tesla))
 		);
 
-		double minStep = 0.1 * meter / p.getVelocity().getR();
-		double maxStep = 1. * kilometer / p.getVelocity().getR();
+		double minStep = 0.1 * meter / p.getSpeed();
+		double maxStep = 1. * kilometer / p.getSpeed();
 		propa.setMinimumTimeStep(minStep);
 		propa.setMaximumTimeStep(maxStep);
 		// small tolerance leads to large values of r
@@ -879,8 +879,8 @@ TEST(testPropagationBP, reduceStep) {
 			1. * kpc
 		);
 
-		double minStep = 0.1 * meter / p.getVelocity().getR();
-		double maxStep = 1. * kilometer / p.getVelocity().getR();
+		double minStep = 0.1 * meter / p.getSpeed();
+		double maxStep = 1. * kilometer / p.getSpeed();
 		// since it is converted internally with c_light and we are very far off:
 		propa.setMinimumStep(minStep*c_light);
 		propa.setMaximumStep(maxStep*c_light);

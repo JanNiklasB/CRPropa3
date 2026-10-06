@@ -50,7 +50,7 @@ void PropagationCK::tryStep(const Y &y, Y &out, Y &error, double h,
 
 PropagationCK::Y PropagationCK::dYdt(const Y &y, ParticleState &p, double z) const {
 	// normalize direction vector to prevent numerical losses
-	Vector3d velocity = y.u.getUnitVector() * p.getVelocity().getR();
+	Vector3d velocity = y.u.getUnitVector() * p.getSpeed();
 	
 	// get B field at particle position
 	Vector3d B = getFieldAtPosition(y.x, z);

@@ -120,7 +120,7 @@ public:
 	/** Returns the scalar value of the velocity 
 	 @returns Scalar velocity of paricle [m/s]
 	*/
-	double getSpeed() const {return speed;};
+	inline double getSpeed() const {return speed;};
 
 	/** Get velocity: direction times the speed of light.
 	 @returns Velocity of particle [m/s]
