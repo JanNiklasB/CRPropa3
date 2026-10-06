@@ -2,6 +2,7 @@
 #define CRPROPA_PARTICLE_STATE_H
 
 #include "crpropa/Vector3.h"
+#include "Units.h"
 
 namespace crpropa {
 /**
@@ -120,7 +121,7 @@ public:
 	/** Returns the scalar value of the velocity 
 	 @returns Scalar velocity of paricle [m/s]
 	*/
-	inline double getSpeed() const {return speed;};
+	inline double getSpeed() const { return speed; };
 
 	/** Get velocity: direction times the speed of light.
 	 @returns Velocity of particle [m/s]
