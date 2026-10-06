@@ -82,7 +82,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G Ninja -DCMAKE_CXX_FLAGS="-fno-fast-math" -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
+          cmake .. -G Ninja -DCMAKE_CXX_FLAGS="-ffast-math" -DENABLE_PYTHON=True -DENABLE_TESTING=On  -DENABLE_SWIG_BUILTIN=${{ matrix.config.swig_builtin }} -DSIMD_EXTENSIONS="none" 
       - name: Build CRPropa
         run: |
           cd build
