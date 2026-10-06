@@ -34,7 +34,7 @@ class ParticleState {
 private:
 	int id; ///< particle ID (Particle Data Group numbering scheme)
 	double energy; ///< total energy
-	double speed; ///< total scalar velocity
+	double speed = c_light; ///< total scalar velocity
 	Vector3d position; ///< position vector in comoving coordinates
 	Vector3d direction; ///< unit vector of velocity or momentum
 	double pmass; ///< particle rest mass
@@ -120,7 +120,7 @@ public:
 	/** Returns the scalar value of the velocity 
 	 @returns Scalar velocity of paricle [m/s]
 	*/
-	inline double getSpeed() const {return speed;};
+	inline double getSpeed() const { return speed; };
 
 	/** Get velocity: direction times the speed of light.
 	 @returns Velocity of particle [m/s]
