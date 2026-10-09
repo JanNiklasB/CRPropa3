@@ -13,7 +13,7 @@ namespace crpropa {
 /** If the Lorentz Factor is smaller then RelativisticLimit the velocity is calculated non relativistically
  * Can be set with crpropa.cvar.RelativisticLimit or crpropa.setRelativisticLimit in python
  */
-inline double RelativisticLimit = 1.001;
+inline double RelativisticLimit = 1.0000007;
 
 /** Function to set RelativisticLimit variable
  * This funciton sets the RelativisticLimit variable, the variable determines when to use the non relativistic limit
