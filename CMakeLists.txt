@@ -549,8 +549,8 @@ if(ENABLE_PYTHON AND Python_FOUND)
       INSTALL_RPATH "${CMAKE_INSTALL_FULL_LIBDIR}"
     )
   endif(APPLE)
-
   
+
   if(BUILD_DOC AND DOXYGEN_FOUND)
     add_dependencies(crpropa-swig docstrings_from_doxy)
   endif(BUILD_DOC AND DOXYGEN_FOUND)
