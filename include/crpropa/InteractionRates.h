@@ -89,7 +89,6 @@ public:
 
 };
 
-
 /**
  @class InteractionRateHomogeneous
  @brief Interaction rates decorator for tabulated homogeneous photon fields.

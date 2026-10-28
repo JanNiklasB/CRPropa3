@@ -154,7 +154,6 @@ public:
 	#endif
 };
 
-
 /**
  @class Grid
  @brief Template class for fields on a periodic grid with trilinear interpolation

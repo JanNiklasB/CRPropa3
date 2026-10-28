@@ -59,7 +59,6 @@ public:
 };
 
 
-
 /**
  @class AbstractCondition
  @brief Abstract Module providing common features for conditional modules.

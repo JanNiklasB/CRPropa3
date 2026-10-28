@@ -104,7 +104,6 @@ protected:
 	
 };
 
-
 /**
  @class TabularPhotonField
  @brief Photon field decorator for tabulated photon fields.

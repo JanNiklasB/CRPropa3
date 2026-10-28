@@ -253,7 +253,6 @@ public:
 	#endif
 };
 
-
 /** @}*/
 } // namespace crpropa
 

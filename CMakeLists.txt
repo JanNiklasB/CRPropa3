@@ -550,6 +550,7 @@ if(ENABLE_PYTHON AND Python_FOUND)
     )
   endif(APPLE)
 
+  
   if(BUILD_DOC AND DOXYGEN_FOUND)
     add_dependencies(crpropa-swig docstrings_from_doxy)
   endif(BUILD_DOC AND DOXYGEN_FOUND)
