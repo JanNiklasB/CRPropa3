@@ -21,8 +21,19 @@ static const int NUCLEAR_ZMAX    = 82;
 static const int NUCLEAR_NMAX    = 132;
 static const int NUCLEAR_NSTRIDE = 133; // = NUCLEAR_NMAX + 1
 
-// Returns the full path to a CRPropa data file
-std::string getDataPath(std::string filename);
+/** Returns the full path to a CRPropa data file
+ * Tha dataPath variable which contains the path of the crpropa data folder is set once on first call
+ * (except reset=true) and is then cached for future calls.
+ * dataPath is searched by the following methods in the following order and set if data is found in that location:
+ * - CRPROPA_DATA_PATH (environment variable)
+ * - CRPROPA_INSTALL_PREFIX + "/share/crpropa" (definition)
+ * - executable_path() + "../data"
+ * - CRPROPA_BINARY_DIR + "/data"  (definition)
+ * - ./data
+ * @param filename The name of the data file found in one of the possible data paths
+ * @param reset Whether the cached dataPath should reseted and set again (default: false)
+ */
+std::string getDataPath(std::string filename, bool reset=false);
 
 // Returns the install prefix
 std::string getInstallPrefix();

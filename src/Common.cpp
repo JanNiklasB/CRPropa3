@@ -20,10 +20,10 @@ std::string removeNullCharacter(std::string path) {
 	return path;
 }
 
-std::string getDataPath(std::string filename) {
+std::string getDataPath(std::string filename, bool reset) {
 	static std::string dataPath;
 
-	if (dataPath.size())
+	if (dataPath.size() && !reset)
 		return removeNullCharacter(concat_path(dataPath, filename));
 
 	const char *env_path = getenv("CRPROPA_DATA_PATH");
@@ -74,7 +74,6 @@ std::string getDataPath(std::string filename) {
 	KISS_LOG_INFO << "getDataPath: use default, " << dataPath << std::endl;
 	return removeNullCharacter(concat_path(dataPath, filename));
 }
-
 
 std::string getInstallPrefix()
 {
