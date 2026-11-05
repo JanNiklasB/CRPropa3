@@ -6,7 +6,6 @@
 #include "kiss/logger.h"
 
 #include <hdf5.h>
-#include <cstring>
 
 const hsize_t RANK = 1;
 const hsize_t BUFFER_SIZE = 1024 * 16;

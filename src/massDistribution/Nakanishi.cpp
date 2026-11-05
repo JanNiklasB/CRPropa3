@@ -1,5 +1,6 @@
 #include "crpropa/massDistribution/Nakanishi.h"
 #include "crpropa/Common.h"
+#include "crpropa/Units.h"
 
 #include "kiss/logger.h"
 

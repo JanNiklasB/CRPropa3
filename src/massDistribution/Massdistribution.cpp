@@ -1,5 +1,7 @@
 #include "crpropa/massDistribution/Massdistribution.h"
+
 #include <sstream>
+
 namespace crpropa {
 
 void DensityList::addDensity(ref_ptr<Density> dens) {

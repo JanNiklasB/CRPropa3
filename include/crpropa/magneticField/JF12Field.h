@@ -3,7 +3,6 @@
 
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/Grid.h"
-#include "kiss/logger.h"
 
 namespace crpropa {
 /**

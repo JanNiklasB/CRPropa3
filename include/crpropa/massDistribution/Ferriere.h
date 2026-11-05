@@ -2,8 +2,8 @@
 #define CRPROPA_FERRIERE_H
 
 #include "crpropa/massDistribution/Density.h"
+#include "crpropa/Units.h"
 
-#include <cmath>
 #include <string>
 
 namespace crpropa {

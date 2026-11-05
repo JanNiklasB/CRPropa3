@@ -65,7 +65,6 @@
 #include "crpropa/Vector3.h"
 
 #include <iostream>
-#include <limits>
 #include <ctime>
 #include <cmath>
 #include <vector>

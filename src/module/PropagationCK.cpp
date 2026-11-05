@@ -1,6 +1,6 @@
 #include "crpropa/module/PropagationCK.h"
+#include "crpropa/Logging.h"
 
-#include <limits>
 #include <sstream>
 #include <stdexcept>
 #include <vector>

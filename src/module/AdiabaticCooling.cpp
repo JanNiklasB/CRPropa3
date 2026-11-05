@@ -1,4 +1,6 @@
 #include "crpropa/module/AdiabaticCooling.h"
+#include "crpropa/Logging.h"
+#include "crpropa/Units.h"
 
 namespace crpropa {
 

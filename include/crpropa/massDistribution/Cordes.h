@@ -3,7 +3,6 @@
 
 #include "crpropa/massDistribution/Density.h"
 
-#include <cmath>
 #include <string>
 
 namespace crpropa {

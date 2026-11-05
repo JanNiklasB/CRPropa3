@@ -1,4 +1,6 @@
 #include "crpropa/module/MomentumDiffusion.h"
+#include "crpropa/Random.h"
+#include "crpropa/Units.h"
 
 using namespace crpropa;
 

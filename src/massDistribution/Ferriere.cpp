@@ -1,5 +1,6 @@
 #include "crpropa/massDistribution/Ferriere.h"
 #include "crpropa/Common.h"
+#include "crpropa/Units.h"
 
 #include "kiss/logger.h"
 

@@ -1,6 +1,7 @@
 #include "crpropa/magneticField/turbulentField/HelicalGridTurbulence.h"
 #include "crpropa/GridTools.h"
 #include "crpropa/Random.h"
+#include "crpropa/Units.h"
 
 #ifdef CRPROPA_HAVE_FFTW3F
 #include "fftw3.h"

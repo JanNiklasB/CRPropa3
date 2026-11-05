@@ -1,4 +1,5 @@
 #include "crpropa/magneticField/KST24Field.h"
+#include "crpropa/Units.h"
 
 /* 
 The C++ implementation of the GMF model KST24 (A.Korochkin, D.Semikoz, P.Tinyakov 2024)

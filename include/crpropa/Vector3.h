@@ -11,7 +11,6 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #endif // CRPROPA_HAVE_PYTHON
-#include <unistd.h>
 
 
 namespace crpropa {

@@ -1,7 +1,6 @@
 #ifndef _KST24_GMF_H_
 #define _KST24_GMF_H_
 
-#include <vector>
 #include "crpropa/magneticField/MagneticField.h"
 
 namespace crpropa {

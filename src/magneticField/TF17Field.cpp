@@ -1,7 +1,6 @@
 #include "crpropa/magneticField/TF17Field.h"
 #include "crpropa/Units.h"
 
-#include <algorithm>
 #include <string>
 
 namespace crpropa {

@@ -1,4 +1,7 @@
 #include "crpropa/module/DiffusionSDE.h"
+#include "crpropa/Random.h"
+#include "crpropa/Units.h"
+#include "crpropa/Logging.h"
 
 
 using namespace crpropa;

@@ -6,7 +6,6 @@
 #include "crpropa/magneticField/turbulentField/GridTurbulence.h"
 
 #include "kiss/logger.h"
-#include "kiss/string.h"
 
 namespace crpropa {
 /**

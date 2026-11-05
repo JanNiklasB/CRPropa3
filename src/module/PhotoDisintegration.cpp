@@ -2,7 +2,6 @@
 #include "crpropa/Common.h"
 #include "crpropa/Units.h"
 #include "crpropa/ParticleID.h"
-#include "crpropa/ParticleMass.h"
 #include "crpropa/Random.h"
 #include "kiss/logger.h"
 

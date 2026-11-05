@@ -1,4 +1,5 @@
 #include "crpropa/module/PropagationBP.h"
+#include "crpropa/Logging.h"
 
 #include <sstream>
 #include <stdexcept>

@@ -1,17 +1,7 @@
 #ifndef CRPROPA_CANDIDATEPLITTING_H
 #define CRPROPA_CANDIDATEPLITTING_H
 
-#include <string>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <sstream>
-
-#include "crpropa/Vector3.h"
 #include "crpropa/Module.h"
-#include "crpropa/Units.h"
-#include "kiss/logger.h"
-
 
 namespace crpropa {
 /** @addtogroup Acceleration

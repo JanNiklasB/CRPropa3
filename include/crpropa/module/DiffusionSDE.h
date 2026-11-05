@@ -1,20 +1,10 @@
 #ifndef CRPROPA_DIFFUSIONSDE_H
 #define CRPROPA_DIFFUSIONSDE_H
 
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <string>
-#include <cstdlib>
-#include <stdexcept>
-
 #include "crpropa/Module.h"
 #include "crpropa/magneticField/MagneticField.h"
 #include "crpropa/advectionField/AdvectionField.h"
 #include "crpropa/Units.h"
-#include "crpropa/Random.h"
-
-#include "kiss/logger.h"
 
 namespace crpropa {
 /**

@@ -2,17 +2,7 @@
 #define CRPROPA_ARCHIMEDEANSPIRALFIELD_H
 
 #include "crpropa/magneticField/MagneticField.h"
-
-
-#include <string>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <sstream>
-
 #include "crpropa/Vector3.h"
-#include "crpropa/Referenced.h"
-#include "crpropa/Units.h"
 
 namespace crpropa {
 

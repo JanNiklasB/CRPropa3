@@ -6,6 +6,8 @@
 
 #include "crpropa/Variant.h"
 
+#include <cstring>
+
 
 namespace crpropa {
 

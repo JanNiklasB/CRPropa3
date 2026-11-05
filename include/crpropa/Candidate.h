@@ -6,7 +6,6 @@
 #include "crpropa/Variant.h"
 
 #include <vector>
-#include <map>
 #include <sstream>
 #include <stdint.h>
 #include <unordered_map>

@@ -6,7 +6,6 @@
 
 #include "HepPID/ParticleIDMethods.hh"
 
-#include <cstdlib>
 #include <sstream>
 
 namespace crpropa {

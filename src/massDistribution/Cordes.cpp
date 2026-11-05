@@ -1,5 +1,6 @@
 #include "crpropa/massDistribution/Cordes.h"
 #include "crpropa/Common.h"
+#include "crpropa/Units.h"
 
 #include <sstream>
 

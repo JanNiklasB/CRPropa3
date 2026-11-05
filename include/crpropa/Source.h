@@ -5,7 +5,7 @@
 #include "crpropa/Grid.h"
 #include "crpropa/EmissionMap.h"
 #include "crpropa/massDistribution/Density.h"
-
+#include "crpropa/Units.h"
 
 #include <vector>
 

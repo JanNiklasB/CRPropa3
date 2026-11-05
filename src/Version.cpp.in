@@ -1,7 +1,6 @@
 #include "crpropa/Version.h"
 #include "kiss/logger.h"
 
-#include <cstring>
 #include <sstream>
 #include <vector>
 #include <iostream>

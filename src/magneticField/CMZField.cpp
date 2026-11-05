@@ -1,5 +1,6 @@
 #include "crpropa/magneticField/CMZField.h"
 #include "crpropa/Units.h"
+#include "crpropa/Common.h"
 
 namespace crpropa {
 

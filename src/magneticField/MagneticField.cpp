@@ -1,4 +1,5 @@
 #include "crpropa/magneticField/MagneticField.h"
+#include "crpropa/Units.h"
 
 namespace crpropa {
 

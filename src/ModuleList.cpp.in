@@ -1,5 +1,6 @@
 #include "crpropa/ModuleList.h"
 #include "crpropa/ProgressBar.h"
+#include "crpropa/Units.h"
 
 #ifndef sighandler_t
 typedef void (*sighandler_t)(int);

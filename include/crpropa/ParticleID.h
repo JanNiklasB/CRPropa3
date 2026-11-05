@@ -1,8 +1,6 @@
 #ifndef CRPROPA_PARTICLE_ID_H
 #define CRPROPA_PARTICLE_ID_H
 
-#include <cstddef>
-#include <vector>
 #include <string>
 
 namespace crpropa {

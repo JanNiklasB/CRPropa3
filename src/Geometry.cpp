@@ -1,7 +1,9 @@
+#include "crpropa/Geometry.h"
+
+#include "kiss/logger.h"
+
 #include <limits>
 #include <cmath>
-#include "kiss/logger.h"
-#include "crpropa/Geometry.h"
 
 namespace crpropa {
 

@@ -2,7 +2,6 @@
 #define BASE64_H
 
 #include <string>
-#include <cstring>
 #include <stdexcept>
 
 namespace crpropa

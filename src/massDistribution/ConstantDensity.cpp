@@ -1,4 +1,5 @@
 #include "crpropa/massDistribution/ConstantDensity.h"
+#include "crpropa/Units.h"
 
 #include "kiss/logger.h"
 

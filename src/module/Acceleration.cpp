@@ -1,6 +1,7 @@
 #include "crpropa/module/Acceleration.h"
-#include <crpropa/Common.h>
-#include <crpropa/Random.h>
+#include "crpropa/Common.h"
+#include "crpropa/Random.h"
+
 #include <cmath>
 
 namespace crpropa {

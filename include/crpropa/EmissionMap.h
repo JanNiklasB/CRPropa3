@@ -4,6 +4,8 @@
 #include "Referenced.h"
 #include "Candidate.h"
 
+#include <map>
+
 namespace crpropa {
 
 /**

@@ -2,15 +2,8 @@
 #define CRPROPA_ADVECTIONFIELD_H
 
 
-#include <string>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-#include <sstream>
-
 #include "crpropa/Vector3.h"
 #include "crpropa/Referenced.h"
-#include "crpropa/Units.h"
 
 namespace crpropa {
 

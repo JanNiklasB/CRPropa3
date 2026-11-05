@@ -1,5 +1,7 @@
 #include "crpropa/advectionField/AdvectionField.h"
+#include "crpropa/Units.h"
 
+#include <sstream>
 
 namespace crpropa {
 

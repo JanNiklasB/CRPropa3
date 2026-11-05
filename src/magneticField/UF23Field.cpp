@@ -1,6 +1,6 @@
 #include "crpropa/magneticField/UF23Field.h"
+#include "crpropa/Units.h"
 
-#include <exception>
 #include <limits>
 #include <string>
 #include <cmath>
