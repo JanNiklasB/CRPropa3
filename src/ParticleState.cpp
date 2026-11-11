@@ -55,6 +55,14 @@ void ParticleState::setId(int newId) {
 	}
 }
 
+void ParticleState::setMass(double Mass) {
+	pmass = Mass;
+}
+
+void ParticleState::setCharge(int ChargeNumber) {
+	charge = ChargeNumber * eplus;
+}
+
 double ParticleState::getLorentzFactor() const {
 	if (pmass==0)
 		return INFINITY;

@@ -99,10 +99,18 @@ public:
 
 	// ======== Helper methods ========
 
+	/** Sets the charge manually, use with caution!
+	 @param ChargeNumber the charge number, set negative for negative charges 
+	 */
+	void setCharge(int ChargeNumber);
 	/** Get electrical charge of the particle.
 	 @returns Charge of the particle [in Coulombs]
 	 */
 	inline double getCharge() const { return charge; }
+	/** Sets the particle mass manually, use with caution!
+	 @param Mass particle mass
+	 */
+	void setMass(double Mass);
 	/** Get mass of the particle.
 	 @returns Mass of the particle [kg]
 	 */
